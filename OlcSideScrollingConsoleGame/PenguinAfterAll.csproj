@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Audio.Library">
+      <HintPath>..\Audio.Library.dll</HintPath>
+    </Reference>
     <Reference Include="Gamepad.Library">
       <HintPath>..\Gamepad.Library.dll</HintPath>
     </Reference>
@@ -76,6 +79,7 @@
   <ItemGroup>
     <Folder Include="Log\" />
     <Folder Include="Resources\Assets\MapData\" />
+    <Folder Include="Resources\Assets\Sound\" />
     <Folder Include="Resources\Assets\Sprites\" />
     <Folder Include="Resources\Settings\" />
   </ItemGroup>

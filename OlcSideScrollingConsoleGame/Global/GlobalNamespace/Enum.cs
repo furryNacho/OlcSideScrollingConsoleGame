@@ -42,6 +42,13 @@ namespace OlcSideScrollingConsoleGame
             Left = 1
         }
 
+        public enum Actions
+        {
+            None = 0,
+            Right = 1,
+            Left = 2
+        }
+
         public enum NATURE
         {
             TALK,

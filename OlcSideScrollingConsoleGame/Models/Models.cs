@@ -36,6 +36,8 @@ namespace OlcSideScrollingConsoleGame.Models
 
         public int SpawnAtWorldMap { get; set; } = 1;
 
+      //  public int StageLastEnter { get; set; }
+
         public int HeroEnergi { get; set; }
         public string PassedTime { get; set; }
 
@@ -56,6 +58,13 @@ namespace OlcSideScrollingConsoleGame.Models
         public string Time { get; set; }
     }
 
+    public class HighScoreEnterName
+    {
+        internal string letter;
+
+        public string MyProperty { get; set; }
+    }
+
     public class SavedGameObj
     {
         public int Id { get; set; }
@@ -63,6 +72,27 @@ namespace OlcSideScrollingConsoleGame.Models
         // TODO: Energi
         // TODO: Tid. Bygga en egen klocka för att kunna sätta tid
     }
+
+    public class KonamiObj
+    {
+        public void nope()
+        {
+            up = upUp = down = downDown = left = right = leftLeft = rightRight = AB = false;
+        }
+
+        public bool up { get; set; }
+        public bool upUp { get; set; }
+        public bool down { get; set; }
+        public bool downDown { get; set; }
+        public bool left { get; set; }
+        public bool right { get; set; }
+        public bool leftLeft { get; set; }
+        public bool rightRight { get; set; }
+        public bool AB { get; set; }
+
+    }
+
+
 
 
     public class EnergiRainObject

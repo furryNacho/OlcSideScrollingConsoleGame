@@ -73,6 +73,8 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
         public Enum.PlayerOrientation TurnedTo { get; set; }
 
+        public Enum.Actions Patrol { get; set; }
+
         public bool Controllable { get; set; } = true;
         protected float KnockBackTimer = 0.0f;
         protected float KnockBackDX = 0.0f;

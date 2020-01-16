@@ -45,18 +45,40 @@ namespace OlcSideScrollingConsoleGame
         private List<Quest> ListQuests { get; set; } = new List<Quest>();
         private List<Item> ListItems { get; set; } = new List<Item>();
         private EnergiRainObject EnergiRainObj { get; set; } = new EnergiRainObject();
+        /// <summary>
+        /// 0 = Hjälten på väg ner. Mellan 1 till 3 så länge har hjälten varit i luften.
+        /// </summary>
+        private int HeroAirBornState { get; set; }
+        /// <summary>
+        /// 0 = Hjälten är inte på marken. Mellan 1 till 3 så länge har hjälten varit på marken. 
+        /// </summary>
+        private int HeroLandedState { get; set; }
+        /// <summary>
+        /// 0 = Spelare har släppt hoppknapp. Mellan 1 till 3 så länge har spelaren hållt nere hoppknappen
+        /// </summary>
+        private int JumpButtonState { get; set; }
+        private bool JumpButtonPressRelease { get; set; }
+        private bool JumpButtonDownRelease { get; set; }
+        private int JumpButtonCounter { get; set; }
 
         const int ScreenW = 256;
-        const int ScreenH = 240;
+        //const int ScreenH = 240;
+        //const int ScreenW = 256;
+        //const int ScreenH = 192;
+        const int ScreenH = 224;
         const int PixW = 4;
         const int PixH = 4;
         const int FrameR = -1;
+
+        private TimeSpan ActualTotalTime { get; set; }
+        private TimeSpan GameTotalTime { get; set; }
+
+        private KonamiObj Konami { get; set; } = new KonamiObj();
+
         static void Main(string[] args)
         {
             try
             {
-
-
                 Program prg = new Program();
                 prg.PixelMode = Pixel.Mode.Alpha;
 
@@ -71,6 +93,8 @@ namespace OlcSideScrollingConsoleGame
 
         public override void OnCreate()
         {
+            //TODO: ljud.. Ingenting fungerar som det ska med den här skiten
+            //this.Enable(Game.Subsystem.Audio);
             /*
             this.Enable(Game.Subsystem.Audio);
             Resx.Load((Game)this);
@@ -88,6 +112,9 @@ namespace OlcSideScrollingConsoleGame
 
 
             Core.Aggregate.Instance.Load(this);
+
+            // Om jag skulle vilja lägga till sparad tid
+            ActualTotalTime = new TimeSpan(0, 0, 7, 0, 0);
 
             Hero = new DynamicCreatureHero();
             //ChangeMap("mapone", 5, 5, Hero);
@@ -123,14 +150,15 @@ namespace OlcSideScrollingConsoleGame
                     this.DisplayPause(elapsed);
                     break;
                 case Enum.State.Settings:
+
                     throw new NotImplementedException();
+
                     break;
                 case Enum.State.GameOver:
                     this.DisplayGameOver(elapsed);
                     break;
                 case Enum.State.HighScore:
-                    throw new NotImplementedException();
-                    //this.DisplayHighScore(elapsed);
+                    this.DisplayHighScore(elapsed);
                     break;
                 case Enum.State.End:
                     this.DisplayEnd(elapsed);
@@ -138,9 +166,243 @@ namespace OlcSideScrollingConsoleGame
             }
         }
 
+
+        int HSSelectX = 0;
+        int HSSelectY = 1;
+        int Select = 1;
+        List<int> NameInAscii = new List<int>() { 65, 65, 65 };
+        List<HighScoreObj> justForNowHighScoreList = new List<HighScoreObj>();
+        private void DisplayHighScore(float elapsed)
+        {
+            Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
+            this.Clear((Pixel)Pixel.Presets.Black);
+
+            SlimDx.timer_Tick();
+            IIP = SlimDx.IIP;
+
+            List<HighScoreEnterName> qwer = new List<HighScoreEnterName>();
+
+
+            #region temp fuckery
+            HighScoreEnterName HSEN1 = new HighScoreEnterName()
+            {
+                MyProperty = "pilupp"
+            };
+            qwer.Add(HSEN1);
+            HighScoreEnterName HSEN2 = new HighScoreEnterName()
+            {
+                MyProperty = "pilupp"
+            };
+            qwer.Add(HSEN2);
+            HighScoreEnterName HSEN3 = new HighScoreEnterName()
+            {
+                MyProperty = "pilupp"
+            };
+            qwer.Add(HSEN3);
+            HighScoreEnterName HSEN4 = new HighScoreEnterName()
+            {
+                MyProperty = "inget"
+            };
+            qwer.Add(HSEN4);
+            HighScoreEnterName HSEN5 = new HighScoreEnterName()
+            {
+                MyProperty = "bokstav",
+                letter = "A"
+            };
+            qwer.Add(HSEN5);
+            HighScoreEnterName HSEN6 = new HighScoreEnterName()
+            {
+                MyProperty = "bokstav",
+                letter = "A"
+            };
+            qwer.Add(HSEN6);
+            HighScoreEnterName HSEN7 = new HighScoreEnterName()
+            {
+                MyProperty = "bokstav",
+                letter = "A"
+            };
+            qwer.Add(HSEN7);
+            HighScoreEnterName HSEN8 = new HighScoreEnterName()
+            {
+                MyProperty = "ok"
+            };
+            qwer.Add(HSEN8);
+            HighScoreEnterName HSEN9 = new HighScoreEnterName()
+            {
+                MyProperty = "pilner"
+            };
+            qwer.Add(HSEN9);
+            HighScoreEnterName HSEN10 = new HighScoreEnterName()
+            {
+                MyProperty = "pilner"
+            };
+            qwer.Add(HSEN10);
+            HighScoreEnterName HSEN11 = new HighScoreEnterName()
+            {
+                MyProperty = "pilner"
+            };
+            qwer.Add(HSEN11);
+            HighScoreEnterName HSEN12 = new HighScoreEnterName()
+            {
+                MyProperty = "inget"
+            };
+            qwer.Add(HSEN12);
+
+            #endregion
+
+            //Draw
+            int i = 0;
+            foreach (var item in qwer)
+            {
+                int x = i % 4;
+                int y = i / 4;
+                i++;
+
+
+
+                // Ska det vara Grå eller vit, upp eller ner, grå eller vit ok. Är det en bokstav, isf vilken bokstav? 
+
+                var fPoint = new Point(8 + x * 20, 20 + y * 20);
+                var sPoint = new Point(0, 0);
+
+                if (item.MyProperty == "pilupp")
+                {
+                    //sPoint = new Point(32, 48);
+                    sPoint = new Point(32, 48);
+
+                    DrawPartialSprite(fPoint, SpriteItems, sPoint, 9, 4);
+                }
+                else if (item.MyProperty == "inget")
+                {
+                    sPoint = new Point(16, 48);
+                    DrawPartialSprite(fPoint, SpriteItems, sPoint, 9, 4);
+                }
+                else if (item.MyProperty == "ok")
+                {
+                    sPoint = new Point(48, 48);
+                    DrawPartialSprite(fPoint, SpriteItems, sPoint, 16, 8);
+                }
+                else if (item.MyProperty == "pilner")
+                {
+                    sPoint = new Point(32, 56);
+                    DrawPartialSprite(fPoint, SpriteItems, sPoint, 9, 4);
+                }
+                else if (item.MyProperty == "bokstav")
+                {
+                    //DrawBigText(item.letter, fPoint.X, fPoint.Y);
+                    var asciiChar = ((char)NameInAscii[x]).ToString();
+                    DrawBigText(asciiChar, fPoint.X, fPoint.Y);
+                }
+                else
+                {
+                    DrawPartialSprite(fPoint, SpriteItems, sPoint, 16, 16);
+                }
+
+                //if (HSSelectX == x && HSSelectY == y)
+                if (HSSelectX == x)
+                {
+                    Select = x;
+                    //highlighted = item;
+                }
+            }
+
+            #region Draw Selected
+            // Draw selection reticule
+            var pointParamOne = new Point(6 + (HSSelectX) * 20, 18 + (HSSelectY) * 20);
+            var pointParamTwo = new Point(6 + (HSSelectX + 1) * 20, 18 + (HSSelectY) * 20);
+            var color = Pixel.FromRgb((uint)Pixel.Presets.White);
+            DrawLine(pointParamOne, pointParamTwo, color);
+            pointParamOne = new Point(6 + (HSSelectX) * 20, 18 + (HSSelectY + 1) * 20);
+            pointParamTwo = new Point(6 + (HSSelectX + 1) * 20, 18 + (HSSelectY + 1) * 20);
+            DrawLine(pointParamOne, pointParamTwo, color);
+            pointParamOne = new Point(6 + (HSSelectX) * 20, 18 + (HSSelectY) * 20);
+            pointParamTwo = new Point(6 + (HSSelectX) * 20, 18 + (HSSelectY + 1) * 20);
+            DrawLine(pointParamOne, pointParamTwo, color);
+            pointParamOne = new Point(6 + (HSSelectX + 1) * 20, 18 + (HSSelectY) * 20);
+            pointParamTwo = new Point(6 + (HSSelectX + 1) * 20, 18 + (HSSelectY + 1) * 20);
+            DrawLine(pointParamOne, pointParamTwo, color);
+
+            if (GetKey(Key.Left).Released) HSSelectX--;
+            if (GetKey(Key.Right).Released) HSSelectX++;
+
+            if (GetKey(Key.Up).Released)
+            {
+                if (Select < 3)
+                {
+                    var newVal = NameInAscii[Select] + 1;
+                    if (newVal > 126)
+                        newVal = 32;
+                    NameInAscii[Select] = newVal;
+                }
+            }
+            if (GetKey(Key.Down).Released)
+            {
+                if (Select < 3)
+                {
+                    var newVal = NameInAscii[Select] - 1;
+                    if (newVal < 32)
+                        newVal = 126;
+                    NameInAscii[Select] = newVal;
+                }
+            }
+
+            if (HSSelectX < 0) HSSelectX = 3;
+            if (HSSelectX >= 4) HSSelectX = 0;
+            if (HSSelectY < 0) HSSelectY = 3;
+            if (HSSelectY >= 4) HSSelectY = 0;
+            #endregion
+
+            //Input
+            if (Focus)
+            {
+
+                //Button spam lock  
+                if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
+                {
+                    ButtonsHasGoneIdle = true;
+                }
+
+                //if (ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !IIP.idle))
+                if (ButtonsHasGoneIdle && (GetKey(Key.Escape).Pressed || IIP.Button7))
+                {
+                    Core.Aggregate.Instance.Settings.ShowEnd = false;
+                    ButtonsHasGoneIdle = false;
+                    this.Machine.Switch(Enum.State.Menu);
+                    // return;
+                }
+
+                // OK
+                if (ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || IIP.Button0))
+                {
+                    if (Select == 3) //nollindex, select är på sista valet
+                    {
+                        var highScoreName = "";
+                        foreach (var asciiLetter in NameInAscii)
+                        {
+                            var asciiChar = ((char)asciiLetter).ToString();
+                            highScoreName += asciiChar;
+                        }
+
+                        //TODO: lägg till i highscorelistan
+
+                        justForNowHighScoreList.Add(new HighScoreObj { Handle = highScoreName });
+
+                        DrawBigText(highScoreName, 10, 180);
+                    }
+                }
+
+            }
+
+            DrawBigText("High Score", 4, 4);
+            //DrawBigText("You are super player", 4, 20);
+            //DrawBigText("Thank you for playing game", 4, 36);
+            DrawBigText("Press any button", 8, 160);
+        }
+
+
         private void DisplayEnd(float elapsed)
         {
-            Core.Aggregate.Instance.Script.ProcessCommands(elapsed); 
+            Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
             this.Clear((Pixel)Pixel.Presets.Black);
 
             SlimDx.timer_Tick();
@@ -161,7 +423,7 @@ namespace OlcSideScrollingConsoleGame
                     Core.Aggregate.Instance.Settings.ShowEnd = false;
                     ButtonsHasGoneIdle = false;
                     this.Machine.Switch(Enum.State.WorldMap);
-                   // return;
+                    // return;
                 }
             }
 
@@ -197,6 +459,8 @@ namespace OlcSideScrollingConsoleGame
 
         private void DisplayMenu(float elapsed)
         {
+            Core.Aggregate.Instance.Sound.pause();
+
             this.Clear((Pixel)Pixel.Presets.Black);
             DrawBigText("Menu", 4, 4);
 
@@ -206,7 +470,7 @@ namespace OlcSideScrollingConsoleGame
 
             var menuList = new List<string>();
 
-            //Pause menu or start menu
+            //Pause on world map or start menu
             if (!Core.Aggregate.Instance.GetSettings().GameHasStarted)
             {
                 menuList = new List<string>()
@@ -271,15 +535,15 @@ namespace OlcSideScrollingConsoleGame
                     ButtonsHasGoneIdle = false;
                 }
 
-                // Select
-                if (ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || IIP.Button6))
+                // Start
+                if (ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || IIP.Button7))
                 {
                     ButtonsHasGoneIdle = false;
 
                     string selectedMenuItemString = menuList[selectedMenuItem - 1];
                     switch (selectedMenuItemString)
                     {
-                       
+
                         case "Start New Game":
                             selectedMenuItem = 1;
 
@@ -297,20 +561,29 @@ namespace OlcSideScrollingConsoleGame
                             break;
                         case "Save":
                             selectedMenuItem = 1;
-                            // TODO code block
                             DrawBigText(menuList[selectedMenuItem - 1], 45, 4);
                             break;
                         case "Load Saved Game":
                             selectedMenuItem = 1;
-                            // TODO code block
                             DrawBigText(menuList[selectedMenuItem - 1], 45, 4);
                             break;
                         case "Exit":
+
+                            //Exit - clean up sound
+                            if (Core.Aggregate.Instance.Sound != null)
+                            {
+                                bool closeAudioLib = Core.Aggregate.Instance.Sound.cleanUp();
+                            }
+
+                            //Exit - leav gameloop
                             Core.Aggregate.Instance.ThisGame.Finish();
+
+
                             break;
                         case "View High Score":
-                            // TODO code block
+                            ButtonsHasGoneIdle = false;
                             DrawBigText(menuList[selectedMenuItem - 1], 45, 4);
+                            this.Machine.Switch(Enum.State.HighScore);
                             break;
                         default:
                             Core.Aggregate.Instance.ReadWrite.WriteToLog("DisplayMenu - Select value : " + selectedMenuItem + ". Default switch");
@@ -318,17 +591,6 @@ namespace OlcSideScrollingConsoleGame
                     }
                 }
 
-                // Tillbaka till worldmap
-                //if (!MenuStartHasBeenReleased && !IIP.Button7)
-                //{
-                //    MenuStartHasBeenReleased = true;
-                //}
-                //if (ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || IIP.Button7))
-                //{
-                //    this.Machine.Switch(Enum.State.WorldMap);
-                //    //WorldmapStartHasBeenReleased = false;
-                //    ButtonsHasGoneIdle = false;
-                //}
             }
 
         }
@@ -346,7 +608,20 @@ namespace OlcSideScrollingConsoleGame
         //public bool WorldmapStartHasBeenReleased { get; set; }
         private void DisplayWorldMap(float elapsed)
         {
-            Core.Aggregate.Instance.Script.ProcessCommands(elapsed); 
+            if (Core.Aggregate.Instance.Sound != null)
+            {
+                if (Core.Aggregate.Instance.Sound.isPlaying("puttekong.wav"))
+                {
+                    Core.Aggregate.Instance.Sound.stop("puttekong.wav");
+                }
+
+                if (!Core.Aggregate.Instance.Sound.isPlaying("uno.wav"))
+                {
+                    Core.Aggregate.Instance.Sound.play("uno.wav");
+                }
+            }
+
+            Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
 
             //TODO hantera om slut
             if (Core.Aggregate.Instance.Settings.ShowEnd)
@@ -382,6 +657,11 @@ namespace OlcSideScrollingConsoleGame
             {
                 corrWorldMapPosX = 9;
                 corrWorldMapPosY = 3;
+            }
+            else if (Core.Aggregate.Instance.Settings.SpawnAtWorldMap == 4)
+            {
+                corrWorldMapPosX = 11;
+                corrWorldMapPosY = 5;
             }
 
             if (CurrentMap.Name != "worldmap")
@@ -433,10 +713,10 @@ namespace OlcSideScrollingConsoleGame
                 // A ("jump button")
                 if (ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || IIP.Button0))
                 {
-                    // TODO : hantera vilen värld man ska till
+                    // TODO : hantera vilken värld man ska till
                     if (Core.Aggregate.Instance.Settings.SpawnAtWorldMap == 1)
                     {
-                       
+
                         hasAccumulatedAllSpeed = false;
                         ChangeMap("mapone", 2, 3, Hero);
 
@@ -448,7 +728,7 @@ namespace OlcSideScrollingConsoleGame
                     }
                     else if (Core.Aggregate.Instance.Settings.SpawnAtWorldMap == 2)
                     {
-                      
+
                         hasAccumulatedAllSpeed = false;
                         ChangeMap("maptwo", 2, 3, Hero);
 
@@ -463,6 +743,18 @@ namespace OlcSideScrollingConsoleGame
 
                         hasAccumulatedAllSpeed = false;
                         ChangeMap("mapthree", 2, 3, Hero);
+
+                        this.Machine.Switch(Enum.State.GameMap);
+
+                        ButtonsHasGoneIdle = false;
+
+                        return;
+                    }
+                    else if (Core.Aggregate.Instance.Settings.SpawnAtWorldMap == 4)
+                    {
+
+                        hasAccumulatedAllSpeed = false;
+                        ChangeMap("mapfour", 2, 3, Hero);
 
                         this.Machine.Switch(Enum.State.GameMap);
 
@@ -547,14 +839,18 @@ namespace OlcSideScrollingConsoleGame
                     }
                     else if (!no4 && (myObject.px >= 11 && myObject.px <= 11.1f && myObject.py < 3.01))
                     {
-                        myObject.vx = 0;
+                        // förbjud att gå ner
+                        if (myObject.vy > 0 || Core.Aggregate.Instance.Settings.StageCompleted != 3)
+                        {
+                            myObject.vy = 0;
+                        }
                         no1 = false;
                         no2 = false;
                         no3 = false;
                         no4 = true;
                         no5 = false;
                         no6 = false;
-                        Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 0;
+                        Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 4;
 
                     }
                     else if (!no5 && (myObject.px >= 11 && myObject.py >= 5f && myObject.py <= 5.1f))
@@ -567,7 +863,7 @@ namespace OlcSideScrollingConsoleGame
                         no4 = false;
                         no5 = true;
                         no6 = false;
-                        Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 0;
+                        Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 4;
                     }
                     else if (!no6 && (myObject.px >= 11 && myObject.py >= 7f && myObject.py <= 7.01f))
                     {
@@ -609,16 +905,8 @@ namespace OlcSideScrollingConsoleGame
 
                     if (CurrentMap.GetSolid((int)(NewObjectPosX + (1.0f - fBorder)), (int)(myObject.py + fBorder + 0.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + (1.0f - fBorder)), (int)(myObject.py + (1.0f - fBorder))))
                     {
-                        if (myObject.IsHero)
-                        {
-                            NewObjectPosX = (int)NewObjectPosX;
-                            myObject.vx = 0;
-                        }
-                        else
-                        {
-                            NewObjectPosX = (int)NewObjectPosX;
-                            myObject.vx = 0;
-                        }
+                        NewObjectPosX = (int)NewObjectPosX;
+                        myObject.vx = 0;
                     }
 
                 }
@@ -884,10 +1172,34 @@ namespace OlcSideScrollingConsoleGame
         }
 
         //public bool PauseStartHasBeenReleased { get; set; }
+        //bool experiment = true;
         private void DisplayPause(float elapsed)
         {
+            if (Core.Aggregate.Instance.Sound != null)
+            {
+                if (Core.Aggregate.Instance.Sound.isPlaying("uno.wav"))
+                {
+                    Core.Aggregate.Instance.Sound.pause("uno.wav");
+                }
+
+                if (Core.Aggregate.Instance.Sound.isPlaying("puttekong.wav"))
+                {
+                    Core.Aggregate.Instance.Sound.pause("puttekong.wav");
+                }
+            }
+
+            //Exempel på att nolla klockan 
+            //if (experiment)
+            //{
+            //    experiment = false;
+            //    ActualTotalTime = new TimeSpan();
+            //    Clock.HardReset();
+            //}
+
             SlimDx.timer_Tick();
             IIP = SlimDx.IIP;
+
+            DrawHUD("pause");
 
             //Input
             if (Focus)
@@ -902,26 +1214,159 @@ namespace OlcSideScrollingConsoleGame
                 if (GetKey(Key.S).Pressed || IIP.Button6)
                 {
                     // TODO: only if stage is done
+                    //if (Core.Aggregate.Instance.Settings.StageCompleted >= Core.Aggregate.Instance.Settings.SpawnAtWorldMap)
+                    //{
                     ButtonsHasGoneIdle = false;
                     this.Machine.Switch(Enum.State.WorldMap);
+                    //}
                 }
 
+                // Press start
                 if (ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || IIP.Button7))
                 {
                     // GameStartHasBeenReleased = false;
                     ButtonsHasGoneIdle = false;
                     this.Machine.Switch(Enum.State.GameMap);
                 }
-            }
 
-            DrawBigText("Pause", 25, 25);
-            DrawHUD();
+                #region Konami
+                if (ButtonsHasGoneIdle && !IIP.idle)
+                {
+                    if (IIP.up || Konami.up)
+                    {
+                        if (!Konami.up)
+                        {
+                            Konami.up = true;
+                            ButtonsHasGoneIdle = false;
+                            return;
+                        }
+                        if (IIP.up || Konami.upUp)
+                        {
+                            if (!Konami.upUp)
+                            {
+                                Konami.upUp = true;
+                                ButtonsHasGoneIdle = false;
+                                return;
+                            }
+                            if (IIP.down || Konami.down)
+                            {
+                                if (!Konami.down)
+                                {
+                                    Konami.down = true;
+                                    ButtonsHasGoneIdle = false;
+                                    return;
+                                }
+                                if (IIP.down || Konami.downDown)
+                                {
+                                    if (!Konami.downDown)
+                                    {
+                                        Konami.downDown = true;
+                                        ButtonsHasGoneIdle = false;
+                                        return;
+                                    }
+                                    if (IIP.left || Konami.left)
+                                    {
+                                        if (!Konami.left)
+                                        {
+                                            Konami.left = true;
+                                            ButtonsHasGoneIdle = false;
+                                            return;
+                                        }
+                                        if (IIP.right || Konami.right)
+                                        {
+                                            if (!Konami.right)
+                                            {
+                                                Konami.right = true;
+                                                ButtonsHasGoneIdle = false;
+                                                return;
+                                            }
+                                            if (IIP.left || Konami.leftLeft)
+                                            {
+                                                if (!Konami.leftLeft)
+                                                {
+                                                    Konami.leftLeft = true;
+                                                    ButtonsHasGoneIdle = false;
+                                                    return;
+                                                }
+                                                if (IIP.right || Konami.rightRight)
+                                                {
+                                                    if (!Konami.rightRight)
+                                                    {
+                                                        Konami.rightRight = true;
+                                                        ButtonsHasGoneIdle = false;
+                                                        return;
+                                                    }
+                                                    if ((IIP.Button0 && IIP.Button1) || Konami.AB)
+                                                    {
+                                                        if (!Konami.AB)
+                                                        {
+                                                            Konami.AB = true;
+                                                            ButtonsHasGoneIdle = false;
+
+                                                            this.Machine.Switch(Enum.State.WorldMap);
+
+                                                            ActualTotalTime += new TimeSpan(7, 0, 0);
+
+                                                            if (Core.Aggregate.Instance.Settings.StageCompleted < Core.Aggregate.Instance.Settings.SpawnAtWorldMap)
+                                                            {
+                                                                Core.Aggregate.Instance.Settings.StageCompleted = Core.Aggregate.Instance.Settings.SpawnAtWorldMap;
+                                                            }
+
+                                                            Konami.nope();
+                                                            return;
+                                                        }
+
+                                                    }
+                                                    else
+                                                        Konami.nope();
+                                                }
+                                                else
+                                                    Konami.nope();
+                                            }
+                                            else
+                                                Konami.nope();
+                                        }
+                                        else
+                                            Konami.nope();
+                                    }
+                                    else
+                                        Konami.nope();
+                                }
+                                else
+                                    Konami.nope();
+                            }
+                            else
+                                Konami.nope();
+                        }
+                        else
+                            Konami.nope();
+                    }
+                    else
+                        Konami.nope();
+                }
+                #endregion
+
+            }
         }
 
         #region DisplayGameMap
         // public bool GameStartHasBeenReleased { get; set; }
         private void DisplayStage(float elapsed)
         {
+
+            if (Core.Aggregate.Instance.Sound != null)
+            {
+                if (Core.Aggregate.Instance.Sound.isPlaying("uno.wav"))
+                {
+                    Core.Aggregate.Instance.Sound.stop("uno.wav");
+                }
+
+                if (!Core.Aggregate.Instance.Sound.isPlaying("puttekong.wav"))
+                {
+                    Core.Aggregate.Instance.Sound.play("puttekong.wav");
+                }
+            }
+
 
             Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
 
@@ -985,11 +1430,62 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 //Jump 
-                if (GetKey(Key.Space).Pressed || IIP.Button0)
+                if (GetKey(Key.Space).Down || IIP.Button0)
                 {
-                    if (Hero.vy == 0)
+                    if (JumpButtonState < 3)
+                        JumpButtonState++;
+
+                    #region ogrinalhopp
+                    //if (Hero.vy == 0)
+                    //{
+                    //    Core.Aggregate.Instance.Sound.play("Click.wav");
+                    //    Hero.vy = -9.3f;
+                    //}
+                    #endregion
+
+                    #region dutthopp
+                    //if (HeroAirBornState == 0 && HeroLandedState > 0 && JumpButtonState == 1) // HeroAirBornState
+                    //{
+                    //    Hero.vy -= 4.65f;
+                    //}
+                    //else if (HeroAirBornState == 3 && HeroLandedState == 0 && JumpButtonState > 1 && JumpButtonDownRelease)
+                    //{
+
+                    //    Hero.vy -= 4.65f;
+                    //    JumpButtonDownRelease = false;
+                    //}
+                    #endregion
+
+                    #region dubbelhopp
+
+                    if (HeroAirBornState == 0 && HeroLandedState > 0 && JumpButtonState == 1 && JumpButtonCounter == 0) // HeroAirBornState
                     {
-                        Hero.vy = -9.0f;
+                        Hero.vy -= 7.0f;
+                        // JumpButtonDownRelease = false; //#1 för att "flyga"
+                        JumpButtonCounter++;
+                        Core.Aggregate.Instance.Sound.play("Click.wav");
+                    }
+                    //else if (HeroAirBornState > 0 && HeroLandedState == 0 && JumpButtonState == 1 && !JumpButtonDownRelease) // dubbel så länge hjälte är på väg upp
+                    // else if (HeroLandedState == 0 && JumpButtonState == 1 && !JumpButtonDownRelease) // #2 för att "flyga"
+                    else if (HeroLandedState == 0 && JumpButtonState == 1 && JumpButtonCounter == 1)
+                    {
+                        Core.Aggregate.Instance.Sound.play("Click.wav");
+                        Hero.vy -= 5.0f; // Riktigt vajsing.. Ger olika höjd om man börjar testa på precis nivå
+                        JumpButtonCounter++; // för att inte kunna flyga 
+                    }
+                    #endregion
+
+
+                }
+                else if (!GetKey(Key.Space).Pressed || !IIP.Button0)
+                {
+                    JumpButtonState = 0;
+                    JumpButtonPressRelease = true;
+
+                    if (HeroLandedState != 0)
+                    {
+                        JumpButtonDownRelease = true;
+                        JumpButtonCounter = 0;
                     }
                 }
 
@@ -1044,6 +1540,7 @@ namespace OlcSideScrollingConsoleGame
             }
 
 
+
             foreach (var myObject in listDynamics)
             {
 
@@ -1087,28 +1584,70 @@ namespace OlcSideScrollingConsoleGame
 
                     if (myObject.vx <= 0) // Moving Left
                     {
-
+                        var turnPatrol = false;
                         if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.9f)))
                         {
-                            NewObjectPosX = (int)NewObjectPosX + 1;
+                            //NewObjectPosX = (int)NewObjectPosX + 1;
+                            NewObjectPosX = NewObjectPosX + 0.1f;
                             myObject.vx = 0;
+
+                            turnPatrol = true;
                         }
 
-                    }
-                    else // Moving Right
-                    {
-
-                        if (CurrentMap.GetSolid((int)(NewObjectPosX + (1.0f - fBorder)), (int)(myObject.py + fBorder + 0.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + (1.0f - fBorder)), (int)(myObject.py + (1.0f - fBorder))))
+                        if (myObject.Name == "walrus")
                         {
-                            if (myObject.IsHero)
+
+                            var x1 = (int)(NewObjectPosX + 0.0f);
+                            var y1 = (int)(myObject.py + 0.0f) + 1; // +1 ner ett 
+                            bool ena = CurrentMap.GetSolid(x1, y1);
+
+                            var x2 = (int)(NewObjectPosX + 0.0f);
+                            var y2 = (int)(myObject.py + 0.9f) + 1; // +1 ner ett 
+                            bool andra = CurrentMap.GetSolid(x2, y2);
+
+                            if (!ena || !andra || turnPatrol)
                             {
-                                NewObjectPosX = (int)NewObjectPosX;
-                                myObject.vx = 0;
+                                //NewObjectPosX = (int)NewObjectPosX + 1;
+                                NewObjectPosX = NewObjectPosX + 0.1f;
+                                myObject.vx = 2;
+                                myObject.Patrol = Enum.Actions.Right;
                             }
                             else
                             {
+                                myObject.Patrol = Enum.Actions.Left;
+                            }
+                        }
+                    }
+                    else // Moving Right
+                    {
+                        var turnPatrol = false;
+                        if (CurrentMap.GetSolid((int)(NewObjectPosX + (1.0f - fBorder)), (int)(myObject.py + fBorder + 0.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + (1.0f - fBorder)), (int)(myObject.py + (1.0f - fBorder))))
+                        {
+                            NewObjectPosX = (int)NewObjectPosX;
+                            myObject.vx = 0;
+
+                            turnPatrol = true;
+                        }
+
+                        if (myObject.Name == "walrus")
+                        {
+                            var x1 = (int)(NewObjectPosX + (1.0f - fBorder));
+                            var y1 = (int)(myObject.py + fBorder + 0.0f) + 1; // +1 ner ett 
+                            bool ena = CurrentMap.GetSolid(x1, y1);
+
+                            var x2 = (int)(NewObjectPosX + (1.0f - fBorder));
+                            var y2 = (int)(myObject.py + (1.0f - fBorder) + 1); // +1 ner ett 
+                            bool andra = CurrentMap.GetSolid(x2, y2);
+
+                            if (!ena || !andra || turnPatrol)
+                            {
                                 NewObjectPosX = (int)NewObjectPosX;
-                                myObject.vx = 0;
+                                myObject.vx = -2;
+                                myObject.Patrol = Enum.Actions.Left;
+                            }
+                            else
+                            {
+                                myObject.Patrol = Enum.Actions.Right;
                             }
                         }
 
@@ -1116,13 +1655,30 @@ namespace OlcSideScrollingConsoleGame
 
                     myObject.Grounded = false;
 
+
                     if (myObject.vy <= 0) // Moving Up
                     {
+
+                        //Hjälten airborn
+                        if (myObject.IsHero)
+                        {
+
+                            if (HeroAirBornState < 3)
+                            {
+                                HeroAirBornState++;
+                            }
+                        }
 
                         if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)NewObjectPosY) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.9f), (int)NewObjectPosY))
                         {
                             NewObjectPosY = (int)NewObjectPosY + 1;
                             myObject.vy = 0;
+                        }
+
+                        //Hjälten landat - reset 
+                        if (myObject.IsHero)
+                        {
+                            HeroLandedState = 0;
                         }
 
                     }
@@ -1134,8 +1690,32 @@ namespace OlcSideScrollingConsoleGame
                             NewObjectPosY = (int)NewObjectPosY;
                             myObject.vy = 0;
                             myObject.Grounded = true;
+
+
+                            //Hjälten landat
+                            if (myObject.IsHero)
+                            {
+
+                                if (HeroLandedState < 3)
+                                {
+                                    HeroLandedState++;
+                                }
+
+
+                                if (HeroLandedState <= 1)
+                                {
+                                    // Core.Aggregate.Instance.Sound.play("Click.wav");
+                                }
+                            }
+
+
                         }
 
+                        //Hjälten airborn - reset 
+                        if (myObject.IsHero)
+                        {
+                            HeroAirBornState = 0;
+                        }
 
                     }
 
@@ -1373,8 +1953,10 @@ namespace OlcSideScrollingConsoleGame
             // Draw health to screen
             //string Health ="HP: " + Hero.Health.ToString() + "/"+ Hero.MaxHealth;
             //DisplayDialog(new List<string>() { Health }, 160, 10);
-            string msg = "player - x: " + Hero.px + " y: " + Hero.py;
-            DisplayDialog(new List<string>() { msg }, 10, 10);
+            //string msg = "player - x: " + Hero.px + " y: " + Hero.py;
+            //DisplayDialog(new List<string>() { msg }, 10, 10);
+
+            DisplayDialog(new List<string>() { "Air: " + HeroAirBornState + " Land: " + HeroLandedState + " Jump: " + JumpButtonState }, 10, 10);
 
             DrawHUD();
         }
@@ -1563,7 +2145,7 @@ namespace OlcSideScrollingConsoleGame
         //}
         #endregion
 
-        void DrawHUD()
+        void DrawHUD(string mode = "")
         {
             // Background rec
             var point = new Point(2, 2);
@@ -1586,10 +2168,14 @@ namespace OlcSideScrollingConsoleGame
 
             // draw some text
             // Should have used ascii.. now this is what I get
-            var fullTime = Clock.Total.ToString();
+            //var fullTime = Clock.Total.ToString();
+
+            GameTotalTime = Clock.Total + ActualTotalTime;
+
             //int idx = fullTime.LastIndexOf('.');
             //string Text = Hero.Health.ToString() + "% "+ fullTime.Substring(0, idx+2);
-            string Text = Hero.Health.ToString() + "% " + fullTime;
+            //string Text = Hero.Health.ToString() + "% " + fullTime;
+            string Text = Hero.Health.ToString() + "% " + GameTotalTime.ToString();
             int i = 0;
             foreach (var c in Text)
             {
@@ -1614,12 +2200,13 @@ namespace OlcSideScrollingConsoleGame
             }
 
             // powerbar meter
-            Pixel color = (Pixel)Pixel.Presets.DarkGreen;
+            //Pixel color = (Pixel)Pixel.Presets.DarkGreen;
+            Pixel color = (Pixel)Pixel.Presets.Black;
 
             int EnergiOmeter = 14; // 14 är full. Max liv är 99. 
             //int RoundEnergiOmeter = 99 / Hero.Health;
             int RoundEnergiOmeter = Hero.Health;
-
+            #region en uppsjö med om
             if (RoundEnergiOmeter >= 0 && RoundEnergiOmeter < 7)
             {
                 EnergiOmeter = 1;
@@ -1682,7 +2269,7 @@ namespace OlcSideScrollingConsoleGame
             {
                 EnergiOmeter = 14;
             }
-
+            #endregion
             var point5 = new Point(WorldX + 1, WorldY + 1); //start
             var point6 = new Point(WorldX + EnergiOmeter, WorldY + 1); //end
             DrawLine(point5, point6, color);
@@ -1690,6 +2277,20 @@ namespace OlcSideScrollingConsoleGame
             var point7 = new Point(WorldX + 1, WorldY + 2); //start
             var point8 = new Point(WorldX + EnergiOmeter, WorldY + 2); //end
             DrawLine(point7, point8, color);
+
+            if (!string.IsNullOrEmpty(mode))
+            {
+                if (mode == "pause")
+                {
+                    DrawBigText("Pause", 25, 25);
+                    DrawBigText("Press Start to resume.", 25, 35);
+                    DrawBigText("Press Select to return to world map.", 25, 45);
+                }
+            }
+            else
+            {
+                DrawBigText("X: " + Hero.px + " Y: " + Hero.py, 25, 25);
+            }
 
         }
 
@@ -1833,6 +2434,10 @@ namespace OlcSideScrollingConsoleGame
             ListItems.Add(item);
             return true;
         }
+
+
+
+
     }
 
 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using OlcSideScrollingConsoleGame.Models;
 using OlcSideScrollingConsoleGame.Models.Items;
 using OlcSideScrollingConsoleGame.Commands;
+using Audio.Library;
 
 namespace OlcSideScrollingConsoleGame.Core
 {
@@ -43,10 +44,13 @@ namespace OlcSideScrollingConsoleGame.Core
         private string PathSprites { get { return @"\Resources\Assets\Sprites"; } }
         private string PathMapData { get { return @"\Resources\Assets\MapData"; } }
         private string PathSettings { get { return @"\Resources\Settings"; } }
+        private string PathSound { get { return @"\Resources\Assets\Sound"; } }
         public ScriptProcessor Script { get; set; }
-        private Random Random {get;set;} = new Random();
+        private Random Random { get; set; } = new Random();
 
         public SettingsObj Settings { get; set; }
+
+        public Audio.Library.Sound Sound { get; private set; }
 
         internal void Load(Program game)
         {
@@ -60,17 +64,44 @@ namespace OlcSideScrollingConsoleGame.Core
 
             //LoadSettings(); // TODO: läsa settings
             Settings = new SettingsObj();
+
+            LoadSound();
+        }
+
+        public void LoadSound()
+        {
+            try
+            {
+                Sound = Audio.Library.Sound.Instance;
+                //var initSuccess = Sound.init();
+                Sound.loadSound("uno.wav");
+                Sound.loopSound("uno.wav");
+                Sound.loadSound("Click.wav");
+                Sound.loadSound("puttekong.wav");
+                //Sound.loopSound("Click.wav");
+                //Sound.play("Piano.wav");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
 
         private void LoadSprites()
         {
             LoadSprite("tilesheetone", PathSprites, @"\tilesheetone", ".png"); // tile sheet
+            LoadSprite("tilesheettwo", PathSprites, @"\tilesheettwo", ".png"); // tile sheet
             LoadSprite("font", PathSprites, @"\font", ".png"); // font
             LoadSprite("hero", PathSprites, @"\hero", ".png"); // hero
             /*LoadSprite("energi", PathSprites, @"\energi", ".png");*/ // energi
             LoadSprite("items", PathSprites, @"\items", ".png");
-            /*LoadSprite("enemyzero", PathSprites, @"\enemyzero", ".png");*/ // enemy
-            LoadSprite("enemyzero", PathSprites, @"\enemyone", ".png");
+
+            // enemy
+            LoadSprite("enemyzero", PathSprites, @"\enemyzero", ".png");
+            LoadSprite("enemyone", PathSprites, @"\enemyone", ".png");
+            LoadSprite("enemytwo", PathSprites, @"\enemytwo", ".png");
 
             LoadSprite("cord", PathSprites, @"\cord", ".bmp"); // tile sheet that is coordinates
 
@@ -99,6 +130,7 @@ namespace OlcSideScrollingConsoleGame.Core
             LoadMapData("maptwo", PathMapData, @"\maptwo", ".json"); // map two
             LoadMapData("worldmap", PathMapData, @"\worldmap", ".json"); // map two
             LoadMapData("mapthree", PathMapData, @"\mapthree", ".json"); // map three
+            LoadMapData("mapfour", PathMapData, @"\mapfour", ".json");
         }
 
         private void LoadMapData(string FriendlyName, string FilePath, string FileName, string FileExtension)
@@ -135,6 +167,10 @@ namespace OlcSideScrollingConsoleGame.Core
             MapMaps.Add("maptwo", lvl2);
             var lvl3 = new MapThree();
             MapMaps.Add("mapthree", lvl3);
+
+            var lvl4 = new MapFour();
+            MapMaps.Add("mapfour", lvl4);
+
             var wm = new WorldMap();
             MapMaps.Add("worldmap", wm);
 
@@ -215,7 +251,7 @@ namespace OlcSideScrollingConsoleGame.Core
             return true;
 
             // TODO; spara settings
-           // return ReadWrite.WriteJson<SettingsObj>(PathSettings, @"\settings", ".json", settingsObj);
+            // return ReadWrite.WriteJson<SettingsObj>(PathSettings, @"\settings", ".json", settingsObj);
 
 
         }
@@ -224,11 +260,11 @@ namespace OlcSideScrollingConsoleGame.Core
         {
             if (SmallNumber > BigNumber)
                 return Random.Next(BigNumber, SmallNumber);
-            
+
             return Random.Next(SmallNumber, BigNumber);
         }
 
     }
 
-  
+
 }
