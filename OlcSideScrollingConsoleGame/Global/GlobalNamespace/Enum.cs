@@ -13,7 +13,8 @@ namespace OlcSideScrollingConsoleGame
             Settings,
             GameOver,
             End,
-            HighScore
+            HighScore,
+            EnterHighScore
         };
 
         public enum Direction

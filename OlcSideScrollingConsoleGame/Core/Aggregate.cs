@@ -48,7 +48,8 @@ namespace OlcSideScrollingConsoleGame.Core
         public ScriptProcessor Script { get; set; }
         private Random Random { get; set; } = new Random();
 
-        public SettingsObj Settings { get; set; }
+        public SettingsObj Settings { get; set; } = new SettingsObj();
+        private List<HighScoreObj> HighScoreList { get; set; }
 
         public Audio.Library.Sound Sound { get; private set; }
 
@@ -62,8 +63,8 @@ namespace OlcSideScrollingConsoleGame.Core
             LoadItems();
             Script = new ScriptProcessor();
 
-            //LoadSettings(); // TODO: läsa settings
-            Settings = new SettingsObj();
+            LoadSettings(); // TODO: läsa settings
+            LoadHighScore();
 
             LoadSound();
         }
@@ -186,6 +187,64 @@ namespace OlcSideScrollingConsoleGame.Core
         {
             Settings = ReadWrite.ReadJson<SettingsObj>(PathSettings, @"\settings", ".json");
         }
+
+        #region High Score
+        private void LoadHighScore()
+        {
+            HighScoreList = ReadWrite.ReadJson <List<HighScoreObj>> (PathSettings, @"\highscore", ".json");
+
+            //High Score
+            if (HighScoreList == null)
+                HighScoreList = new List<HighScoreObj>();
+
+            if (HighScoreList.Count < 6)
+            {
+                int addToFive = 5 - HighScoreList.Count;
+                for (int i = 0; i < addToFive; i++)
+                {
+                    HighScoreList.Add(new HighScoreObj { DateTime = DateTime.Now, Handle = "Empty", TimeSpan = new TimeSpan(7, 23, 59, 59) });
+                }
+            }
+            HighScoreList = HighScoreList.OrderBy(x => x.TimeSpan).ThenBy(y => y.DateTime).ToList();
+
+          
+
+        }
+        public bool PlacesOnHighScore(TimeSpan TS)
+        {
+            return HighScoreList.Any(x => x.TimeSpan > TS);
+        }
+        public void PutOnHighScore(HighScoreObj HSO)
+        {
+            HighScoreList.Add(HSO);
+            HighScoreList = HighScoreList.OrderBy(x => x.TimeSpan).ThenBy(y => y.DateTime).Take(5).ToList();
+        }
+        public void ResetHighScore()
+        {
+            HighScoreList = new List<HighScoreObj>();
+            for (int i = 0; i < 5; i++)
+            {
+                HighScoreList.Add(new HighScoreObj { DateTime =new DateTime(2020,7,28), Handle = "Empty", TimeSpan = new TimeSpan(7, 23, 59, 59) });
+            }
+            SaveHighScoreList();
+        }
+        public bool IsNewFirstPlaceHS(TimeSpan TS)
+        {
+            if (HighScoreList.FirstOrDefault().TimeSpan > TS)
+            {
+                return true;
+            }
+            return false;
+        }
+        public List<HighScoreObj> GetHighScoreList()
+        {
+            return HighScoreList;
+        }
+        public bool SaveHighScoreList()
+        {
+            return ReadWrite.WriteJson<List<HighScoreObj>>(PathSettings, @"\highscore", ".json", HighScoreList);
+        }
+        #endregion
 
         internal LevelObj GetMapData(string name)
         {

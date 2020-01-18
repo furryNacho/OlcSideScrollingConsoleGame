@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OlcSideScrollingConsoleGame.Core;
 using OlcSideScrollingConsoleGame.Models;
 
 namespace UnitTest
@@ -20,6 +21,42 @@ namespace UnitTest
         }
 
         [TestMethod]
+        public void TestWriteHighScore()
+        {
+            //Arrange
+            string PathSettings = @"\Resources\Settings";
+            var ReadWrite = new ReadWrite();
+            var HighScoreList = new List<HighScoreObj>();
+            for (int i = 0; i < 5; i++)
+            {
+                HighScoreList.Add(new HighScoreObj { DateTime = DateTime.Now, Handle = "Empty", TimeSpan = new TimeSpan(7, 23, 59, 59) });
+            }
+
+            // Act
+            var HasWritten = ReadWrite.WriteJson<List<HighScoreObj>>(PathSettings, @"\highscore", ".json", HighScoreList);
+
+            //Assert
+            Assert.IsTrue(HasWritten);
+        }
+
+        [TestMethod]
+        public void TestReadHighScore()
+        {
+            //Arrange
+            string PathSettings = @"\Resources\Settings";
+            var ReadWrite = new ReadWrite();
+            var HighScoreList = new List<HighScoreObj>();
+
+            // Act
+            HighScoreList = ReadWrite.ReadJson<List<HighScoreObj>>(PathSettings, @"\highscore", ".json");
+
+            //Assert
+            Assert.IsNotNull(HighScoreList);
+            Assert.IsTrue(HighScoreList.Count == 5);
+        }
+
+
+        [TestMethod]
         public void TestWriteJson()
         {
             //Arrange
@@ -28,14 +65,16 @@ namespace UnitTest
             string FileName = "\\settings";
             string FileExtension = ".json";
 
+            // highscore
+
             var HSO = new HighScoreObj()
             {
-                Id = 1,
+                //Id = 1,
                 Handle = "AAA",
-                Hours = 0,
-                Minutes = 5,
-                Seconds = 2,
-                Time = "00:05:02:123"
+                //Hours = 0,
+                //Minutes = 5,
+                //Seconds = 2,
+                //Time = "00:05:02:123"
             };
             var HSOList = new List<HighScoreObj>();
             HSOList.Add(HSO);
@@ -44,7 +83,7 @@ namespace UnitTest
             {
                 misc = "Unit test",
                 //AttributeIndex = new int[3] { 1, 2, 4 }
-                HighScoreList = HSOList
+                //HighScoreList = HSOList
             };
 
             //Act
@@ -73,7 +112,7 @@ namespace UnitTest
             Assert.IsTrue(returnObj.misc == "Unit test");
         }
 
-        
+
         [TestMethod]
         public void KrabbaMedJson()
         {

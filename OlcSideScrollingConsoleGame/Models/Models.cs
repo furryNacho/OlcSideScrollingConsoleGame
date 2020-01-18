@@ -43,19 +43,17 @@ namespace OlcSideScrollingConsoleGame.Models
 
         public string misc { get; set; }
 
-        public List<HighScoreObj> HighScoreList { get; set; }
+       
         public List<SavedGameObj> SavedGames { get; set; }
         public bool ShowEnd { get; set; }
     }
 
     public class HighScoreObj
     {
-        public int Id { get; set; }
         public string Handle { get; set; }
-        public int Hours { get; set; }
-        public int Minutes { get; set; }
-        public int Seconds { get; set; }
-        public string Time { get; set; }
+        public TimeSpan TimeSpan { get; set; }
+        public DateTime DateTime { get; set; }
+
     }
 
     public class HighScoreEnterName

@@ -27,6 +27,10 @@ namespace OlcSideScrollingConsoleGame
         public IsItPressed IIP { get; set; }
         private bool ButtonsHasGoneIdle { get; set; }
 
+        private bool HasSwitchedState { get; set; } = false;
+
+        private bool RightToAccessPodium { get; set; } = true; // once per game. must reset on new game!
+
         private List<DynamicGameObject> listDynamics { get; set; } = new List<DynamicGameObject>();
 
         private OlcSideScrollingConsoleGame.Models.Map CurrentMap { get; set; }
@@ -72,6 +76,7 @@ namespace OlcSideScrollingConsoleGame
 
         private TimeSpan ActualTotalTime { get; set; }
         private TimeSpan GameTotalTime { get; set; }
+        private TimeSpan EndTotalTime { get; set; }
 
         private KonamiObj Konami { get; set; } = new KonamiObj();
 
@@ -108,13 +113,15 @@ namespace OlcSideScrollingConsoleGame
 
             this.Machine = new StateMachine<Enum.State>();
             //this.Machine.Switch(Enum.State.GameMap);
+            HasSwitchedState = true;
             this.Machine.Switch(Enum.State.SplashScreen);
 
 
             Core.Aggregate.Instance.Load(this);
 
             // Om jag skulle vilja lägga till sparad tid
-            ActualTotalTime = new TimeSpan(0, 0, 7, 0, 0);
+            //ActualTotalTime = new TimeSpan(0, 0, 7, 0, 0);
+            ActualTotalTime = new TimeSpan();
 
             Hero = new DynamicCreatureHero();
             //ChangeMap("mapone", 5, 5, Hero);
@@ -157,6 +164,9 @@ namespace OlcSideScrollingConsoleGame
                 case Enum.State.GameOver:
                     this.DisplayGameOver(elapsed);
                     break;
+                case Enum.State.EnterHighScore:
+                    this.DisplayEnterHighScore(elapsed);
+                    break;
                 case Enum.State.HighScore:
                     this.DisplayHighScore(elapsed);
                     break;
@@ -171,16 +181,20 @@ namespace OlcSideScrollingConsoleGame
         int HSSelectY = 1;
         int Select = 1;
         List<int> NameInAscii = new List<int>() { 65, 65, 65 };
-        List<HighScoreObj> justForNowHighScoreList = new List<HighScoreObj>();
-        private void DisplayHighScore(float elapsed)
+        //List<HighScoreObj> justForNowHighScoreList = new List<HighScoreObj>();
+        private void DisplayEnterHighScore(float elapsed)
         {
+            if (HasSwitchedState)
+                HasSwitchedState = false;
+
+
             Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
             this.Clear((Pixel)Pixel.Presets.Black);
 
             SlimDx.timer_Tick();
             IIP = SlimDx.IIP;
 
-            List<HighScoreEnterName> qwer = new List<HighScoreEnterName>();
+            List<HighScoreEnterName> ActionPlaceholder = new List<HighScoreEnterName>();
 
 
             #region temp fuckery
@@ -188,89 +202,132 @@ namespace OlcSideScrollingConsoleGame
             {
                 MyProperty = "pilupp"
             };
-            qwer.Add(HSEN1);
+            ActionPlaceholder.Add(HSEN1);
             HighScoreEnterName HSEN2 = new HighScoreEnterName()
             {
                 MyProperty = "pilupp"
             };
-            qwer.Add(HSEN2);
+            ActionPlaceholder.Add(HSEN2);
             HighScoreEnterName HSEN3 = new HighScoreEnterName()
             {
                 MyProperty = "pilupp"
             };
-            qwer.Add(HSEN3);
+            ActionPlaceholder.Add(HSEN3);
             HighScoreEnterName HSEN4 = new HighScoreEnterName()
             {
                 MyProperty = "inget"
             };
-            qwer.Add(HSEN4);
+            ActionPlaceholder.Add(HSEN4);
             HighScoreEnterName HSEN5 = new HighScoreEnterName()
             {
                 MyProperty = "bokstav",
                 letter = "A"
             };
-            qwer.Add(HSEN5);
+            ActionPlaceholder.Add(HSEN5);
             HighScoreEnterName HSEN6 = new HighScoreEnterName()
             {
                 MyProperty = "bokstav",
                 letter = "A"
             };
-            qwer.Add(HSEN6);
+            ActionPlaceholder.Add(HSEN6);
             HighScoreEnterName HSEN7 = new HighScoreEnterName()
             {
                 MyProperty = "bokstav",
                 letter = "A"
             };
-            qwer.Add(HSEN7);
+            ActionPlaceholder.Add(HSEN7);
             HighScoreEnterName HSEN8 = new HighScoreEnterName()
             {
                 MyProperty = "ok"
             };
-            qwer.Add(HSEN8);
+            ActionPlaceholder.Add(HSEN8);
             HighScoreEnterName HSEN9 = new HighScoreEnterName()
             {
                 MyProperty = "pilner"
             };
-            qwer.Add(HSEN9);
+            ActionPlaceholder.Add(HSEN9);
             HighScoreEnterName HSEN10 = new HighScoreEnterName()
             {
                 MyProperty = "pilner"
             };
-            qwer.Add(HSEN10);
+            ActionPlaceholder.Add(HSEN10);
             HighScoreEnterName HSEN11 = new HighScoreEnterName()
             {
                 MyProperty = "pilner"
             };
-            qwer.Add(HSEN11);
+            ActionPlaceholder.Add(HSEN11);
             HighScoreEnterName HSEN12 = new HighScoreEnterName()
             {
                 MyProperty = "inget"
             };
-            qwer.Add(HSEN12);
+            ActionPlaceholder.Add(HSEN12);
 
             #endregion
 
+            bool newTopScore = Core.Aggregate.Instance.IsNewFirstPlaceHS(EndTotalTime);
+
             //Draw
+            if (newTopScore)
+            {
+                string gratz = "Congratulations!";
+                int gratzX = (ScreenW / 2) - ((gratz.Length * 8) / 2);
+                DrawBigText(gratz, gratzX, 8);
+            }
+
+            string Header = "New High Score";
+            if (newTopScore)
+            {
+                Header = "You've Beaten The Top High Score";
+            }
+            int HeaderX = (ScreenW / 2) - ((Header.Length * 8) / 2);
+            DrawBigText(Header, HeaderX, 20);
+
+            string endTime = EndTotalTime.ToString("hh':'mm':'ss");
+            int endTimeX = (ScreenW / 2) - ((endTime.Length * 8) / 2);
+            DrawBigText(endTime, endTimeX, 35);
+
+            string inst = "Enter Your Tag";
+            int instX = (ScreenW / 2) - ((inst.Length * 8) / 2);
+            DrawBigText(inst, instX, 58);
+
+
+            #region Draw
             int i = 0;
-            foreach (var item in qwer)
+            foreach (var item in ActionPlaceholder)
             {
                 int x = i % 4;
                 int y = i / 4;
                 i++;
 
 
+                //if (HSSelectX == x && HSSelectY == y)
+                if (HSSelectX == x)
+                {
+                    Select = x;
+                    //highlighted = item;
+                }
+
 
                 // Ska det vara Grå eller vit, upp eller ner, grå eller vit ok. Är det en bokstav, isf vilken bokstav? 
 
-                var fPoint = new Point(8 + x * 20, 20 + y * 20);
+                //var fPoint = new Point(8 + x * 20, 20 + y * 20);
+                var fPoint = new Point((8 + x * 20) + 90, (20 + y * 20) + 55);
                 var sPoint = new Point(0, 0);
 
                 if (item.MyProperty == "pilupp")
                 {
-                    //sPoint = new Point(32, 48);
-                    sPoint = new Point(32, 48);
-
-                    DrawPartialSprite(fPoint, SpriteItems, sPoint, 9, 4);
+                    if (Select + 1 == i)
+                    {
+                        // vit pil upp
+                        sPoint = new Point(32, 48);
+                        DrawPartialSprite(fPoint, SpriteItems, sPoint, 9, 4);
+                    }
+                    else
+                    {
+                        // grå (pil upp)
+                        sPoint = new Point(32, 52);
+                        DrawPartialSprite(fPoint, SpriteItems, sPoint, 9, 4);
+                    }
                 }
                 else if (item.MyProperty == "inget")
                 {
@@ -279,13 +336,33 @@ namespace OlcSideScrollingConsoleGame
                 }
                 else if (item.MyProperty == "ok")
                 {
-                    sPoint = new Point(48, 48);
-                    DrawPartialSprite(fPoint, SpriteItems, sPoint, 16, 8);
+                    if (Select == 3)
+                    {
+                        //Om inte markerad
+                        sPoint = new Point(48, 48);
+                        DrawPartialSprite(fPoint, SpriteItems, sPoint, 16, 8);
+                    }
+                    else
+                    {
+                        // Om markerad
+                        sPoint = new Point(48, 56);
+                        DrawPartialSprite(fPoint, SpriteItems, sPoint, 16, 8);
+                    }
                 }
                 else if (item.MyProperty == "pilner")
                 {
-                    sPoint = new Point(32, 56);
-                    DrawPartialSprite(fPoint, SpriteItems, sPoint, 9, 4);
+                    if (Select + 9 == i)
+                    {
+                        // vit pil ner
+                        sPoint = new Point(32, 60);
+                        DrawPartialSprite(fPoint, SpriteItems, sPoint, 9, 4);
+                    }
+                    else
+                    {
+                        // grå pil ner
+                        sPoint = new Point(32, 56);
+                        DrawPartialSprite(fPoint, SpriteItems, sPoint, 9, 4);
+                    }
                 }
                 else if (item.MyProperty == "bokstav")
                 {
@@ -298,82 +375,93 @@ namespace OlcSideScrollingConsoleGame
                     DrawPartialSprite(fPoint, SpriteItems, sPoint, 16, 16);
                 }
 
-                //if (HSSelectX == x && HSSelectY == y)
-                if (HSSelectX == x)
-                {
-                    Select = x;
-                    //highlighted = item;
-                }
+
             }
-
-            #region Draw Selected
-            // Draw selection reticule
-            var pointParamOne = new Point(6 + (HSSelectX) * 20, 18 + (HSSelectY) * 20);
-            var pointParamTwo = new Point(6 + (HSSelectX + 1) * 20, 18 + (HSSelectY) * 20);
-            var color = Pixel.FromRgb((uint)Pixel.Presets.White);
-            DrawLine(pointParamOne, pointParamTwo, color);
-            pointParamOne = new Point(6 + (HSSelectX) * 20, 18 + (HSSelectY + 1) * 20);
-            pointParamTwo = new Point(6 + (HSSelectX + 1) * 20, 18 + (HSSelectY + 1) * 20);
-            DrawLine(pointParamOne, pointParamTwo, color);
-            pointParamOne = new Point(6 + (HSSelectX) * 20, 18 + (HSSelectY) * 20);
-            pointParamTwo = new Point(6 + (HSSelectX) * 20, 18 + (HSSelectY + 1) * 20);
-            DrawLine(pointParamOne, pointParamTwo, color);
-            pointParamOne = new Point(6 + (HSSelectX + 1) * 20, 18 + (HSSelectY) * 20);
-            pointParamTwo = new Point(6 + (HSSelectX + 1) * 20, 18 + (HSSelectY + 1) * 20);
-            DrawLine(pointParamOne, pointParamTwo, color);
-
-            if (GetKey(Key.Left).Released) HSSelectX--;
-            if (GetKey(Key.Right).Released) HSSelectX++;
-
-            if (GetKey(Key.Up).Released)
-            {
-                if (Select < 3)
-                {
-                    var newVal = NameInAscii[Select] + 1;
-                    if (newVal > 126)
-                        newVal = 32;
-                    NameInAscii[Select] = newVal;
-                }
-            }
-            if (GetKey(Key.Down).Released)
-            {
-                if (Select < 3)
-                {
-                    var newVal = NameInAscii[Select] - 1;
-                    if (newVal < 32)
-                        newVal = 126;
-                    NameInAscii[Select] = newVal;
-                }
-            }
-
-            if (HSSelectX < 0) HSSelectX = 3;
-            if (HSSelectX >= 4) HSSelectX = 0;
-            if (HSSelectY < 0) HSSelectY = 3;
-            if (HSSelectY >= 4) HSSelectY = 0;
             #endregion
+
+            #region Selected And Input
+            //// Draw selection reticule
+            //var color = Pixel.FromRgb((uint)Pixel.Presets.White);
+            //var pointParamOne = new Point(94 + (HSSelectX) * 20, (50 + 18 + (HSSelectY) * 20));
+            //var pointParamTwo = new Point(94 + (HSSelectX + 1) * 20, (50 + 18 + (HSSelectY) * 20));
+            //DrawLine(pointParamOne, pointParamTwo, color);
+            //pointParamOne = new Point(94 + (HSSelectX) * 20, (50 + 18 + (HSSelectY + 1) * 20));
+            //pointParamTwo = new Point(94 + (HSSelectX + 1) * 20, (50 + 18 + (HSSelectY + 1) * 20));
+            //DrawLine(pointParamOne, pointParamTwo, color);
+            //pointParamOne = new Point(94 + (HSSelectX) * 20, (50 + 18 + (HSSelectY) * 20));
+            //pointParamTwo = new Point(94 + (HSSelectX) * 20, (50 + 18 + (HSSelectY + 1) * 20));
+            //DrawLine(pointParamOne, pointParamTwo, color);
+            //pointParamOne = new Point(94 + (HSSelectX + 1) * 20, (50 + 18 + (HSSelectY) * 20));
+            //pointParamTwo = new Point(94 + (HSSelectX + 1) * 20, (50 + 18 + (HSSelectY + 1) * 20));
+            //DrawLine(pointParamOne, pointParamTwo, color);
+
+
+
 
             //Input
             if (Focus)
             {
-
                 //Button spam lock  
                 if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
                 {
                     ButtonsHasGoneIdle = true;
                 }
 
+                //Selecting part
+                if (ButtonsHasGoneIdle && (GetKey(Key.Left).Released || IIP.left))
+                {
+                    ButtonsHasGoneIdle = false;
+                    HSSelectX--;
+                }
+                if (ButtonsHasGoneIdle && (GetKey(Key.Right).Released || IIP.right))
+                {
+                    ButtonsHasGoneIdle = false;
+                    HSSelectX++;
+                }
+
+                if (ButtonsHasGoneIdle && (GetKey(Key.Up).Released || IIP.up))
+                {
+                    ButtonsHasGoneIdle = false;
+                    if (Select < 3)
+                    {
+                        var newVal = NameInAscii[Select] + 1;
+                        if (newVal > 126)
+                            newVal = 32;
+                        NameInAscii[Select] = newVal;
+                    }
+                }
+                if (ButtonsHasGoneIdle && (GetKey(Key.Down).Released || IIP.down))
+                {
+                    ButtonsHasGoneIdle = false;
+                    if (Select < 3)
+                    {
+                        var newVal = NameInAscii[Select] - 1;
+                        if (newVal < 32)
+                            newVal = 126;
+                        NameInAscii[Select] = newVal;
+                    }
+                }
+
+                if (HSSelectX < 0) HSSelectX = 3;
+                if (HSSelectX >= 4) HSSelectX = 0;
+                if (HSSelectY < 0) HSSelectY = 3;
+                if (HSSelectY >= 4) HSSelectY = 0;
+
+
                 //if (ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !IIP.idle))
                 if (ButtonsHasGoneIdle && (GetKey(Key.Escape).Pressed || IIP.Button7))
                 {
-                    Core.Aggregate.Instance.Settings.ShowEnd = false;
+
                     ButtonsHasGoneIdle = false;
                     this.Machine.Switch(Enum.State.Menu);
+                    HasSwitchedState = true;
                     // return;
                 }
 
                 // OK
                 if (ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || IIP.Button0))
                 {
+                    ButtonsHasGoneIdle = false;
                     if (Select == 3) //nollindex, select är på sista valet
                     {
                         var highScoreName = "";
@@ -385,28 +473,136 @@ namespace OlcSideScrollingConsoleGame
 
                         //TODO: lägg till i highscorelistan
 
-                        justForNowHighScoreList.Add(new HighScoreObj { Handle = highScoreName });
+                        //Lite extra, just för att testa att lägga till
+                        //if (Core.Aggregate.Instance.PlacesOnHighScore(EndTotalTime))
+                        //{
+                        Core.Aggregate.Instance.PutOnHighScore(new HighScoreObj { DateTime = DateTime.Now, Handle = highScoreName, TimeSpan = EndTotalTime });
 
-                        DrawBigText(highScoreName, 10, 180);
+                        Core.Aggregate.Instance.SaveHighScoreList();
+                        //Core.Aggregate.Instance.ResetHighScore();
+
+
+                        ButtonsHasGoneIdle = false;
+                        this.Machine.Switch(Enum.State.HighScore);
+                        HasSwitchedState = true;
+
+                        //}
+                        //
+
+
+                        //justForNowHighScoreList.Add(new HighScoreObj { Handle = highScoreName });
+
+                        //DrawBigText(highScoreName, 10, 180);
                     }
                 }
 
             }
+            #endregion
 
-            DrawBigText("High Score", 4, 4);
-            //DrawBigText("You are super player", 4, 20);
-            //DrawBigText("Thank you for playing game", 4, 36);
-            DrawBigText("Press any button", 8, 160);
+            DrawBigText("Press OK when done", 8, 210);
         }
 
-
-        private void DisplayEnd(float elapsed)
+        private void DisplayHighScore(float elapsed)
         {
+            if (HasSwitchedState)
+                HasSwitchedState = false;
+
             Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
             this.Clear((Pixel)Pixel.Presets.Black);
 
             SlimDx.timer_Tick();
             IIP = SlimDx.IIP;
+
+            //GameTotalTime = Clock.Total + ActualTotalTime;//temp
+
+            if (Focus)
+            {
+                //Button spam lock  
+                if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
+                {
+                    ButtonsHasGoneIdle = true;
+                }
+
+                //if (ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !IIP.idle))
+                if (ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || IIP.Button7))
+                {
+                    ButtonsHasGoneIdle = false;
+                    HasSwitchedState = true;
+
+                    if (returnToEndAfterHighScore)
+                    {
+                        returnToEndAfterHighScore = false;
+
+                        this.Machine.Switch(Enum.State.End);
+                    }
+                    else
+                    {
+                        this.Machine.Switch(Enum.State.Menu);
+                    }
+
+                }
+
+            }
+
+            string Header = "Penguin After All High Score";
+            int HeaderX = (ScreenW / 2) - ((Header.Length * 8) / 2);
+            DrawBigText(Header, HeaderX, 10);
+            DrawBigText("    Name  Time     Date", 8, 45);
+            int idx = 0;
+            foreach (var HighScoreRow in Core.Aggregate.Instance.GetHighScoreList())
+            {
+                idx++;
+                int HSRY = idx * 10 + 50;
+                var formatHandle = HighScoreRow.Handle;
+                if (formatHandle.Length < 5)
+                    formatHandle = HighScoreRow.Handle + "  ";
+
+                DrawBigText(" " + idx + ". " + formatHandle + " " + HighScoreRow.TimeSpan.ToString("hh':'mm':'ss") + " " + HighScoreRow.DateTime.ToString("dd MMM yy"), 8, HSRY);
+
+            }
+
+            DrawBigText("Press any button", 8, 210);
+        }
+
+        bool returnToEndAfterHighScore = false;
+        private void DisplayEnd(float elapsed)
+        {
+            Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
+
+            Core.Aggregate.Instance.Sound.stop();
+
+            if (HasSwitchedState)
+            {
+                HasSwitchedState = false;
+
+                if (RightToAccessPodium)
+                {
+                    EndTotalTime = GameTotalTime;
+                    RightToAccessPodium = false;
+
+                    if (Core.Aggregate.Instance.PlacesOnHighScore(EndTotalTime))
+                    {
+                        returnToEndAfterHighScore = true;
+
+                        ButtonsHasGoneIdle = false;
+                        this.Machine.Switch(Enum.State.EnterHighScore);
+                        HasSwitchedState = true;
+
+                        return;
+                    }
+
+                }
+            }
+
+
+
+            
+            this.Clear((Pixel)Pixel.Presets.Black);
+
+            SlimDx.timer_Tick();
+            IIP = SlimDx.IIP;
+
+            Core.Aggregate.Instance.Settings.ShowEnd = false;
 
             //Input
             if (Focus)
@@ -420,9 +616,12 @@ namespace OlcSideScrollingConsoleGame
 
                 if (ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !IIP.idle))
                 {
-                    Core.Aggregate.Instance.Settings.ShowEnd = false;
+                    // TODO: om klar med spelet... Menu och eller reset. Kanske skulle ha reset som ett gamestate, där allt nollas och sätts igång
+
+
                     ButtonsHasGoneIdle = false;
                     this.Machine.Switch(Enum.State.WorldMap);
+                    HasSwitchedState = true;
                     // return;
                 }
             }
@@ -435,6 +634,9 @@ namespace OlcSideScrollingConsoleGame
 
         private void DisplaySplashScreen(float elapsed)
         {
+            if (HasSwitchedState)
+                HasSwitchedState = false;
+
             SlimDx.timer_Tick();
             IIP = SlimDx.IIP;
 
@@ -445,6 +647,7 @@ namespace OlcSideScrollingConsoleGame
                 {
                     ButtonsHasGoneIdle = false;
                     this.Machine.Switch(Enum.State.Menu);
+                    HasSwitchedState = true;
                 }
             }
 
@@ -459,6 +662,9 @@ namespace OlcSideScrollingConsoleGame
 
         private void DisplayMenu(float elapsed)
         {
+            if (HasSwitchedState)
+                HasSwitchedState = false;
+
             Core.Aggregate.Instance.Sound.pause();
 
             this.Clear((Pixel)Pixel.Presets.Black);
@@ -487,7 +693,7 @@ namespace OlcSideScrollingConsoleGame
                 {
                     "Resume",
                     "Save",
-                    "Load Saved Game",
+                    //"Load Saved Game",
                     "Exit"
                  };
             }
@@ -552,11 +758,13 @@ namespace OlcSideScrollingConsoleGame
                             //Core.Aggregate.Instance.SaveSettings(tempSaveSettings);
 
                             this.Machine.Switch(Enum.State.WorldMap);
+                            HasSwitchedState = true;
                             ButtonsHasGoneIdle = false;
                             break;
                         case "Resume":
                             selectedMenuItem = 1;
                             this.Machine.Switch(Enum.State.WorldMap);
+                            HasSwitchedState = true;
                             ButtonsHasGoneIdle = false;
                             break;
                         case "Save":
@@ -584,6 +792,7 @@ namespace OlcSideScrollingConsoleGame
                             ButtonsHasGoneIdle = false;
                             DrawBigText(menuList[selectedMenuItem - 1], 45, 4);
                             this.Machine.Switch(Enum.State.HighScore);
+                            HasSwitchedState = true;
                             break;
                         default:
                             Core.Aggregate.Instance.ReadWrite.WriteToLog("DisplayMenu - Select value : " + selectedMenuItem + ". Default switch");
@@ -608,6 +817,9 @@ namespace OlcSideScrollingConsoleGame
         //public bool WorldmapStartHasBeenReleased { get; set; }
         private void DisplayWorldMap(float elapsed)
         {
+            if (HasSwitchedState)
+                HasSwitchedState = false;
+
             if (Core.Aggregate.Instance.Sound != null)
             {
                 if (Core.Aggregate.Instance.Sound.isPlaying("puttekong.wav"))
@@ -623,12 +835,13 @@ namespace OlcSideScrollingConsoleGame
 
             Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
 
-            //TODO hantera om slut
+            
             if (Core.Aggregate.Instance.Settings.ShowEnd)
             {
                 this.Machine.Switch(Enum.State.End);
                 ButtonsHasGoneIdle = false;
-                //return;
+                HasSwitchedState = true;
+                return;
             }
 
             this.Clear((Pixel)Pixel.Presets.Black);
@@ -721,7 +934,7 @@ namespace OlcSideScrollingConsoleGame
                         ChangeMap("mapone", 2, 3, Hero);
 
                         this.Machine.Switch(Enum.State.GameMap);
-
+                        HasSwitchedState = true;
                         ButtonsHasGoneIdle = false;
 
                         return;
@@ -733,7 +946,7 @@ namespace OlcSideScrollingConsoleGame
                         ChangeMap("maptwo", 2, 3, Hero);
 
                         this.Machine.Switch(Enum.State.GameMap);
-
+                        HasSwitchedState = true;
                         ButtonsHasGoneIdle = false;
 
                         return;
@@ -745,7 +958,7 @@ namespace OlcSideScrollingConsoleGame
                         ChangeMap("mapthree", 2, 3, Hero);
 
                         this.Machine.Switch(Enum.State.GameMap);
-
+                        HasSwitchedState = true;
                         ButtonsHasGoneIdle = false;
 
                         return;
@@ -757,7 +970,7 @@ namespace OlcSideScrollingConsoleGame
                         ChangeMap("mapfour", 2, 3, Hero);
 
                         this.Machine.Switch(Enum.State.GameMap);
-
+                        HasSwitchedState = true;
                         ButtonsHasGoneIdle = false;
 
                         return;
@@ -771,6 +984,7 @@ namespace OlcSideScrollingConsoleGame
                 {
                     // Todo öppna meny
                     this.Machine.Switch(Enum.State.Menu);
+                    HasSwitchedState = true;
                     //MenuStartHasBeenReleased = false;
                     ButtonsHasGoneIdle = false;
                 }
@@ -1175,6 +1389,9 @@ namespace OlcSideScrollingConsoleGame
         //bool experiment = true;
         private void DisplayPause(float elapsed)
         {
+            if (HasSwitchedState)
+                HasSwitchedState = false;
+
             if (Core.Aggregate.Instance.Sound != null)
             {
                 if (Core.Aggregate.Instance.Sound.isPlaying("uno.wav"))
@@ -1218,6 +1435,7 @@ namespace OlcSideScrollingConsoleGame
                     //{
                     ButtonsHasGoneIdle = false;
                     this.Machine.Switch(Enum.State.WorldMap);
+                    HasSwitchedState = true;
                     //}
                 }
 
@@ -1227,6 +1445,7 @@ namespace OlcSideScrollingConsoleGame
                     // GameStartHasBeenReleased = false;
                     ButtonsHasGoneIdle = false;
                     this.Machine.Switch(Enum.State.GameMap);
+                    HasSwitchedState = true;
                 }
 
                 #region Konami
@@ -1304,7 +1523,7 @@ namespace OlcSideScrollingConsoleGame
                                                             ButtonsHasGoneIdle = false;
 
                                                             this.Machine.Switch(Enum.State.WorldMap);
-
+                                                            HasSwitchedState = true;
                                                             ActualTotalTime += new TimeSpan(7, 0, 0);
 
                                                             if (Core.Aggregate.Instance.Settings.StageCompleted < Core.Aggregate.Instance.Settings.SpawnAtWorldMap)
@@ -1353,6 +1572,8 @@ namespace OlcSideScrollingConsoleGame
         // public bool GameStartHasBeenReleased { get; set; }
         private void DisplayStage(float elapsed)
         {
+            if (HasSwitchedState)
+                HasSwitchedState = false;
 
             if (Core.Aggregate.Instance.Sound != null)
             {
@@ -1373,6 +1594,7 @@ namespace OlcSideScrollingConsoleGame
             if (Hero.Health < 1)
             {
                 this.Machine.Switch(Enum.State.GameOver);
+                HasSwitchedState = true;
             }
 
             //listDynamics = listDynamics.Where(x => x.Redundant == false).ToList(); // Kanske ska dumpa denna för att kunna göra en poff på fiende om jump damage
@@ -1395,26 +1617,26 @@ namespace OlcSideScrollingConsoleGame
                 if (GetKey(Key.Up).Down || IIP.up)
                 {
                     //Hero.vy = -6.0f;
-                    var qwer = (DynamicCreatureHero)Hero;
-                    qwer.LookUp = true;
+                    var tempHeroObj = (DynamicCreatureHero)Hero;
+                    tempHeroObj.LookUp = true;
                 }
                 else
                 {
-                    var qwer = (DynamicCreatureHero)Hero;
-                    qwer.LookUp = false;
+                    var tempHeroObj = (DynamicCreatureHero)Hero;
+                    tempHeroObj.LookUp = false;
                 }
 
                 //Down
                 if (GetKey(Key.Down).Down || IIP.down)
                 {
                     //Hero.vy = 6.0f;
-                    var qwer = (DynamicCreatureHero)Hero;
-                    qwer.LookDown = true;
+                    var tempHeroObj = (DynamicCreatureHero)Hero;
+                    tempHeroObj.LookDown = true;
                 }
                 else
                 {
-                    var qwer = (DynamicCreatureHero)Hero;
-                    qwer.LookDown = false;
+                    var tempHeroObj = (DynamicCreatureHero)Hero;
+                    tempHeroObj.LookDown = false;
                 }
 
                 //Right
@@ -1505,6 +1727,7 @@ namespace OlcSideScrollingConsoleGame
                     //PauseStartHasBeenReleased = false;
                     ButtonsHasGoneIdle = false;
                     this.Machine.Switch(Enum.State.Pause);
+                    HasSwitchedState = true;
                 }
 
 
@@ -2010,6 +2233,9 @@ namespace OlcSideScrollingConsoleGame
         private int AnimationCount = 10;
         private void DisplayGameOver(float elapsed)
         {
+            if (HasSwitchedState)
+                HasSwitchedState = false;
+
             this.Clear((Pixel)Pixel.Presets.Black);
 
             SlimDx.timer_Tick();
@@ -2025,6 +2251,7 @@ namespace OlcSideScrollingConsoleGame
             if (GetKey(Key.Space).Pressed || IIP.Button0)
             {
                 this.Machine.Switch(Enum.State.GameMap);
+                HasSwitchedState = true;
                 AnimateCirkle = ScreenH;
                 AnimationCount = 10;
             }
@@ -2391,6 +2618,7 @@ namespace OlcSideScrollingConsoleGame
             if (MapName == "worldmap")
             {
                 this.Machine.Switch(Enum.State.WorldMap);
+                HasSwitchedState = true;
             }
             else
             {
