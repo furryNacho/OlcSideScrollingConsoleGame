@@ -30,22 +30,32 @@ namespace OlcSideScrollingConsoleGame.Models
 
     public class SettingsObj
     {
-        public bool GameHasStarted { get; set; }
-
         public int StageCompleted { get; set; }
 
         public int SpawnAtWorldMap { get; set; } = 1;
 
-      //  public int StageLastEnter { get; set; }
+        public bool AudioOn { get; set; } = true;
 
-        public int HeroEnergi { get; set; }
-        public string PassedTime { get; set; }
+        public SaveSlotMainObj SaveSlotsObjs { get; set; } = new SaveSlotMainObj();
 
-        public string misc { get; set; }
-
-       
-        public List<SavedGameObj> SavedGames { get; set; }
         public bool ShowEnd { get; set; }
+    }
+
+    public class SaveSlotMainObj
+    {
+        public SaveSlot SlotOne { get; set; } = new SaveSlot() {Name = "Slot One" };
+        public SaveSlot SlotTwo { get; set; } = new SaveSlot() { Name = "Slot Two" };
+        public SaveSlot SlotThree { get; set; } = new SaveSlot() { Name = "Slot Three" };
+    }
+    public class SaveSlot
+    {
+        public DateTime DateTime { get; set; }
+        public string Name { get; set; }
+        public int AmountCompleted { get; set; }
+        public TimeSpan Time { get; set; }
+        public bool IsUsed { get; set; }
+        public int HeroEnergi { get; set; }
+
     }
 
     public class HighScoreObj
@@ -61,6 +71,16 @@ namespace OlcSideScrollingConsoleGame.Models
         internal string letter;
 
         public string MyProperty { get; set; }
+    }
+
+    public class OptionsObj
+    {
+        public string Display { get; set; }
+        public bool OptionIsBack { get; set; }
+
+        public bool OptionIsSlotOne { get; set; }
+        public bool OptionIsSlotTwo { get; set; }
+        public bool OptionIsSlotThree { get; set; }
     }
 
     public class SavedGameObj
@@ -89,8 +109,6 @@ namespace OlcSideScrollingConsoleGame.Models
         public bool AB { get; set; }
 
     }
-
-
 
 
     public class EnergiRainObject

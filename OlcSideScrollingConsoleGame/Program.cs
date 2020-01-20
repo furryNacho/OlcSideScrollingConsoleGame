@@ -157,9 +157,7 @@ namespace OlcSideScrollingConsoleGame
                     this.DisplayPause(elapsed);
                     break;
                 case Enum.State.Settings:
-
-                    throw new NotImplementedException();
-
+                    this.DisplaySettings(elapsed);
                     break;
                 case Enum.State.GameOver:
                     this.DisplayGameOver(elapsed);
@@ -176,6 +174,230 @@ namespace OlcSideScrollingConsoleGame
             }
         }
 
+        int SettingsSelectIndex = 1;
+        private void DisplaySettings(float elapsed)
+        {
+            if (HasSwitchedState)
+            {
+                SettingsSelectIndex = 1;
+                HasSwitchedState = false;
+            }
+
+            this.Clear((Pixel)Pixel.Presets.Black);
+
+            SlimDx.timer_Tick();
+            IIP = SlimDx.IIP;
+
+            //What to draw
+            string header = "";
+            string bread = "";
+            List<OptionsObj> options = new List<OptionsObj>();
+            switch (MenuState)
+            {
+                case Enum.MenuState.Audio:
+                    // Slå av på ljud. Ja nej
+                    header = "Audio";
+                    string soundIs = Core.Aggregate.Instance.Settings.AudioOn ? "on" : "off";
+                    bread = "Sound is " + soundIs;
+
+                    options = new List<OptionsObj>() {
+                        new OptionsObj { Display = "Turn Sound On" },
+                        new OptionsObj { Display = "Turn Sound Off"  },
+                        new OptionsObj { Display = "Back", OptionIsBack = true } };
+
+                    break;
+                case Enum.MenuState.ClearHighScore:
+
+                    header = "Clear High Score";
+
+                    bread = "Clear The High Score List?";
+
+                    options = new List<OptionsObj>() {
+                        new OptionsObj { Display = "Yes" },
+                        new OptionsObj { Display = "No" },
+                        new OptionsObj { Display = "Back", OptionIsBack = true }
+                    };
+
+
+                    break;
+                case Enum.MenuState.ClearSavedGame:
+                    //Lista sparade spel.
+                    //Nolla vald sparat spel
+                    header = "Clear Saved Game";
+
+                    bread = "Clear Slot";
+                    switch (SettingsSelectIndex)
+                    {
+                        case 1:
+                            bread += " One";
+                            break;
+                        case 2:
+                            bread += " Two";
+                            break;
+                        case 3:
+                            bread += " Three";
+                            break;
+                        default:
+                            bread = "";
+                            break;
+                    }
+
+                    string displayForSlotOne = "Empty";
+                    var slotOne = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne;
+                    if (slotOne.IsUsed)
+                    {
+                        displayForSlotOne = "Empty"; // TODO: skriv nåt vettigt vad det är för savestate
+                    }
+                    string displayForSlotTwo = "Empty";
+                    var slotTwo = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo;
+                    if (slotTwo.IsUsed)
+                    {
+                        displayForSlotTwo = "Empty"; // TODO: skriv nåt vettigt vad det är för savestate
+                    }
+                    string displayForSlotThree = "Empty";
+                    var slotThree = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree;
+                    if (slotThree.IsUsed)
+                    {
+                        displayForSlotThree = "Empty"; // TODO: skriv nåt vettigt vad det är för savestate
+                    }
+
+                    options = new List<OptionsObj>() {
+                        new OptionsObj { Display = "1 "+ displayForSlotOne, OptionIsSlotOne = true },
+                        new OptionsObj { Display = "2 "+ displayForSlotTwo, OptionIsSlotTwo = true },
+                        new OptionsObj { Display = "3 "+ displayForSlotThree, OptionIsSlotThree = true},
+                        new OptionsObj { Display = "Back", OptionIsBack = true },
+                    };
+
+                    break;
+                default:
+                case Enum.MenuState.StartMenu:
+                    break;
+            }
+
+            //Draw
+            int HeaderX = (ScreenW / 2) - ((header.Length * 8) / 2);
+            DrawBigText(header, HeaderX, 4);
+
+            int breadX = (ScreenW / 2) - ((bread.Length * 8) / 2);
+            DrawBigText(bread, breadX, 18);
+
+            int idx = 0;
+            foreach (var option in options)
+            {
+                idx++;
+                string textRow = option.Display;
+                if (SettingsSelectIndex == idx)
+                {
+                    textRow = "> " + option.Display + " <";
+                }
+                int optionX = (ScreenW / 2) - ((textRow.Length * 8) / 2);
+                DrawBigText(textRow, optionX, 26 + idx * 12);
+            }
+
+
+            //Input
+            if (Focus)
+            {
+                //Button spam lock  
+                if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
+                {
+                    ButtonsHasGoneIdle = true;
+                }
+                //Up
+                if (ButtonsHasGoneIdle && (GetKey(Key.Up).Pressed || IIP.up))
+                {
+
+                    if (SettingsSelectIndex <= 1)
+                    {
+                        SettingsSelectIndex = options.Count;
+                    }
+                    else
+                    {
+                        SettingsSelectIndex--;
+                    }
+
+                    ButtonsHasGoneIdle = false;
+                }
+                if (ButtonsHasGoneIdle && (GetKey(Key.Down).Pressed || IIP.down))
+                {
+
+                    if (SettingsSelectIndex >= options.Count)
+                    {
+                        SettingsSelectIndex = 1;
+                    }
+                    else
+                    {
+                        SettingsSelectIndex++;
+                    }
+
+                    ButtonsHasGoneIdle = false;
+                }
+
+                // Select
+                if (ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || IIP.Button7 || IIP.Button0))
+                {
+                    var SelectedOption = options[SettingsSelectIndex - 1];
+
+                    //Back to menu
+                    if (SelectedOption.OptionIsBack)
+                    {
+                        MenuState = Enum.MenuState.SettingsMenu;
+                        ButtonsHasGoneIdle = false;
+                        HasSwitchedState = true;
+                        this.Machine.Switch(Enum.State.Menu);
+                    }
+                    else if (MenuState == Enum.MenuState.Audio)
+                    {
+                        if (SelectedOption.Display == "Turn Sound On")
+                        {
+                            Core.Aggregate.Instance.Settings.AudioOn = true;
+                        }
+                        else if (SelectedOption.Display == "Turn Sound Off")
+                        {
+                            Core.Aggregate.Instance.Settings.AudioOn = false;
+                        }
+                        //TODO: save settings audio + faktiskt kolla på denna för att avgöra om det ska spelas ljud eller inte 
+                    }
+                    else if (MenuState == Enum.MenuState.ClearHighScore)
+                    {
+                        if (SelectedOption.Display == "Yes")
+                        {
+                            Core.Aggregate.Instance.ResetHighScore();
+
+                            MenuState = Enum.MenuState.SettingsMenu;
+                            ButtonsHasGoneIdle = false;
+                            HasSwitchedState = true;
+                            this.Machine.Switch(Enum.State.Menu);
+
+                        }
+                        else if (SelectedOption.Display == "No")
+                        {
+                            MenuState = Enum.MenuState.SettingsMenu;
+                            ButtonsHasGoneIdle = false;
+                            HasSwitchedState = true;
+                            this.Machine.Switch(Enum.State.Menu);
+                        }
+
+                    }
+                    else if (MenuState == Enum.MenuState.ClearSavedGame)
+                    {
+                        if (SelectedOption.OptionIsSlotOne)
+                        {
+                            Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne = new SaveSlot() { Name = "Slot One" };
+                        }
+                        else if (SelectedOption.OptionIsSlotTwo)
+                        {
+                            Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo = new SaveSlot() { Name = "Slot Two" };
+                        }
+                        else if (SelectedOption.OptionIsSlotThree)
+                        {
+                            Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree = new SaveSlot() { Name = "Slot Three" };
+                        }
+                        //TODO: spara save
+                    }
+                }
+            }
+        }
 
         int HSSelectX = 0;
         int HSSelectY = 1;
@@ -453,6 +675,7 @@ namespace OlcSideScrollingConsoleGame
                 {
 
                     ButtonsHasGoneIdle = false;
+                    MenuState = Enum.MenuState.StartMenu;
                     this.Machine.Switch(Enum.State.Menu);
                     HasSwitchedState = true;
                     // return;
@@ -523,8 +746,8 @@ namespace OlcSideScrollingConsoleGame
                     ButtonsHasGoneIdle = true;
                 }
 
-                //if (ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !IIP.idle))
-                if (ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || IIP.Button7))
+                if (ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !IIP.idle))
+                //if (ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || IIP.Button7))
                 {
                     ButtonsHasGoneIdle = false;
                     HasSwitchedState = true;
@@ -537,6 +760,7 @@ namespace OlcSideScrollingConsoleGame
                     }
                     else
                     {
+                        MenuState = Enum.MenuState.StartMenu;
                         this.Machine.Switch(Enum.State.Menu);
                     }
 
@@ -596,7 +820,7 @@ namespace OlcSideScrollingConsoleGame
 
 
 
-            
+
             this.Clear((Pixel)Pixel.Presets.Black);
 
             SlimDx.timer_Tick();
@@ -646,6 +870,7 @@ namespace OlcSideScrollingConsoleGame
                 if (GetKey(Key.Any).Pressed || !IIP.idle)
                 {
                     ButtonsHasGoneIdle = false;
+                    MenuState = Enum.MenuState.StartMenu;
                     this.Machine.Switch(Enum.State.Menu);
                     HasSwitchedState = true;
                 }
@@ -660,6 +885,8 @@ namespace OlcSideScrollingConsoleGame
         //public bool MenuStartHasBeenReleased { get; set; }
         int selectedMenuItem = 1;
 
+
+        public Enum.MenuState MenuState { get; set; } = Enum.MenuState.StartMenu;
         private void DisplayMenu(float elapsed)
         {
             if (HasSwitchedState)
@@ -668,7 +895,9 @@ namespace OlcSideScrollingConsoleGame
             Core.Aggregate.Instance.Sound.pause();
 
             this.Clear((Pixel)Pixel.Presets.Black);
-            DrawBigText("Menu", 4, 4);
+
+            string Header = "Menu";
+
 
             SlimDx.timer_Tick();
             IIP = SlimDx.IIP;
@@ -677,26 +906,52 @@ namespace OlcSideScrollingConsoleGame
             var menuList = new List<string>();
 
             //Pause on world map or start menu
-            if (!Core.Aggregate.Instance.GetSettings().GameHasStarted)
+            if (MenuState == Enum.MenuState.StartMenu)
             {
                 menuList = new List<string>()
                 {
                     "Start New Game",
                     "Load Saved Game",
                     "View High Score",
-                    "Exit"
+                    "Settings",
+                    "Exit Game"
                 };
             }
-            else
+            else if (MenuState == Enum.MenuState.PauseMenu)
             {
                 menuList = new List<string>()
                 {
                     "Resume",
                     "Save",
-                    //"Load Saved Game",
                     "Exit"
                  };
             }
+            else if (MenuState == Enum.MenuState.SettingsMenu)
+            {
+                Header = "Menu - Settings";
+
+                menuList = new List<string>()
+                {
+                    "Audio",
+                    "Clear High Score",
+                    "Clear Saved Game",
+                    "Back"
+                 };
+            }
+            //else if (MenuState == Enum.MenuState.Audio)
+            //{
+            //    menuList = new List<string>()
+            //    {
+            //        "Audio",
+            //        "Clear High Score",
+            //        "Clear Saved Game",
+            //        "Back"
+            //     };
+            //}
+
+            // Draw
+            int HeaderX = (ScreenW / 2) - ((Header.Length * 8) / 2);
+            DrawBigText(Header, HeaderX, 4);
 
             int i = 0;
             foreach (var menuItem in menuList)
@@ -741,8 +996,8 @@ namespace OlcSideScrollingConsoleGame
                     ButtonsHasGoneIdle = false;
                 }
 
-                // Start
-                if (ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || IIP.Button7))
+                // Select
+                if (ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || IIP.Button7 || IIP.Button0))
                 {
                     ButtonsHasGoneIdle = false;
 
@@ -753,8 +1008,10 @@ namespace OlcSideScrollingConsoleGame
                         case "Start New Game":
                             selectedMenuItem = 1;
 
+                            // TODO: ska faktiskt starta ett nytt spel.. inte bara börja där man slutade
+
                             // TODO: spara settings lite snyggare
-                            Core.Aggregate.Instance.Settings.GameHasStarted = true;
+                            //Core.Aggregate.Instance.Settings.GameHasStarted = true;
                             //Core.Aggregate.Instance.SaveSettings(tempSaveSettings);
 
                             this.Machine.Switch(Enum.State.WorldMap);
@@ -775,25 +1032,73 @@ namespace OlcSideScrollingConsoleGame
                             selectedMenuItem = 1;
                             DrawBigText(menuList[selectedMenuItem - 1], 45, 4);
                             break;
+                        case "Settings":
+                            selectedMenuItem = 1;
+                            //this.Machine.Switch(Enum.State.Settings);
+                            //HasSwitchedState = true;
+                            MenuState = Enum.MenuState.SettingsMenu;
+                            ButtonsHasGoneIdle = false;
+                            break;
+                        case "Audio":
+                            ButtonsHasGoneIdle = false;
+                            MenuState = Enum.MenuState.Audio;
+                            HasSwitchedState = true;
+                            this.Machine.Switch(Enum.State.Settings);
+                            break;
+                        case "Clear High Score":
+                            ButtonsHasGoneIdle = false;
+                            MenuState = Enum.MenuState.ClearHighScore;
+                            HasSwitchedState = true;
+                            this.Machine.Switch(Enum.State.Settings);
+                            break;
+                        case "Clear Saved Game":
+                            ButtonsHasGoneIdle = false;
+                            MenuState = Enum.MenuState.ClearSavedGame;
+                            HasSwitchedState = true;
+                            this.Machine.Switch(Enum.State.Settings);
+                            break;
+                        case "Back":
+                            ButtonsHasGoneIdle = false;
+
+                            //if (MenuState == Enum.MenuState.StartMenu)
+                            //{
+                            //}
+                            //else
+                            //{
+                            //}
+                            MenuState = Enum.MenuState.StartMenu;
+
+                            break;
                         case "Exit":
 
-                            //Exit - clean up sound
+                            // TODO: clean up.
+                            //TODO: go back to main menu
+                            //Core.Aggregate.Instance.GetSettings().GameHasStarted = false;
+                            MenuState = Enum.MenuState.StartMenu;
+                            ButtonsHasGoneIdle = false;
+
+                            break;
+                        case "Exit Game":
+                            //Clean up sound
                             if (Core.Aggregate.Instance.Sound != null)
-                            {
-                                bool closeAudioLib = Core.Aggregate.Instance.Sound.cleanUp();
-                            }
+                                Core.Aggregate.Instance.Sound.cleanUp();
 
-                            //Exit - leav gameloop
+                            //Exit gameloop
                             Core.Aggregate.Instance.ThisGame.Finish();
-
-
                             break;
                         case "View High Score":
                             ButtonsHasGoneIdle = false;
-                            DrawBigText(menuList[selectedMenuItem - 1], 45, 4);
+                            // DrawBigText(menuList[selectedMenuItem - 1], 45, 4);
                             this.Machine.Switch(Enum.State.HighScore);
                             HasSwitchedState = true;
                             break;
+
+                        //case "examp":
+                        //    ButtonsHasGoneIdle = false;
+                        //    MenuState = Enum.MenuState.StartMenu;
+
+                        //    break;
+
                         default:
                             Core.Aggregate.Instance.ReadWrite.WriteToLog("DisplayMenu - Select value : " + selectedMenuItem + ". Default switch");
                             break;
@@ -835,7 +1140,7 @@ namespace OlcSideScrollingConsoleGame
 
             Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
 
-            
+
             if (Core.Aggregate.Instance.Settings.ShowEnd)
             {
                 this.Machine.Switch(Enum.State.End);
@@ -983,6 +1288,7 @@ namespace OlcSideScrollingConsoleGame
                 if (ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || IIP.Button7))
                 {
                     // Todo öppna meny
+                    MenuState = Enum.MenuState.PauseMenu;
                     this.Machine.Switch(Enum.State.Menu);
                     HasSwitchedState = true;
                     //MenuStartHasBeenReleased = false;

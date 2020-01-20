@@ -17,6 +17,26 @@ namespace OlcSideScrollingConsoleGame
             EnterHighScore
         };
 
+        public enum MenuState
+        {
+            None,
+            StartMenu,
+            PauseMenu,
+            SettingsMenu,
+            Audio,
+            ClearHighScore,
+            ClearSavedGame,
+
+            /*"Start New Game",
+"Load Saved Game",
+"View High Score",
+"Settings",
+"Exit",*/
+            /*"Resume",
+            "Save",
+            "Exit"*/
+        }
+
         public enum Direction
         {
             SOUTH = 0,

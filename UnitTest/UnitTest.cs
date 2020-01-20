@@ -81,7 +81,7 @@ namespace UnitTest
 
             var testObj = new SettingsObj()
             {
-                misc = "Unit test",
+                //misc = "Unit test",
                 //AttributeIndex = new int[3] { 1, 2, 4 }
                 //HighScoreList = HSOList
             };
@@ -108,8 +108,8 @@ namespace UnitTest
             //Assert
             Assert.IsNotNull(returnObj);
             Assert.IsTrue(returnObj is SettingsObj);
-            Assert.IsNotNull(returnObj.misc);
-            Assert.IsTrue(returnObj.misc == "Unit test");
+            //Assert.IsNotNull(returnObj.misc);
+            //Assert.IsTrue(returnObj.misc == "Unit test");
         }
 
 
