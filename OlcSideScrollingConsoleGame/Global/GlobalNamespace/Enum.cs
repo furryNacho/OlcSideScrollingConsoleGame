@@ -26,6 +26,8 @@ namespace OlcSideScrollingConsoleGame
             Audio,
             ClearHighScore,
             ClearSavedGame,
+            Load,
+            Save,
 
             /*"Start New Game",
 "Load Saved Game",

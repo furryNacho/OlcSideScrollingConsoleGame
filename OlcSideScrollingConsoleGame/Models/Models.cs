@@ -30,31 +30,40 @@ namespace OlcSideScrollingConsoleGame.Models
 
     public class SettingsObj
     {
-        public int StageCompleted { get; set; }
+        //public int StageCompleted { get; set; }
 
-        public int SpawnAtWorldMap { get; set; } = 1;
+        //public int SpawnAtWorldMap { get; set; } = 1;
+
+        public SaveSlot ActivePlayer { get; set; }
 
         public bool AudioOn { get; set; } = true;
 
         public SaveSlotMainObj SaveSlotsObjs { get; set; } = new SaveSlotMainObj();
 
-        public bool ShowEnd { get; set; }
+        //public bool ShowEnd { get; set; }
     }
 
     public class SaveSlotMainObj
     {
-        public SaveSlot SlotOne { get; set; } = new SaveSlot() {Name = "Slot One" };
-        public SaveSlot SlotTwo { get; set; } = new SaveSlot() { Name = "Slot Two" };
-        public SaveSlot SlotThree { get; set; } = new SaveSlot() { Name = "Slot Three" };
+        //public SaveSlot SlotOne { get; set; } = new SaveSlot() {Name = "Slot One" };
+        //public SaveSlot SlotTwo { get; set; } = new SaveSlot() { Name = "Slot Two" };
+        //public SaveSlot SlotThree { get; set; } = new SaveSlot() { Name = "Slot Three" };
+        public SaveSlot SlotOne { get; set; } = new SaveSlot();
+        public SaveSlot SlotTwo { get; set; } = new SaveSlot();
+        public SaveSlot SlotThree { get; set; } = new SaveSlot();
     }
     public class SaveSlot
     {
-        public DateTime DateTime { get; set; }
-        public string Name { get; set; }
-        public int AmountCompleted { get; set; }
+        public DateTime DateTime { get; set; } = DateTime.Now;
+        //public string Name { get; set; }
         public TimeSpan Time { get; set; }
-        public bool IsUsed { get; set; }
-        public int HeroEnergi { get; set; }
+        public bool IsUsed { get; set; } = false;
+        public int HeroEnergi { get; set; } = 7;
+
+
+        public int StageCompleted { get; set; } = 0;
+        public int SpawnAtWorldMap { get; set; } = 1;
+        public bool ShowEnd { get; set; } = false;
 
     }
 
@@ -81,15 +90,10 @@ namespace OlcSideScrollingConsoleGame.Models
         public bool OptionIsSlotOne { get; set; }
         public bool OptionIsSlotTwo { get; set; }
         public bool OptionIsSlotThree { get; set; }
+
+        public bool SlotIsUsed { get; set; }
     }
 
-    public class SavedGameObj
-    {
-        public int Id { get; set; }
-        public string Handle { get; set; }
-        // TODO: Energi
-        // TODO: Tid. Bygga en egen klocka för att kunna sätta tid
-    }
 
     public class KonamiObj
     {

@@ -63,7 +63,7 @@ namespace OlcSideScrollingConsoleGame.Core
             LoadItems();
             Script = new ScriptProcessor();
 
-            LoadSettings(); // TODO: läsa settings
+            LoadSettings(); 
             LoadHighScore();
 
             LoadSound();
@@ -81,6 +81,16 @@ namespace OlcSideScrollingConsoleGame.Core
                 Sound.loadSound("puttekong.wav");
                 //Sound.loopSound("Click.wav");
                 //Sound.play("Piano.wav");
+
+                if (Settings != null)
+                    if (Settings.AudioOn)
+                    {
+                       Sound.unMute();
+                    }
+                    else if(!Settings.AudioOn)
+                    {
+                        Sound.mute();
+                    }
 
             }
             catch (Exception ex)
@@ -187,6 +197,12 @@ namespace OlcSideScrollingConsoleGame.Core
         {
             Settings = ReadWrite.ReadJson<SettingsObj>(PathSettings, @"\settings", ".json");
         }
+
+        public bool SaveSettings()
+        {
+             return ReadWrite.WriteJson<SettingsObj>(PathSettings, @"\settings", ".json", Settings);
+        }
+
 
         #region High Score
         private void LoadHighScore()

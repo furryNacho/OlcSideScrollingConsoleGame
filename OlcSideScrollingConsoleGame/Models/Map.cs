@@ -225,11 +225,11 @@ namespace OlcSideScrollingConsoleGame.Models
 
             if (target.Name == "Teleport")
             {
-                if (Core.Aggregate.Instance.Settings.StageCompleted < 1)
+                if (Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted < 1)
                 {
-                    Core.Aggregate.Instance.Settings.StageCompleted = 1;
+                    Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = 1;
                 }
-                Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 1;
+                Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 1;
                 Script.AddCommand(new CommandChangeMap((target as Teleport).MapName, (target as Teleport).MapPosX, (target as Teleport).MapPosY));
             }
 
@@ -292,11 +292,11 @@ namespace OlcSideScrollingConsoleGame.Models
 
             if (target.Name == "Teleport")
             {
-                if (Core.Aggregate.Instance.Settings.StageCompleted < 2)
+                if (Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted < 2)
                 {
-                    Core.Aggregate.Instance.Settings.StageCompleted = 2;
+                    Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = 2;
                 }
-                Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 2;
+                Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 2;
                 Script.AddCommand(new CommandChangeMap((target as Teleport).MapName, (target as Teleport).MapPosX, (target as Teleport).MapPosY));
             }
 
@@ -342,12 +342,12 @@ namespace OlcSideScrollingConsoleGame.Models
 
             if (target.Name == "Teleport")
             {
-                if (Core.Aggregate.Instance.Settings.StageCompleted < 3)
+                if (Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted < 3)
                 {
-                    Core.Aggregate.Instance.Settings.StageCompleted = 3;
+                    Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = 3;
 
                 }
-                Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 3;
+                Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 3;
                 Script.AddCommand(new CommandChangeMap((target as Teleport).MapName, (target as Teleport).MapPosX, (target as Teleport).MapPosY));
             }
 
@@ -478,14 +478,14 @@ namespace OlcSideScrollingConsoleGame.Models
 
             if (target.Name == "Teleport")
             {
-                if (Core.Aggregate.Instance.Settings.StageCompleted < 4)
+                if (Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted < 4)
                 {
-                    Core.Aggregate.Instance.Settings.StageCompleted = 4;
+                    Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = 4;
 
                     // Flag this is final stage
-                    Core.Aggregate.Instance.Settings.ShowEnd = true;
+                    Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd = true;
                 }
-                Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 4;
+                Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 4;
                 Script.AddCommand(new CommandChangeMap((target as Teleport).MapName, (target as Teleport).MapPosX, (target as Teleport).MapPosY));
             }
 

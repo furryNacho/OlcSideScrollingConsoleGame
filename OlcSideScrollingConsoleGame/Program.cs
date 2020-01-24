@@ -220,6 +220,54 @@ namespace OlcSideScrollingConsoleGame
 
 
                     break;
+                case Enum.MenuState.Save:
+
+                    header = "Select Slot To Save Your Game";
+
+                    bread = "Selected Slot ";
+                    switch (SettingsSelectIndex)
+                    {
+                        case 1:
+                            bread += " One";
+                            break;
+                        case 2:
+                            bread += " Two";
+                            break;
+                        case 3:
+                            bread += " Three";
+                            break;
+                        default:
+                            bread = "";
+                            break;
+                    }
+
+                    options = DefaultListSave();
+
+                    break;
+                case Enum.MenuState.Load:
+
+                    header = "Select Game To Load";
+
+                    bread = "Selected Slot ";
+                    switch (SettingsSelectIndex)
+                    {
+                        case 1:
+                            bread += " One";
+                            break;
+                        case 2:
+                            bread += " Two";
+                            break;
+                        case 3:
+                            bread += " Three";
+                            break;
+                        default:
+                            bread = "";
+                            break;
+                    }
+
+                    options = DefaultListSave();
+
+                    break;
                 case Enum.MenuState.ClearSavedGame:
                     //Lista sparade spel.
                     //Nolla vald sparat spel
@@ -242,31 +290,34 @@ namespace OlcSideScrollingConsoleGame
                             break;
                     }
 
-                    string displayForSlotOne = "Empty";
-                    var slotOne = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne;
-                    if (slotOne.IsUsed)
-                    {
-                        displayForSlotOne = "Empty"; // TODO: skriv nåt vettigt vad det är för savestate
-                    }
-                    string displayForSlotTwo = "Empty";
-                    var slotTwo = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo;
-                    if (slotTwo.IsUsed)
-                    {
-                        displayForSlotTwo = "Empty"; // TODO: skriv nåt vettigt vad det är för savestate
-                    }
-                    string displayForSlotThree = "Empty";
-                    var slotThree = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree;
-                    if (slotThree.IsUsed)
-                    {
-                        displayForSlotThree = "Empty"; // TODO: skriv nåt vettigt vad det är för savestate
-                    }
 
-                    options = new List<OptionsObj>() {
-                        new OptionsObj { Display = "1 "+ displayForSlotOne, OptionIsSlotOne = true },
-                        new OptionsObj { Display = "2 "+ displayForSlotTwo, OptionIsSlotTwo = true },
-                        new OptionsObj { Display = "3 "+ displayForSlotThree, OptionIsSlotThree = true},
-                        new OptionsObj { Display = "Back", OptionIsBack = true },
-                    };
+                    options = DefaultListSave();
+
+                    //string displayForSlotOne = "Empty";
+                    //var slotOne = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne;
+                    //if (slotOne.IsUsed)
+                    //{
+                    //    displayForSlotOne = "Empty"; // TODO: skriv nåt vettigt vad det är för savestate
+                    //}
+                    //string displayForSlotTwo = "Empty";
+                    //var slotTwo = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo;
+                    //if (slotTwo.IsUsed)
+                    //{
+                    //    displayForSlotTwo = "Empty"; // TODO: skriv nåt vettigt vad det är för savestate
+                    //}
+                    //string displayForSlotThree = "Empty";
+                    //var slotThree = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree;
+                    //if (slotThree.IsUsed)
+                    //{
+                    //    displayForSlotThree = "Empty"; // TODO: skriv nåt vettigt vad det är för savestate
+                    //}
+
+                    //options = new List<OptionsObj>() {
+                    //    new OptionsObj { Display = "1 "+ displayForSlotOne, OptionIsSlotOne = true },
+                    //    new OptionsObj { Display = "2 "+ displayForSlotTwo, OptionIsSlotTwo = true },
+                    //    new OptionsObj { Display = "3 "+ displayForSlotThree, OptionIsSlotThree = true},
+                    //    new OptionsObj { Display = "Back", OptionIsBack = true },
+                    //};
 
                     break;
                 default:
@@ -337,26 +388,40 @@ namespace OlcSideScrollingConsoleGame
                 if (ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || IIP.Button7 || IIP.Button0))
                 {
                     var SelectedOption = options[SettingsSelectIndex - 1];
+                    ButtonsHasGoneIdle = false;
 
                     //Back to menu
                     if (SelectedOption.OptionIsBack)
                     {
-                        MenuState = Enum.MenuState.SettingsMenu;
                         ButtonsHasGoneIdle = false;
                         HasSwitchedState = true;
+
+                        if (MenuState == Enum.MenuState.Load)
+                            MenuState = Enum.MenuState.StartMenu;
+                        else if (MenuState == Enum.MenuState.Save)
+                            MenuState = Enum.MenuState.PauseMenu;
+                        else
+                            MenuState = Enum.MenuState.SettingsMenu;
+                        
                         this.Machine.Switch(Enum.State.Menu);
                     }
                     else if (MenuState == Enum.MenuState.Audio)
                     {
+                        ButtonsHasGoneIdle = false;
+
                         if (SelectedOption.Display == "Turn Sound On")
                         {
                             Core.Aggregate.Instance.Settings.AudioOn = true;
+                            Core.Aggregate.Instance.Sound.unMute();
                         }
                         else if (SelectedOption.Display == "Turn Sound Off")
                         {
                             Core.Aggregate.Instance.Settings.AudioOn = false;
+                            Core.Aggregate.Instance.Sound.mute();
                         }
-                        //TODO: save settings audio + faktiskt kolla på denna för att avgöra om det ska spelas ljud eller inte 
+
+                        Core.Aggregate.Instance.SaveSettings();
+
                     }
                     else if (MenuState == Enum.MenuState.ClearHighScore)
                     {
@@ -381,22 +446,100 @@ namespace OlcSideScrollingConsoleGame
                     }
                     else if (MenuState == Enum.MenuState.ClearSavedGame)
                     {
+                        ButtonsHasGoneIdle = false;
+
                         if (SelectedOption.OptionIsSlotOne)
                         {
-                            Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne = new SaveSlot() { Name = "Slot One" };
+                            //Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne = new SaveSlot() { Name = "Slot One" };
+                            Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne = new SaveSlot();
                         }
                         else if (SelectedOption.OptionIsSlotTwo)
                         {
-                            Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo = new SaveSlot() { Name = "Slot Two" };
+                            Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo = new SaveSlot();
                         }
                         else if (SelectedOption.OptionIsSlotThree)
                         {
-                            Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree = new SaveSlot() { Name = "Slot Three" };
+                            Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree = new SaveSlot();
                         }
-                        //TODO: spara save
+
+                        Core.Aggregate.Instance.SaveSettings();
+
+                    }
+                    else if (MenuState == Enum.MenuState.Load)
+                    {
+                        ButtonsHasGoneIdle = false;
+
+                        if (SelectedOption.SlotIsUsed)
+                        {
+                            if (SelectedOption.OptionIsSlotOne)
+                            {
+                                Load(1);
+                            }
+                            else if (SelectedOption.OptionIsSlotTwo)
+                            {
+                                Load(2);
+                            }
+                            else if (SelectedOption.OptionIsSlotThree)
+                            {
+                                Load(3);
+                            }
+                            
+                            this.Machine.Switch(Enum.State.WorldMap);
+                            HasSwitchedState = true;
+                            ButtonsHasGoneIdle = false;
+                        }
+
+                    }
+                    else if (MenuState == Enum.MenuState.Save)
+                    {
+                        //Spara spelet (indikera att spelet är sparat)
+                        ButtonsHasGoneIdle = false;
+
+                        if (SelectedOption.OptionIsSlotOne)
+                        {
+                            Save(1);
+                        }
+                        else if (SelectedOption.OptionIsSlotTwo)
+                        {
+                            Save(2);
+                        }
+                        else if (SelectedOption.OptionIsSlotThree)
+                        {
+                            Save(3);
+                        }
+
+                        Core.Aggregate.Instance.SaveSettings();
+
                     }
                 }
             }
+
+        }
+
+        private List<OptionsObj> DefaultListSave()
+        {
+            string displayForSlotOne = "Empty";
+            if (Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.IsUsed)
+            {
+                displayForSlotOne = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.DateTime.ToString("dd MMM yy") + " " + Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.StageCompleted.ToString();
+            }
+            string displayForSlotTwo = "Empty";
+            if (Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.IsUsed)
+            {
+                displayForSlotTwo = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.DateTime.ToString("dd MMM yy") + " " + Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.StageCompleted.ToString();
+            }
+            string displayForSlotThree = "Empty";
+            if (Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.IsUsed)
+            {
+                displayForSlotThree = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.DateTime.ToString("dd MMM yy") + " " + Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.StageCompleted.ToString();
+            }
+
+            return new List<OptionsObj>() {
+                        new OptionsObj { Display = "1 "+ displayForSlotOne, OptionIsSlotOne = true,OptionIsSlotTwo = false, OptionIsSlotThree = false, SlotIsUsed = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.IsUsed},
+                        new OptionsObj { Display = "2 "+ displayForSlotTwo, OptionIsSlotTwo = true, OptionIsSlotOne = false, OptionIsSlotThree = false, SlotIsUsed = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.IsUsed},
+                        new OptionsObj { Display = "3 "+ displayForSlotThree, OptionIsSlotThree = true,OptionIsSlotOne = false,OptionIsSlotTwo = false, SlotIsUsed = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.IsUsed},
+                        new OptionsObj { Display = "Back", OptionIsBack = true },
+                    };
         }
 
         int HSSelectX = 0;
@@ -826,7 +969,7 @@ namespace OlcSideScrollingConsoleGame
             SlimDx.timer_Tick();
             IIP = SlimDx.IIP;
 
-            Core.Aggregate.Instance.Settings.ShowEnd = false;
+            Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd = false;
 
             //Input
             if (Focus)
@@ -923,7 +1066,7 @@ namespace OlcSideScrollingConsoleGame
                 {
                     "Resume",
                     "Save",
-                    "Exit"
+                    "Quit"
                  };
             }
             else if (MenuState == Enum.MenuState.SettingsMenu)
@@ -1009,14 +1152,16 @@ namespace OlcSideScrollingConsoleGame
                             selectedMenuItem = 1;
 
                             // TODO: ska faktiskt starta ett nytt spel.. inte bara börja där man slutade
-
+                            Reset();
                             // TODO: spara settings lite snyggare
                             //Core.Aggregate.Instance.Settings.GameHasStarted = true;
                             //Core.Aggregate.Instance.SaveSettings(tempSaveSettings);
 
-                            this.Machine.Switch(Enum.State.WorldMap);
                             HasSwitchedState = true;
                             ButtonsHasGoneIdle = false;
+
+                            this.Machine.Switch(Enum.State.WorldMap);
+                           
                             break;
                         case "Resume":
                             selectedMenuItem = 1;
@@ -1026,11 +1171,23 @@ namespace OlcSideScrollingConsoleGame
                             break;
                         case "Save":
                             selectedMenuItem = 1;
-                            DrawBigText(menuList[selectedMenuItem - 1], 45, 4);
+
+
+                            ButtonsHasGoneIdle = false;
+                            MenuState = Enum.MenuState.Save;
+                            HasSwitchedState = true;
+                            this.Machine.Switch(Enum.State.Settings);
+
+
                             break;
                         case "Load Saved Game":
-                            selectedMenuItem = 1;
-                            DrawBigText(menuList[selectedMenuItem - 1], 45, 4);
+                            selectedMenuItem = 1; // Kanske ska sätta till 2..
+
+                            ButtonsHasGoneIdle = false;
+                            MenuState = Enum.MenuState.Load;
+                            HasSwitchedState = true;
+                            this.Machine.Switch(Enum.State.Settings);
+
                             break;
                         case "Settings":
                             selectedMenuItem = 1;
@@ -1069,7 +1226,7 @@ namespace OlcSideScrollingConsoleGame
                             MenuState = Enum.MenuState.StartMenu;
 
                             break;
-                        case "Exit":
+                        case "Quit":
 
                             // TODO: clean up.
                             //TODO: go back to main menu
@@ -1141,7 +1298,7 @@ namespace OlcSideScrollingConsoleGame
             Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
 
 
-            if (Core.Aggregate.Instance.Settings.ShowEnd)
+            if (Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd)
             {
                 this.Machine.Switch(Enum.State.End);
                 ButtonsHasGoneIdle = false;
@@ -1161,22 +1318,22 @@ namespace OlcSideScrollingConsoleGame
             float corrWorldMapPosX = 2;
             float corrWorldMapPosY = 3;
 
-            if (Core.Aggregate.Instance.Settings.SpawnAtWorldMap == 1)
+            if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 1)
             {
                 corrWorldMapPosX = 2;
                 corrWorldMapPosY = 3;
             }
-            else if (Core.Aggregate.Instance.Settings.SpawnAtWorldMap == 2)
+            else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 2)
             {
                 corrWorldMapPosX = 5;
                 corrWorldMapPosY = 3;
             }
-            else if (Core.Aggregate.Instance.Settings.SpawnAtWorldMap == 3)
+            else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 3)
             {
                 corrWorldMapPosX = 9;
                 corrWorldMapPosY = 3;
             }
-            else if (Core.Aggregate.Instance.Settings.SpawnAtWorldMap == 4)
+            else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 4)
             {
                 corrWorldMapPosX = 11;
                 corrWorldMapPosY = 5;
@@ -1232,7 +1389,7 @@ namespace OlcSideScrollingConsoleGame
                 if (ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || IIP.Button0))
                 {
                     // TODO : hantera vilken värld man ska till
-                    if (Core.Aggregate.Instance.Settings.SpawnAtWorldMap == 1)
+                    if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 1)
                     {
 
                         hasAccumulatedAllSpeed = false;
@@ -1244,7 +1401,7 @@ namespace OlcSideScrollingConsoleGame
 
                         return;
                     }
-                    else if (Core.Aggregate.Instance.Settings.SpawnAtWorldMap == 2)
+                    else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 2)
                     {
 
                         hasAccumulatedAllSpeed = false;
@@ -1256,7 +1413,7 @@ namespace OlcSideScrollingConsoleGame
 
                         return;
                     }
-                    else if (Core.Aggregate.Instance.Settings.SpawnAtWorldMap == 3)
+                    else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 3)
                     {
 
                         hasAccumulatedAllSpeed = false;
@@ -1268,7 +1425,7 @@ namespace OlcSideScrollingConsoleGame
 
                         return;
                     }
-                    else if (Core.Aggregate.Instance.Settings.SpawnAtWorldMap == 4)
+                    else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 4)
                     {
 
                         hasAccumulatedAllSpeed = false;
@@ -1307,12 +1464,12 @@ namespace OlcSideScrollingConsoleGame
                 if (myObject.IsHero)
                 {
 
-                    if ((!no1 || Core.Aggregate.Instance.Settings.StageCompleted == 0) && (myObject.px >= 2 && myObject.px <= 2.05f))
+                    if ((!no1 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 0) && (myObject.px >= 2 && myObject.px <= 2.05f))
                     {
                         /*Om vx är possitiv - instruktion att gå höger.
                          *Om vx är negativ - instruktion att gå vänster
                          *Om StageCompleted == 0 förbjud att gå till höger specifikt (i detta fall höger)*/
-                        if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.StageCompleted != 0)
+                        if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 0)
                         {
                             myObject.vx = 0;
                         }
@@ -1322,13 +1479,13 @@ namespace OlcSideScrollingConsoleGame
                         no4 = false;
                         no5 = false;
                         no6 = false;
-                        Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 1;
+                        Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 1;
 
                     }
-                    else if ((!no2 || Core.Aggregate.Instance.Settings.StageCompleted == 1) && (myObject.px >= 5 && myObject.px <= 5.09f))
+                    else if ((!no2 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 1) && (myObject.px >= 5 && myObject.px <= 5.09f))
                     {
                         // förbjud att gå höger
-                        if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.StageCompleted != 1)
+                        if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 1)
                         {
                             myObject.vx = 0;
                         }
@@ -1338,13 +1495,13 @@ namespace OlcSideScrollingConsoleGame
                         no4 = false;
                         no5 = false;
                         no6 = false;
-                        Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 2;
+                        Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 2;
 
                     }
-                    else if ((!no3 || Core.Aggregate.Instance.Settings.StageCompleted == 2) && (myObject.px >= 9 && myObject.px <= 9.1f))
+                    else if ((!no3 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 2) && (myObject.px >= 9 && myObject.px <= 9.1f))
                     {
                         // förbjud att gå höger
-                        if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.StageCompleted != 2)
+                        if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 2)
                         {
                             myObject.vx = 0;
                         }
@@ -1354,13 +1511,13 @@ namespace OlcSideScrollingConsoleGame
                         no4 = false;
                         no5 = false;
                         no6 = false;
-                        Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 3;
+                        Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 3;
 
                     }
                     else if (!no4 && (myObject.px >= 11 && myObject.px <= 11.1f && myObject.py < 3.01))
                     {
                         // förbjud att gå ner
-                        if (myObject.vy > 0 || Core.Aggregate.Instance.Settings.StageCompleted != 3)
+                        if (myObject.vy > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 3)
                         {
                             myObject.vy = 0;
                         }
@@ -1370,7 +1527,7 @@ namespace OlcSideScrollingConsoleGame
                         no4 = true;
                         no5 = false;
                         no6 = false;
-                        Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 4;
+                        Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 4;
 
                     }
                     else if (!no5 && (myObject.px >= 11 && myObject.py >= 5f && myObject.py <= 5.1f))
@@ -1383,7 +1540,7 @@ namespace OlcSideScrollingConsoleGame
                         no4 = false;
                         no5 = true;
                         no6 = false;
-                        Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 4;
+                        Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 4;
                     }
                     else if (!no6 && (myObject.px >= 11 && myObject.py >= 7f && myObject.py <= 7.01f))
                     {
@@ -1395,7 +1552,7 @@ namespace OlcSideScrollingConsoleGame
                         no4 = false;
                         no5 = false;
                         no6 = true;
-                        Core.Aggregate.Instance.Settings.SpawnAtWorldMap = 0;
+                        Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 0;
                     }
 
                 }
@@ -1719,6 +1876,7 @@ namespace OlcSideScrollingConsoleGame
             //    Clock.HardReset();
             //}
 
+
             SlimDx.timer_Tick();
             IIP = SlimDx.IIP;
 
@@ -1832,9 +1990,9 @@ namespace OlcSideScrollingConsoleGame
                                                             HasSwitchedState = true;
                                                             ActualTotalTime += new TimeSpan(7, 0, 0);
 
-                                                            if (Core.Aggregate.Instance.Settings.StageCompleted < Core.Aggregate.Instance.Settings.SpawnAtWorldMap)
+                                                            if (Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted < Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap)
                                                             {
-                                                                Core.Aggregate.Instance.Settings.StageCompleted = Core.Aggregate.Instance.Settings.SpawnAtWorldMap;
+                                                                Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap;
                                                             }
 
                                                             Konami.nope();
@@ -2670,12 +2828,87 @@ namespace OlcSideScrollingConsoleGame
         }
         #endregion
 
-        #region Reset
-        //private void Reset()
-        //{
-        //    var fakeTeleport = listDynamics.FirstOrDefault(x => x.Name == "Teleport");
-        //    CurrentMap.OnInteraction(listDynamics, fakeTeleport, Enum.NATURE.WALK);
-        //}
+        #region Reset / Load / Save
+        private void Reset()
+        {
+            //var fakeTeleport = listDynamics.FirstOrDefault(x => x.Name == "Teleport");
+            //CurrentMap.OnInteraction(listDynamics, fakeTeleport, Enum.NATURE.WALK);
+
+            // hjälten ska böra på 0
+            // antal banor klarade 0
+            // tid ska vara noll
+            // liv ska vara 7  Hero.Health;
+            // visa slut ska vara true
+            Core.Aggregate.Instance.Settings.ActivePlayer = new SaveSlot();
+
+            Hero.Health = Core.Aggregate.Instance.Settings.ActivePlayer.HeroEnergi;
+
+            //Exempel på att nolla klockan 
+            //if (experiment)
+            //{
+            //    experiment = false;
+            //    ActualTotalTime = new TimeSpan();
+            //    Clock.HardReset();
+            //}
+            // Om jag skulle vilja lägga till sparad tid
+            //ActualTotalTime = new TimeSpan(0, 0, 7, 0, 0);
+            ActualTotalTime = new TimeSpan();
+            Clock.HardReset();
+
+        }
+        private void Load(int slot)
+        {
+            if (slot == 3)
+            {
+                Core.Aggregate.Instance.Settings.ActivePlayer = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree;
+            }
+            else if (slot == 2)
+            {
+                Core.Aggregate.Instance.Settings.ActivePlayer = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo;
+            }
+            else
+            {
+                Core.Aggregate.Instance.Settings.ActivePlayer = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne;
+            }
+
+
+            ActualTotalTime = Core.Aggregate.Instance.Settings.ActivePlayer.Time;
+            Clock.HardReset();
+
+            Hero.Health = Core.Aggregate.Instance.Settings.ActivePlayer.HeroEnergi;
+        }
+        private void Save(int slot)
+        {
+            if (slot == 3)
+            {
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree = Core.Aggregate.Instance.Settings.ActivePlayer;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.HeroEnergi = Hero.Health;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.Time = GameTotalTime;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.DateTime = DateTime.Now;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.IsUsed = true;
+            }
+            else if (slot == 2)
+            {
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo = Core.Aggregate.Instance.Settings.ActivePlayer;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.HeroEnergi = Hero.Health;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.Time = GameTotalTime;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.DateTime = DateTime.Now;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.IsUsed = true;
+            }
+            else
+            {
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne = Core.Aggregate.Instance.Settings.ActivePlayer;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.HeroEnergi = Hero.Health;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.Time = GameTotalTime;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.DateTime = DateTime.Now;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.IsUsed = true;
+
+                // TODO: avgöra om jag ska spara hero x y för placering på load
+
+            }
+
+
+        }
         #endregion
 
         void DrawHUD(string mode = "")
