@@ -66,6 +66,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         public bool IsTempEnergi { get; set; }
 
         public bool IsHero { get; set; } = false;
+        public bool detHarBallatUr { get; set; }
         public bool Grounded { get; set; }
 
         public bool IsIdle { get; set; }

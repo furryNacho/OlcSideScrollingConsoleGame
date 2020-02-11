@@ -63,6 +63,7 @@ namespace OlcSideScrollingConsoleGame
         private int JumpButtonState { get; set; }
         private bool JumpButtonPressRelease { get; set; }
         private bool JumpButtonDownRelease { get; set; }
+        private bool JumpButtonDownReleaseOnce { get; set; }
         private int JumpButtonCounter { get; set; }
 
         const int ScreenW = 256;
@@ -1279,8 +1280,13 @@ namespace OlcSideScrollingConsoleGame
         //public bool WorldmapStartHasBeenReleased { get; set; }
         private void DisplayWorldMap(float elapsed)
         {
-            if (HasSwitchedState)
-                HasSwitchedState = false;
+            Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
+
+            //if (HasSwitchedState)
+            //{
+
+            //    HasSwitchedState = false;
+            //}
 
             if (Core.Aggregate.Instance.Sound != null)
             {
@@ -1344,6 +1350,20 @@ namespace OlcSideScrollingConsoleGame
                 //TODO: skicka in en placeholder och läsa settings för att avgöra vart på kartan ska placeras
                 ChangeMap("worldmap", corrWorldMapPosX, corrWorldMapPosY, Hero);
                 ButtonsHasGoneIdle = false;
+               
+            }
+
+            if (HasSwitchedState)
+            {
+                Hero.vx = 0;
+                Hero.vy = 0;
+                HasSwitchedState = false;
+
+                if (Hero.px != corrWorldMapPosX || Hero.py != corrWorldMapPosY)
+                {
+                    Hero.px = corrWorldMapPosX;
+                    Hero.py = corrWorldMapPosY;
+                }
             }
 
             SlimDx.timer_Tick();
@@ -1362,25 +1382,25 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 //Up
-                if (GetKey(Key.Up).Down || IIP.up)
+                if (ButtonsHasGoneIdle && (GetKey(Key.Up).Down || IIP.up))
                 {
                     Hero.vy = -3.0f;
                 }
 
                 //Down
-                if (GetKey(Key.Down).Down || IIP.down)
+                if (ButtonsHasGoneIdle &&  (GetKey(Key.Down).Down || IIP.down))
                 {
                     Hero.vy = 3.0f;
                 }
 
                 //Right
-                if (GetKey(Key.Right).Down || IIP.right)
+                if (ButtonsHasGoneIdle && (GetKey(Key.Right).Down || IIP.right))
                 {
                     Hero.vx = 3;
                 }
 
                 //Left
-                if (GetKey(Key.Left).Down || IIP.left)
+                if (ButtonsHasGoneIdle && (GetKey(Key.Left).Down || IIP.left))
                 {
                     Hero.vx = -3;
                 }
@@ -1979,16 +1999,24 @@ namespace OlcSideScrollingConsoleGame
                                                         ButtonsHasGoneIdle = false;
                                                         return;
                                                     }
-                                                    if ((IIP.Button0 && IIP.Button1) || Konami.AB)
+                                                    if (IIP.Button1 || Konami.B)
                                                     {
-                                                        if (!Konami.AB)
+                                                        // TODO a sen b, inte ab
+
+                                                        if (!Konami.B)
                                                         {
-                                                            Konami.AB = true;
+                                                            Konami.B = true;
+                                                            ButtonsHasGoneIdle = false;
+                                                            return;
+                                                        }
+                                                        if (IIP.Button0 || Konami.A)
+                                                        {
+                                                            Konami.A = true;
                                                             ButtonsHasGoneIdle = false;
 
                                                             this.Machine.Switch(Enum.State.WorldMap);
                                                             HasSwitchedState = true;
-                                                            ActualTotalTime += new TimeSpan(7, 0, 0);
+                                                            ActualTotalTime += new TimeSpan(1, 0, 0);
 
                                                             if (Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted < Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap)
                                                             {
@@ -1998,7 +2026,8 @@ namespace OlcSideScrollingConsoleGame
                                                             Konami.nope();
                                                             return;
                                                         }
-
+                                                        else
+                                                            Konami.nope();
                                                     }
                                                     else
                                                         Konami.nope();
@@ -2034,10 +2063,27 @@ namespace OlcSideScrollingConsoleGame
 
         #region DisplayGameMap
         // public bool GameStartHasBeenReleased { get; set; }
+        //private bool solidLeft { get; set; }
+
+        public bool detHarBallatUrLog { get; set; }
+        public float maxR { get; set; }
+        public float maxL { get; set; }
+        public float maxY { get; set; }
+        public bool BPower { get; set; }
+        public int rememberJumpCollision { get; set; }
+        public int jumpMemory { get; set; }
+        public int fallCounter { get; set; }
+        public bool allowCoyoteTime { get; set; }
+        // public int coyoteTime { get; set; }
+        public int tempMemoryJumpCounter { get; set; }
+        public int tempMemoryCayotyCounter { get; set; }
+        public int enemyJump { get; set; }
         private void DisplayStage(float elapsed)
         {
             if (HasSwitchedState)
                 HasSwitchedState = false;
+
+            Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
 
             if (Core.Aggregate.Instance.Sound != null)
             {
@@ -2052,13 +2098,16 @@ namespace OlcSideScrollingConsoleGame
                 }
             }
 
-
-            Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
+            if (enemyJump > -1)
+            {
+                enemyJump--;
+            }
 
             if (Hero.Health < 1)
             {
                 this.Machine.Switch(Enum.State.GameOver);
                 HasSwitchedState = true;
+                ButtonsHasGoneIdle = false;
             }
 
             //listDynamics = listDynamics.Where(x => x.Redundant == false).ToList(); // Kanske ska dumpa denna för att kunna göra en poff på fiende om jump damage
@@ -2073,10 +2122,20 @@ namespace OlcSideScrollingConsoleGame
             SlimDx.timer_Tick();
             IIP = SlimDx.IIP;
 
-
+            detHarBallatUrLog = false;
             // Handle Input
             if (Focus)
             {
+                //B
+                if (IIP.Button1)
+                {
+                    BPower = true;
+                }
+                else if (!IIP.Button1)
+                {
+                    BPower = false;
+                }
+
                 //Up
                 if (GetKey(Key.Up).Down || IIP.up)
                 {
@@ -2103,30 +2162,30 @@ namespace OlcSideScrollingConsoleGame
                     tempHeroObj.LookDown = false;
                 }
 
-                //Right
-                if (GetKey(Key.Right).Down || IIP.right)
-                {
-                    Hero.vx += (Hero.Grounded ? 25.0f : 15.0f) * elapsed;
-                }
-
-                //Left
-                if (GetKey(Key.Left).Down || IIP.left)
-                {
-                    Hero.vx += (Hero.Grounded ? -25.0f : -15.0f) * elapsed;
-                }
-
                 //Jump 
                 if (GetKey(Key.Space).Down || IIP.Button0)
                 {
+                    if(JumpButtonDownReleaseOnce) // hoppknapp måste ha släppts, hjälten måste vara airborn
+                        jumpMemory = 5;
+
                     if (JumpButtonState < 3)
                         JumpButtonState++;
 
+                    //coyoteTime allowCoyoteTime
+
                     #region ogrinalhopp
-                    //if (Hero.vy == 0)
-                    //{
-                    //    Core.Aggregate.Instance.Sound.play("Click.wav");
-                    //    Hero.vy = -9.3f;
-                    //}
+                    if ((Hero.vy == 0 && JumpButtonDownRelease) || (allowCoyoteTime && JumpButtonDownReleaseOnce) || enemyJump > -1)
+                    {
+
+                        if (Hero.vy != 0 && allowCoyoteTime)
+                            tempMemoryCayotyCounter++;
+
+                        Core.Aggregate.Instance.Sound.play("Click.wav");
+                        Hero.vy = -9.3f;
+                        JumpButtonDownRelease = false;
+                        jumpMemory = -1;
+                        enemyJump = -1;
+                    }
                     #endregion
 
                     #region dutthopp
@@ -2144,27 +2203,29 @@ namespace OlcSideScrollingConsoleGame
 
                     #region dubbelhopp
 
-                    if (HeroAirBornState == 0 && HeroLandedState > 0 && JumpButtonState == 1 && JumpButtonCounter == 0) // HeroAirBornState
-                    {
-                        Hero.vy -= 7.0f;
-                        // JumpButtonDownRelease = false; //#1 för att "flyga"
-                        JumpButtonCounter++;
-                        Core.Aggregate.Instance.Sound.play("Click.wav");
-                    }
-                    //else if (HeroAirBornState > 0 && HeroLandedState == 0 && JumpButtonState == 1 && !JumpButtonDownRelease) // dubbel så länge hjälte är på väg upp
-                    // else if (HeroLandedState == 0 && JumpButtonState == 1 && !JumpButtonDownRelease) // #2 för att "flyga"
-                    else if (HeroLandedState == 0 && JumpButtonState == 1 && JumpButtonCounter == 1)
-                    {
-                        Core.Aggregate.Instance.Sound.play("Click.wav");
-                        Hero.vy -= 5.0f; // Riktigt vajsing.. Ger olika höjd om man börjar testa på precis nivå
-                        JumpButtonCounter++; // för att inte kunna flyga 
-                    }
+                    //if (HeroAirBornState == 0 && HeroLandedState > 0 && JumpButtonState == 1 && JumpButtonCounter == 0) // HeroAirBornState
+                    //{
+                    //    Hero.vy -= 7.0f;
+                    //    // JumpButtonDownRelease = false; //#1 för att "flyga"
+                    //    JumpButtonCounter++;
+                    //    Core.Aggregate.Instance.Sound.play("Click.wav");
+                    //}
+                    ////else if (HeroAirBornState > 0 && HeroLandedState == 0 && JumpButtonState == 1 && !JumpButtonDownRelease) // dubbel så länge hjälte är på väg upp
+                    //// else if (HeroLandedState == 0 && JumpButtonState == 1 && !JumpButtonDownRelease) // #2 för att "flyga"
+                    //else if (HeroLandedState == 0 && JumpButtonState == 1 && JumpButtonCounter == 1)
+                    //{
+                    //    Core.Aggregate.Instance.Sound.play("Click.wav");
+                    //    Hero.vy -= 5.0f; // Riktigt vajsing.. Ger olika höjd om man börjar testa på precis nivå
+                    //    JumpButtonCounter++; // för att inte kunna flyga 
+                    //}
                     #endregion
 
-
+                    JumpButtonDownReleaseOnce = false;
                 }
                 else if (!GetKey(Key.Space).Pressed || !IIP.Button0)
                 {
+                    JumpButtonDownReleaseOnce = true;
+
                     JumpButtonState = 0;
                     JumpButtonPressRelease = true;
 
@@ -2173,6 +2234,61 @@ namespace OlcSideScrollingConsoleGame
                         JumpButtonDownRelease = true;
                         JumpButtonCounter = 0;
                     }
+                }
+                if (jumpMemory > 0 && Hero.Grounded)// && kanske Hero.vy == 0
+                {
+                    tempMemoryJumpCounter++;
+                    Core.Aggregate.Instance.Sound.play("Click.wav");
+                    Hero.vy = -9.3f;
+                    JumpButtonDownRelease = false;
+                    jumpMemory = -1;
+                }
+
+                //Right
+                if (GetKey(Key.Right).Down || IIP.right)
+                {
+                    var newSpeed = (Hero.Grounded ? 25.0f : 15.0f) * elapsed;
+                    Hero.vx += newSpeed;
+                    if (BPower)
+                    {
+                        if (Hero.vx > 10)
+                        {
+                            Hero.vx = 10;
+                        }
+                    }
+                    else
+                    {
+                        if (Hero.vx > 6)
+                        {
+                            Hero.vx = 6;
+                        }
+                    }
+                   
+                    //solidLeft = false;
+                }
+
+                //Left
+                if (GetKey(Key.Left).Down || IIP.left)
+                {
+                    var newSpeed = (Hero.Grounded ? -25.0f : -15.0f) * elapsed;
+                    Hero.vx += newSpeed;
+                    if (BPower)
+                    {
+                        if (Hero.vx < -10)
+                        {
+                            Hero.vx = -10;
+                        }
+                    }
+                    else
+                    {
+                        if (Hero.vx < -6)
+                        {
+                            Hero.vx = -6;
+                        }
+                    }
+                    //if (!solidLeft)
+                    //{
+                    //}
                 }
 
                 //if (GetKey(Key.R).Released || IIP.Button1 || IIP.Button3)
@@ -2230,39 +2346,158 @@ namespace OlcSideScrollingConsoleGame
 
             foreach (var myObject in listDynamics)
             {
-
+                myObject.detHarBallatUr = false;
 
                 if (!myObject.Redundant)
                 {
 
                     // Gravity
-                    myObject.vy += 20.0f * elapsed;
+                    //myObject.vy += 20.0f * elapsed;
+                    if (myObject.IsHero)
+                    {
+                        if (rememberJumpCollision > -1)
+                        {
+                            rememberJumpCollision--;
+                        }
+
+                        if (myObject.vy < 0)
+                        {
+                            if (BPower)
+                            {
+                                if(rememberJumpCollision < 0)
+                                    myObject.vy += 17.0f * elapsed;
+                            }
+                            else
+                            {
+                                if (rememberJumpCollision < 0)
+                                    myObject.vy += 20.0f * elapsed;
+                            }
+                        }
+                        else
+                        {
+                            myObject.vy += 21.0f * elapsed;
+                        }
+
+                    }
+                    else
+                    {
+                        myObject.vy += 20.0f * elapsed;
+                    }
 
 
                     // Drag
                     if (myObject.IsHero && myObject.Grounded)
                     {
-                        myObject.vx += -3.0f * myObject.vx * elapsed;
-                        if (Math.Abs(myObject.vx) < 0.01f)
-                            myObject.vx = 0.0f;
+                        /* myObject.vx += -3.0f * myObject.vx * elapsed;
+                            if (Math.Abs(myObject.vx) < 0.01f)
+                                myObject.vx = 0.0f;
+                         */
+                        if (!BPower)
+                        {
+                            myObject.vx += -3.0f * myObject.vx * elapsed;
+
+                            if(!IIP.left && !IIP.right)
+                            {
+                                if (Math.Abs(myObject.vx) < 3.0f)
+                                    myObject.vx = 0.0f;
+                            }
+
+                        }
+                        else if (BPower)
+                        {
+                            myObject.vx += -2.0f * myObject.vx * elapsed;
+                            if (!IIP.left && !IIP.right)
+                            {
+                                if (Math.Abs(myObject.vx) < 0.09f)
+                                    myObject.vx = 0.0f;
+                            }
+                           
+                        }
                     }
 
+                    //temp högsta hast:
+                    if (myObject.IsHero)
+                    {
+                        if (myObject.vx < maxL)
+                        {
+                            maxL = myObject.vx;
+                        }
+                        if (myObject.vx > maxR)
+                        {
+                            maxR = myObject.vx;
+                        }
+                    }
+                    //end temp
+
                     // Clamp velocities
-                    if (myObject.vx > 10.0f)
-                        myObject.vx = 10.0f;
+                    if (myObject.vx > 10.0f) // höger
+                    {
+                        if(myObject.vx > 11.0f)
+                        {
+                            myObject.detHarBallatUr = true;
+                            detHarBallatUrLog = true;
+                            myObject.vx = 0.0f;
+                        }
+                        else
+                        {
+                            myObject.vx = 10.0f;
+                        }
+                    }
 
-                    if (myObject.vx < -10.0f)
-                        myObject.vx = -10.0f;
+                    if (myObject.vx < -10.0f) // vänster
+                    {
+                        if (myObject.vx < -11.0f)
+                        {
+                            myObject.detHarBallatUr = true;
+                            detHarBallatUrLog = true;
+                            myObject.vx = 0.0f;
+                        }
+                        else
+                        {
+                            myObject.vx = -10.0f;
+                        }
+                    }
 
-                    if (myObject.vy > 100.0f)
-                        myObject.vy = 100.0f;
+                    if (myObject.vy > 20.0f)//neråt
+                    {
+                        if (myObject.vy > 25.0f)
+                        {
+                            myObject.detHarBallatUr = true;
+                            detHarBallatUrLog = true;
+                            myObject.vy = 0.0f;
+                        }
+                        else
+                        {
+                            myObject.vy = 20.0f;
+                        }
+                    }
 
-                    if (myObject.vy < -100.0f)
-                        myObject.vy = -100.0f;
+                    if (myObject.vy < -10.0f)//uppåt
+                    {
+                        if (myObject.vy < -11.0f)
+                        {
+                            myObject.detHarBallatUr = true;
+                            detHarBallatUrLog = true;
+                            myObject.vy = 0.0f;
+                        }
+                        else
+                        {
+                            myObject.vy = -10.0f;
+                        }
+                    }
+                    //End Clamp velocities
 
 
                     float NewObjectPosX = myObject.px + myObject.vx * elapsed;
                     float NewObjectPosY = myObject.py + myObject.vy * elapsed;
+
+                    if (myObject.IsHero && rememberJumpCollision >= 0)
+                    {
+                        if (NewObjectPosY > myObject.py)
+                        {
+                            NewObjectPosY = myObject.py;
+                        }
+                    }
 
                     //
                     // Collision
@@ -2272,18 +2507,31 @@ namespace OlcSideScrollingConsoleGame
                     if (myObject.vx <= 0) // Moving Left
                     {
                         var turnPatrol = false;
-                        if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.9f)))
+                        //if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.9f)))
+                        if (CurrentMap.GetSolid((int)(NewObjectPosX + 0), (int)(myObject.py + 0.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.9f)))
                         {
+                            //if (myObject.IsHero)
+                            //{
+                            //  //  solidLeft = true;
+                            //}
                             //NewObjectPosX = (int)NewObjectPosX + 1;
-                            NewObjectPosX = NewObjectPosX + 0.1f;
+                            //NewObjectPosX = (int)NewObjectPosX + 0.9f;
+                            NewObjectPosX = (int)(NewObjectPosX + 0.9f);
+
                             myObject.vx = 0;
 
                             turnPatrol = true;
                         }
+                        //else
+                        //{
+                        //    if (myObject.IsHero)
+                        //    {
+                        //        solidLeft = false;
+                        //    }
+                        //}
 
                         if (myObject.Name == "walrus")
                         {
-
                             var x1 = (int)(NewObjectPosX + 0.0f);
                             var y1 = (int)(myObject.py + 0.0f) + 1; // +1 ner ett 
                             bool ena = CurrentMap.GetSolid(x1, y1);
@@ -2291,6 +2539,8 @@ namespace OlcSideScrollingConsoleGame
                             var x2 = (int)(NewObjectPosX + 0.0f);
                             var y2 = (int)(myObject.py + 0.9f) + 1; // +1 ner ett 
                             bool andra = CurrentMap.GetSolid(x2, y2);
+
+                           
 
                             if (!ena || !andra || turnPatrol)
                             {
@@ -2303,6 +2553,7 @@ namespace OlcSideScrollingConsoleGame
                             {
                                 myObject.Patrol = Enum.Actions.Left;
                             }
+
                         }
                     }
                     else // Moving Right
@@ -2326,6 +2577,7 @@ namespace OlcSideScrollingConsoleGame
                             var y2 = (int)(myObject.py + (1.0f - fBorder) + 1); // +1 ner ett 
                             bool andra = CurrentMap.GetSolid(x2, y2);
 
+                         
                             if (!ena || !andra || turnPatrol)
                             {
                                 NewObjectPosX = (int)NewObjectPosX;
@@ -2336,6 +2588,7 @@ namespace OlcSideScrollingConsoleGame
                             {
                                 myObject.Patrol = Enum.Actions.Right;
                             }
+
                         }
 
                     }
@@ -2349,6 +2602,12 @@ namespace OlcSideScrollingConsoleGame
                         //Hjälten airborn
                         if (myObject.IsHero)
                         {
+                            jumpMemory = -1;
+
+                            //coyoteTime = -1;
+
+                            allowCoyoteTime = false;
+                            fallCounter = 0;
 
                             if (HeroAirBornState < 3)
                             {
@@ -2360,6 +2619,19 @@ namespace OlcSideScrollingConsoleGame
                         {
                             NewObjectPosY = (int)NewObjectPosY + 1;
                             myObject.vy = 0;
+
+                            //if (myObject.IsHero && IIP.Button1 && rememberJumpCollision < 0)
+                            //{
+                            //    rememberJumpCollision = 5;
+                            //}
+                            //if (myObject.IsHero && !IIP.Button1 && IIP.Button0 && rememberJumpCollision < 0)
+                            //{
+                            //    rememberJumpCollision = 5;
+                            //}
+                            if (myObject.IsHero && rememberJumpCollision < 0)
+                            {
+                                rememberJumpCollision = 5;
+                            }
                         }
 
                         //Hjälten landat - reset 
@@ -2367,10 +2639,15 @@ namespace OlcSideScrollingConsoleGame
                         {
                             HeroLandedState = 0;
                         }
-
                     }
-                    else // Moving Down
+                    else if(myObject.vy > 0)// Moving Down
                     {
+                        //if (myObject.IsHero && myObject.vy > 1 && coyoteTime < 0)
+                        //{
+                        //    coyoteTime = 90;
+                        //}
+                        //if (coyoteTime >= 0)
+                        //    coyoteTime--;
 
                         if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(NewObjectPosY + 1.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.9f), (int)(NewObjectPosY + 1.0f)))
                         {
@@ -2382,6 +2659,8 @@ namespace OlcSideScrollingConsoleGame
                             //Hjälten landat
                             if (myObject.IsHero)
                             {
+                                fallCounter = 0;
+                                allowCoyoteTime = true;
 
                                 if (HeroLandedState < 3)
                                 {
@@ -2402,8 +2681,14 @@ namespace OlcSideScrollingConsoleGame
                         if (myObject.IsHero)
                         {
                             HeroAirBornState = 0;
+                            if(jumpMemory >= 0)
+                                jumpMemory -= 1;
                         }
 
+                        if (myObject.IsHero && myObject.vy > 1 && fallCounter < 10)
+                            fallCounter++;
+                        if(fallCounter > 3) //3
+                            allowCoyoteTime = false;
                     }
 
 
@@ -2468,7 +2753,21 @@ namespace OlcSideScrollingConsoleGame
 
                                     }
 
-
+                                    //if (otherObject.Name == "walrus" || myObject.Name == "walrus")
+                                    if (myObject.Name == "walrus" && !otherObject.Friendly)
+                                    {
+                                        
+                                        if (myObject.Patrol == Enum.Actions.Right)
+                                        {
+                                            myObject.Patrol = Enum.Actions.Left;
+                                            myObject.vx = -2;
+                                        }
+                                        else
+                                        {
+                                            myObject.Patrol = Enum.Actions.Right;
+                                            myObject.vx = 2;
+                                        }
+                                    }
 
                                 }
 
@@ -2499,13 +2798,15 @@ namespace OlcSideScrollingConsoleGame
                                                 if (!myObject.IsHero)
                                                 {
                                                     //studsa hjälten lite
-                                                    Hero.vy = -8.5f;
-
+                                                    //Hero.vy = -8.5f;
+                                                    Hero.vy = -5.5f;
+                                                    Hero.Grounded = true;
                                                     JumpDamage((Creature)Hero, (Creature)myObject);
                                                 }
                                             }
                                         }
 
+                                       
 
                                     }
                                     else
@@ -2519,8 +2820,8 @@ namespace OlcSideScrollingConsoleGame
                                             if (!otherObject.Friendly) // otherObject är fiende
                                             {
                                                 //studsa hjälten lite
-                                                Hero.vy = -8.5f;
-
+                                                Hero.vy = -5.5f;
+                                                Hero.Grounded = true;
                                                 JumpDamage((Creature)Hero, (Creature)otherObject);
                                             }
                                         }
@@ -2528,6 +2829,10 @@ namespace OlcSideScrollingConsoleGame
 
 
                                     }
+
+
+                                   
+
                                 }
                             }
                             else
@@ -2559,12 +2864,21 @@ namespace OlcSideScrollingConsoleGame
 
 
                     // Apply new position
-                    myObject.px = DynamicObjectPosX;
-                    myObject.py = DynamicObjectPosY;
-
+                    if (!myObject.detHarBallatUr)
+                    {
+                        myObject.px = DynamicObjectPosX;
+                        myObject.py = DynamicObjectPosY;
+                    }
+                    else
+                    {
+                        if (detHarBallatUrLog && myObject.Name != "pickup")
+                            Core.Aggregate.Instance.ReadWrite.WriteToLog($"Did not update position. Name: {myObject.Name}. Velocity X: {myObject.vx}. Velocuty Y: {myObject.vy}");
+                    }
+                    //End Apply new position
 
                     //Uppdatera Objektet!
                     myObject.Update(elapsed, Hero);
+
                 }
                 else
                 {
@@ -2584,6 +2898,7 @@ namespace OlcSideScrollingConsoleGame
             //// Link camera to player position
             CameraPosX = Hero.px; // Ganska bra om det finns direkt tillgång till spelar obj, även om det kommer finnas massa olika obj, för kameran vill alltid följa spelaren.
             CameraPosY = Hero.py;
+            //end link camera
 
             // Draw Levels
             int nTileWidth = 16;
@@ -2643,7 +2958,8 @@ namespace OlcSideScrollingConsoleGame
             //string msg = "player - x: " + Hero.px + " y: " + Hero.py;
             //DisplayDialog(new List<string>() { msg }, 10, 10);
 
-            DisplayDialog(new List<string>() { "Air: " + HeroAirBornState + " Land: " + HeroLandedState + " Jump: " + JumpButtonState }, 10, 10);
+            //DisplayDialog(new List<string>() { "Air: " + HeroAirBornState + " Land: " + HeroLandedState + " Jump: " + JumpButtonState }, 10, 10);
+            //DisplayDialog(new List<string>() { "maxL: " + maxL + " maxR: " + maxR }, 10, 10);
 
             DrawHUD();
         }
@@ -2697,8 +3013,12 @@ namespace OlcSideScrollingConsoleGame
         private int AnimationCount = 10;
         private void DisplayGameOver(float elapsed)
         {
+            Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
+
             if (HasSwitchedState)
                 HasSwitchedState = false;
+
+           
 
             this.Clear((Pixel)Pixel.Presets.Black);
 
@@ -2711,10 +3031,30 @@ namespace OlcSideScrollingConsoleGame
                 Hero.Health = 10;
             }
 
-            // klicka ut ur animation
-            if (GetKey(Key.Space).Pressed || IIP.Button0)
+            //Button spam lock  
+            if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
             {
-                this.Machine.Switch(Enum.State.GameMap);
+                ButtonsHasGoneIdle = true;
+            }
+            // klicka ut ur animation
+            //if (ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || IIP.Button0))
+            if (ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !IIP.idle))
+            {
+               
+
+                //this.Machine.Switch(Enum.State.GameMap);
+
+                if (GetKey(Key.Space).Pressed || IIP.Button0)
+                {
+                    Reset();
+                    this.Machine.Switch(Enum.State.WorldMap);
+                }
+                else
+                {
+                    MenuState = Enum.MenuState.StartMenu;
+                    this.Machine.Switch(Enum.State.Menu);
+                }
+
                 HasSwitchedState = true;
                 AnimateCirkle = ScreenH;
                 AnimationCount = 10;
@@ -2821,6 +3161,8 @@ namespace OlcSideScrollingConsoleGame
                 // statisk bild
                 this.Clear((Pixel)Pixel.Presets.Black);
                 DrawBigText("Player Dead", 4, 4);
+                //DrawBigText("YOLO", 8, 8);
+                DrawBigText("Jump = restart. Any = Menu", 4, 32);
                 DrawBigText("Press button to continue", 8, 160);
             }
 
@@ -2854,42 +3196,96 @@ namespace OlcSideScrollingConsoleGame
             //ActualTotalTime = new TimeSpan(0, 0, 7, 0, 0);
             ActualTotalTime = new TimeSpan();
             Clock.HardReset();
+            RightToAccessPodium = true;
+            //Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd = false;
+            Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = 0;
 
         }
         private void Load(int slot)
         {
             if (slot == 3)
             {
-                Core.Aggregate.Instance.Settings.ActivePlayer = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree;
+                //Core.Aggregate.Instance.Settings.ActivePlayer = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree;
+                var copyObj = new SaveSlot()
+                {
+                    DateTime = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.DateTime,
+                    Time = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.Time,
+                    IsUsed = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.IsUsed,
+                    HeroEnergi = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.HeroEnergi,
+                    StageCompleted = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.StageCompleted,
+                    SpawnAtWorldMap = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.SpawnAtWorldMap,
+                    ShowEnd = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.ShowEnd
+                };
+                ActualTotalTime = copyObj.Time;
+                Core.Aggregate.Instance.Settings.ActivePlayer = copyObj;
+                Hero.Health = copyObj.HeroEnergi;
             }
             else if (slot == 2)
             {
-                Core.Aggregate.Instance.Settings.ActivePlayer = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo;
+                //Core.Aggregate.Instance.Settings.ActivePlayer = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo;
+                var copyObj = new SaveSlot()
+                {
+                    DateTime = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.DateTime,
+                    Time = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.Time,
+                    IsUsed = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.IsUsed,
+                    HeroEnergi = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.HeroEnergi,
+                    StageCompleted = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.StageCompleted,
+                    SpawnAtWorldMap = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.SpawnAtWorldMap,
+                    ShowEnd = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.ShowEnd
+                };
+                ActualTotalTime = copyObj.Time;
+                Core.Aggregate.Instance.Settings.ActivePlayer = copyObj;
+                Hero.Health = copyObj.HeroEnergi;
             }
             else
             {
-                Core.Aggregate.Instance.Settings.ActivePlayer = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne;
+                //Core.Aggregate.Instance.Settings.ActivePlayer = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne;
+                var copyObj = new SaveSlot()
+                {
+                    DateTime = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.DateTime,
+                    Time = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.Time,
+                    IsUsed = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.IsUsed,
+                    HeroEnergi = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.HeroEnergi,
+                    StageCompleted = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.StageCompleted,
+                    SpawnAtWorldMap = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.SpawnAtWorldMap,
+                    ShowEnd = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.ShowEnd
+                };
+                ActualTotalTime = copyObj.Time;
+                Core.Aggregate.Instance.Settings.ActivePlayer = copyObj;
+                Hero.Health = copyObj.HeroEnergi;
             }
 
 
-            ActualTotalTime = Core.Aggregate.Instance.Settings.ActivePlayer.Time;
+            //ActualTotalTime = Core.Aggregate.Instance.Settings.ActivePlayer.Time;
             Clock.HardReset();
 
-            Hero.Health = Core.Aggregate.Instance.Settings.ActivePlayer.HeroEnergi;
+            //Hero.Health = Core.Aggregate.Instance.Settings.ActivePlayer.HeroEnergi;
         }
         private void Save(int slot)
         {
+            var copyObj = new SaveSlot()
+            {
+                DateTime = Core.Aggregate.Instance.Settings.ActivePlayer.DateTime,
+                Time = Core.Aggregate.Instance.Settings.ActivePlayer.Time,
+                IsUsed = Core.Aggregate.Instance.Settings.ActivePlayer.IsUsed,
+                HeroEnergi = Core.Aggregate.Instance.Settings.ActivePlayer.HeroEnergi,
+                StageCompleted = Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted,
+                SpawnAtWorldMap = Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap,
+                ShowEnd = Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd
+            };
+
             if (slot == 3)
             {
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree = Core.Aggregate.Instance.Settings.ActivePlayer;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree = copyObj;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.HeroEnergi = Hero.Health;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.Time = GameTotalTime;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.DateTime = DateTime.Now;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.IsUsed = true;
+
             }
             else if (slot == 2)
             {
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo = Core.Aggregate.Instance.Settings.ActivePlayer;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo = copyObj;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.HeroEnergi = Hero.Health;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.Time = GameTotalTime;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.DateTime = DateTime.Now;
@@ -2897,14 +3293,11 @@ namespace OlcSideScrollingConsoleGame
             }
             else
             {
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne = Core.Aggregate.Instance.Settings.ActivePlayer;
+                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne = copyObj;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.HeroEnergi = Hero.Health;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.Time = GameTotalTime;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.DateTime = DateTime.Now;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.IsUsed = true;
-
-                // TODO: avgöra om jag ska spara hero x y för placering på load
-
             }
 
 
@@ -2941,7 +3334,7 @@ namespace OlcSideScrollingConsoleGame
             //int idx = fullTime.LastIndexOf('.');
             //string Text = Hero.Health.ToString() + "% "+ fullTime.Substring(0, idx+2);
             //string Text = Hero.Health.ToString() + "% " + fullTime;
-            string Text = Hero.Health.ToString() + "% " + GameTotalTime.ToString();
+            string Text = Hero.Health.ToString() + "% " + GameTotalTime.ToString("hh':'mm':'ss'.'fff");
             int i = 0;
             foreach (var c in Text)
             {
@@ -2967,7 +3360,7 @@ namespace OlcSideScrollingConsoleGame
 
             // powerbar meter
             //Pixel color = (Pixel)Pixel.Presets.DarkGreen;
-            Pixel color = (Pixel)Pixel.Presets.Black;
+            Pixel color = (Pixel)Pixel.Presets.Green;
 
             int EnergiOmeter = 14; // 14 är full. Max liv är 99. 
             //int RoundEnergiOmeter = 99 / Hero.Health;
@@ -2991,17 +3384,17 @@ namespace OlcSideScrollingConsoleGame
             else if (RoundEnergiOmeter >= 21 && RoundEnergiOmeter < 28)
             {
                 EnergiOmeter = 4;
-                color = (Pixel)Pixel.Presets.Green;
+                //color = (Pixel)Pixel.Presets.Green;
             }
             else if (RoundEnergiOmeter >= 28 && RoundEnergiOmeter < 35)
             {
                 EnergiOmeter = 5;
-                color = (Pixel)Pixel.Presets.Green;
+                //color = (Pixel)Pixel.Presets.Green;
             }
             else if (RoundEnergiOmeter >= 35 && RoundEnergiOmeter < 42)
             {
                 EnergiOmeter = 6;
-                color = (Pixel)Pixel.Presets.Green;
+                //color = (Pixel)Pixel.Presets.Green;
             }
             else if (RoundEnergiOmeter >= 42 && RoundEnergiOmeter < 49)
             {
@@ -3055,7 +3448,13 @@ namespace OlcSideScrollingConsoleGame
             }
             else
             {
-                DrawBigText("X: " + Hero.px + " Y: " + Hero.py, 25, 25);
+                //DrawBigText("X: " + Hero.px + " Y: " + Hero.py, 25, 25);
+                //DrawBigText("vX: " + Hero.vx+" vY: "+Hero.vy, 25, 25);
+                //DrawBigText("memoryjump: " + tempMemoryJumpCounter, 25, 30);
+                //DrawBigText("CayotyCounter: " + tempMemoryCayotyCounter, 25, 40);
+                //DrawBigText("allowCoyoteTime: " + allowCoyoteTime, 35, 40);
+                
+
             }
 
         }
@@ -3145,6 +3544,9 @@ namespace OlcSideScrollingConsoleGame
             victim.Health = 0;
             victim.Redundant = true;
             victim.RemoveCount = 1;
+
+            enemyJump = 5;
+
         }
         public void ShowDialog(List<string> listLines)
         {

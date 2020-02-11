@@ -141,6 +141,115 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
                     }
                     else
                     {
+                        vy = 0;
+                        vx = 0;
+
+                    }
+
+                    StateTick += 1.0f;
+                }
+            }
+
+        }
+    }
+
+    public class DynamicCreatureEnemyWind : Creature
+    {
+
+        public DynamicCreatureEnemyWind() : base("enemywind", Core.Aggregate.Instance.GetSprite("enemywind"))
+        {
+            Friendly = true;
+            Health = 50;
+            MaxHealth = 50;
+            SolidVsDynamic = true;
+            SolidVsMap = true;
+            DamageGiven = 0;
+        }
+
+        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null)
+        {
+            if (Health <= 0)
+            {
+                vx = 0;
+                vy = 0;
+                SolidVsDynamic = false;
+                IsAttackable = false;
+                // Patrol = Enum.Actions.Left;
+                return;
+            }
+
+            if (player != null)
+            {
+                // patrol (and fear of heights)
+
+                StateTick -= fElapsedTime;
+
+                if (StateTick <= 0.0f) // för att inte göra beslut så ofta. 
+                {
+                    if (Patrol == Enum.Actions.Left)
+                    {
+                        vx = -2;
+                    }
+                    else if (Patrol == Enum.Actions.Right)
+                    {
+                        vx = 2;
+                    }
+                    else
+                    {
+                        vx = 0;
+                        vy = 0;
+                    }
+
+                    StateTick += 1.0f;
+                }
+            }
+
+        }
+    }
+
+    public class DynamicCreatureEnemyFrostBoss : Creature
+    {
+
+        public DynamicCreatureEnemyFrostBoss() : base("enemyboss", Core.Aggregate.Instance.GetSprite("enemyboss"))
+        {
+            Friendly = false;
+            Health = 50;
+            MaxHealth = 50;
+            SolidVsDynamic = true;
+            SolidVsMap = true;
+            DamageGiven = 10;
+        }
+
+        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null)
+        {
+            if (Health <= 0)
+            {
+                vx = 0;
+                vy = 0;
+                SolidVsDynamic = false;
+                IsAttackable = false;
+               // Patrol = Enum.Actions.Left;
+                return;
+            }
+
+            if (player != null)
+            {
+                // patrol (and fear of heights)
+
+                StateTick -= fElapsedTime;
+
+                if (StateTick <= 0.0f) // för att inte göra beslut så ofta. 
+                {
+                    if (Patrol == Enum.Actions.Left)
+                    {
+                        vx = -2;
+                    }
+                    else if (Patrol == Enum.Actions.Right)
+                    {
+                        vx = 2;
+                    }
+                    else
+                    {
                         vx = 0;
                         vy = 0;
                     }

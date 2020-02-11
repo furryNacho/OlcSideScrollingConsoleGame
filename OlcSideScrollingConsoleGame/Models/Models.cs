@@ -65,6 +65,9 @@ namespace OlcSideScrollingConsoleGame.Models
         public int SpawnAtWorldMap { get; set; } = 1;
         public bool ShowEnd { get; set; } = false;
 
+        //public float PosX { get; set; }
+        //public float PosY { get; set; }
+
     }
 
     public class HighScoreObj
@@ -99,7 +102,7 @@ namespace OlcSideScrollingConsoleGame.Models
     {
         public void nope()
         {
-            up = upUp = down = downDown = left = right = leftLeft = rightRight = AB = false;
+            up = upUp = down = downDown = left = right = leftLeft = rightRight = AB = A = B = false;
         }
 
         public bool up { get; set; }
@@ -111,6 +114,10 @@ namespace OlcSideScrollingConsoleGame.Models
         public bool leftLeft { get; set; }
         public bool rightRight { get; set; }
         public bool AB { get; set; }
+
+        public bool A { get; set; }
+
+        public bool B { get; set; }
 
     }
 
