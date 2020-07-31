@@ -102,6 +102,13 @@ namespace OlcSideScrollingConsoleGame.Core
 
         private void LoadSprites()
         {
+            LoadSprite("tilesheetspring", PathSprites, @"\tilesheetspring", ".png");
+            LoadSprite("tilesheetsummer", PathSprites, @"\tilesheetsummer", ".png");
+            LoadSprite("tilesheetfall", PathSprites, @"\tilesheetfall", ".png");
+            LoadSprite("tilesheetwinter", PathSprites, @"\tilesheetwinter", ".png");
+
+
+            LoadSprite("tilesheetwm", PathSprites, @"\tilesheetwm", ".png"); // tile sheet
             LoadSprite("tilesheetone", PathSprites, @"\tilesheetone", ".png"); // tile sheet
             LoadSprite("tilesheettwo", PathSprites, @"\tilesheettwo", ".png"); // tile sheet
             LoadSprite("font", PathSprites, @"\font", ".png"); // font
@@ -113,6 +120,8 @@ namespace OlcSideScrollingConsoleGame.Core
             LoadSprite("enemyzero", PathSprites, @"\enemyzero", ".png");
             LoadSprite("enemyone", PathSprites, @"\enemyone", ".png");
             LoadSprite("enemytwo", PathSprites, @"\enemytwo", ".png");
+            LoadSprite("enemythree", PathSprites, @"\enemythree", ".png");
+            LoadSprite("enemyboss", PathSprites, @"\enemyboss", ".png");
 
             LoadSprite("cord", PathSprites, @"\cord", ".bmp"); // tile sheet that is coordinates
 
@@ -137,11 +146,17 @@ namespace OlcSideScrollingConsoleGame.Core
 
         private void LoadAllMapData()
         {
-            LoadMapData("mapone", PathMapData, @"\mapone", ".json"); // map one
-            LoadMapData("maptwo", PathMapData, @"\maptwo", ".json"); // map two
-            LoadMapData("worldmap", PathMapData, @"\worldmap", ".json"); // map two
-            LoadMapData("mapthree", PathMapData, @"\mapthree", ".json"); // map three
+            LoadMapData("worldmap", PathMapData, @"\worldmap", ".json");
+            LoadMapData("mapone", PathMapData, @"\mapone", ".json"); 
+            LoadMapData("maptwo", PathMapData, @"\maptwo", ".json"); 
+            LoadMapData("mapthree", PathMapData, @"\mapthree", ".json"); 
             LoadMapData("mapfour", PathMapData, @"\mapfour", ".json");
+            LoadMapData("mapfive", PathMapData, @"\mapfive", ".json");
+            LoadMapData("mapsix", PathMapData, @"\mapsix", ".json");
+            LoadMapData("mapseven", PathMapData, @"\mapseven", ".json");
+            LoadMapData("mapeight", PathMapData, @"\mapeight", ".json");
+            LoadMapData("mapnine", PathMapData, @"\mapnine", ".json");
+
         }
 
         private void LoadMapData(string FriendlyName, string FilePath, string FileName, string FileExtension)
@@ -172,18 +187,28 @@ namespace OlcSideScrollingConsoleGame.Core
 
         private void LoadMaps()
         {
+            var wm = new WorldMap();
+            MapMaps.Add("worldmap", wm);
+
             var lvl1 = new MapOne();
             MapMaps.Add("mapone", lvl1);
             var lvl2 = new MapTwo();
             MapMaps.Add("maptwo", lvl2);
             var lvl3 = new MapThree();
             MapMaps.Add("mapthree", lvl3);
-
             var lvl4 = new MapFour();
             MapMaps.Add("mapfour", lvl4);
+            var lvl5 = new MapFive();
+            MapMaps.Add("mapfive", lvl5);
+            var lvl6 = new MapSix();
+            MapMaps.Add("mapsix", lvl6);
+            var lvl7 = new MapSeven();
+            MapMaps.Add("mapseven", lvl7);
+            var lvl8 = new MapEight();
+            MapMaps.Add("mapeight", lvl8);
 
-            var wm = new WorldMap();
-            MapMaps.Add("worldmap", wm);
+            var lvl9 = new MapNine();
+            MapMaps.Add("mapnine", lvl9);
 
         }
 

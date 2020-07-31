@@ -107,7 +107,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = Core.Aggregate.Instance.GetMapData("worldmap"),
-                sprite = Core.Aggregate.Instance.GetSprite("tilesheetone"),
+                sprite = Core.Aggregate.Instance.GetSprite("tilesheetwm"), // tilesheetwm //tilesheetone
                 name = "worldmap",
             };
 
@@ -157,7 +157,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = Core.Aggregate.Instance.GetMapData("mapone"),
-                sprite = Core.Aggregate.Instance.GetSprite("tilesheetone"),
+                sprite = Core.Aggregate.Instance.GetSprite("tilesheetspring"),
                 name = "mapone",
             };
 
@@ -176,8 +176,8 @@ namespace OlcSideScrollingConsoleGame.Models
         {
 
             //Placering
-            float placeraPortalX = 50;
-            float placeraPortalY = 3;
+            float placeraPortalX = 57.5f;
+            float placeraPortalY = 20;
             float skickaTillX = 2;
             float skickaTillY = 3;
             // ListDynamicObjs.Add(new Teleport(placeraPortalX, placeraPortalY, "maptwo", skickaTillX, skickaTillY)); // Placering hamna, plcering visa
@@ -185,36 +185,48 @@ namespace OlcSideScrollingConsoleGame.Models
 
 
             // Placera ut fiender
-            DynamicGameObject g1 = new DynamicCreatureEnemyPenguin();
-            ListDynamicObjs.Add(g1);
-            g1.px = 11;
-            g1.py = 5;
-            g1.Name = "NoOne";
+            //DynamicGameObject g1 = new DynamicCreatureEnemyPenguin();
+            //ListDynamicObjs.Add(g1);
+            //g1.px = 11;
+            //g1.py = 5;
+            //g1.Name = "BadPeng";
 
-            DynamicGameObject g2 = new DynamicCreatureEnemyPenguin();
-            ListDynamicObjs.Add(g2);
-            g2.px = 14;
-            g2.py = 5;
-            g2.Name = "NoTwo";
+            //DynamicGameObject g2 = new DynamicCreatureEnemyPenguin();
+            //ListDynamicObjs.Add(g2);
+            //g2.px = 14;
+            //g2.py = 5;
+            //g2.Name = "NoTwo";
 
 
             //Valross
             DynamicGameObject g3 = new DynamicCreatureEnemyWalrus();
             ListDynamicObjs.Add(g3);
-            g3.px = 20;
-            g3.py = 13;
+            g3.px = 37;
+            g3.py = 21;
             g3.Name = "walrus";
 
 
             //Istapp 
-            DynamicGameObject g4 = new DynamicCreatureEnemyIcicle();
-            ListDynamicObjs.Add(g4);
-            g4.px = 60;
-            g4.py = 7;
-            g4.Name = "icicle";
+            //DynamicGameObject g4 = new DynamicCreatureEnemyIcicle();
+            //ListDynamicObjs.Add(g4);
+            //g4.px = 60;
+            //g4.py = 7;
+            //g4.Name = "icicle";
+
+
+            // 3 18
+            //DynamicGameObject g5 = new DynamicCreatureEnemyFrostBoss();
+            //ListDynamicObjs.Add(g5);
+            //g5.px = 3;
+            //g5.py = 18;
+            //g5.Name = "frostboss";
+
 
             // Add items
-            ListDynamicObjs.Add(new DynamicItem(10, 10, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(20, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(25, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(43, 22, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(47, 22, Core.Aggregate.Instance.GetItem("energi")));
 
 
             return true;
@@ -250,7 +262,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = Core.Aggregate.Instance.GetMapData("maptwo"),
-                sprite = Core.Aggregate.Instance.GetSprite("tilesheetone"),
+                sprite = Core.Aggregate.Instance.GetSprite("tilesheetspring"),
                 name = "maptwo",
             };
 
@@ -266,8 +278,9 @@ namespace OlcSideScrollingConsoleGame.Models
         public override bool PopulateDynamics(List<DynamicGameObject> ListDynamicObjs)
         {
 
+
             //ListDynamicObjs.Add(new Teleport(50.0f, 3.0f, "mapone", 2.0f, 2.0f)); // placering portal
-            ListDynamicObjs.Add(new Teleport(58.0f, 3.0f, "worldmap", 2.0f, 3.0f));
+            ListDynamicObjs.Add(new Teleport(125.5f, 23.0f, "worldmap", 2.0f, 3.0f));
 
 
             //Valross
@@ -282,6 +295,46 @@ namespace OlcSideScrollingConsoleGame.Models
             g3.px = 20;
             g3.py = 13;
             g3.Name = "walrus";
+
+            DynamicGameObject g4 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(g4);
+            g4.px = 87;
+            g4.py = 21;
+            g4.Name = "walrus";
+
+            DynamicGameObject g5 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(g5);
+            g5.px = 93;
+            g5.py = 22;
+            g5.Name = "walrus";
+
+            DynamicGameObject g6 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(g6);
+            g6.px = 100;
+            g6.py = 22;
+            g6.Name = "walrus";
+
+            DynamicGameObject g7 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(g7);
+            g7.px = 111;
+            g7.py = 18;
+            g7.Name = "walrus";
+
+            DynamicGameObject g8 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(g8);
+            g8.px = 47;
+            g8.py = 22;
+            g8.Name = "walrus";
+
+            ListDynamicObjs.Add(new DynamicItem(29, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(30, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(31, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(32, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(65, 18, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(97, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(98, 23, Core.Aggregate.Instance.GetItem("energi")));
+
+            ListDynamicObjs.Add(new DynamicItem(40, 18, Core.Aggregate.Instance.GetItem("energi")));
 
 
             return true;
@@ -314,7 +367,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = Core.Aggregate.Instance.GetMapData("mapthree"),
-                sprite = Core.Aggregate.Instance.GetSprite("tilesheetone"),
+                sprite = Core.Aggregate.Instance.GetSprite("tilesheetsummer"),
                 name = "mapthree",
             };
 
@@ -331,8 +384,67 @@ namespace OlcSideScrollingConsoleGame.Models
         {
 
             //ListDynamicObjs.Add(new Teleport(50.0f, 3.0f, "mapone", 2.0f, 2.0f)); // placering portal
-            ListDynamicObjs.Add(new Teleport(58.0f, 3.0f, "worldmap", 2.0f, 5.0f));
+            ListDynamicObjs.Add(new Teleport(187.5f, 3.0f, "worldmap", 2.0f, 5.0f));
 
+
+            ListDynamicObjs.Add(new DynamicItem(31, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(32, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(33, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(34, 23, Core.Aggregate.Instance.GetItem("energi")));
+
+            ListDynamicObjs.Add(new DynamicItem(189, 17, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(172, 19, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(155, 22, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(83, 8, Core.Aggregate.Instance.GetItem("energi")));
+
+
+            DynamicGameObject g1 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g1);
+            g1.px = 20;
+            g1.py =22;
+            g1.Name = "BadPeng"; 
+
+            DynamicGameObject g2 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g2);
+            g2.px = 45;
+            g2.py = 18;
+            g2.Name = "BadPeng";
+
+            DynamicGameObject g3 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g3);
+            g3.px = 53;
+            g3.py = 18;
+            g3.Name = "BadPeng";
+
+            DynamicGameObject g4 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g4);
+            g4.px = 86;
+            g4.py = 9;
+            g4.Name = "BadPeng";
+
+            DynamicGameObject g5 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g5);
+            g5.px = 105;
+            g5.py = 13;
+            g5.Name = "BadPeng";
+
+            DynamicGameObject g6 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g6);
+            g6.px = 110;
+            g6.py = 12;
+            g6.Name = "BadPeng";
+
+            DynamicGameObject g7 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g7);
+            g7.px = 162;
+            g7.py = 8;
+            g7.Name = "BadPeng";
+
+            DynamicGameObject g8 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g8);
+            g8.px = 176;
+            g8.py = 7;
+            g8.Name = "BadPeng";
 
             return true;
         }
@@ -365,7 +477,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = Core.Aggregate.Instance.GetMapData("mapfour"),
-                sprite = Core.Aggregate.Instance.GetSprite("tilesheettwo"),
+                sprite = Core.Aggregate.Instance.GetSprite("tilesheetsummer"),
                 name = "mapfour",
             };
 
@@ -384,90 +496,167 @@ namespace OlcSideScrollingConsoleGame.Models
             // Placera ut fiender
             DynamicGameObject g1 = new DynamicCreatureEnemyPenguin();
             ListDynamicObjs.Add(g1);
-            g1.px = 27;
-            g1.py = 8;
+            g1.px = 17;
+            g1.py = 4;
             g1.Name = "BadPeng";
 
             DynamicGameObject g2 = new DynamicCreatureEnemyPenguin();
             ListDynamicObjs.Add(g2);
-            g2.px = 38;
-            g2.py = 9;
+            g2.px = 30;
+            g2.py = 10;
             g2.Name = "BadPeng";
 
             DynamicGameObject g3 = new DynamicCreatureEnemyPenguin();
             ListDynamicObjs.Add(g3);
-            g3.px = 47;
-            g3.py = 9;
+            g3.px = 37;
+            g3.py = 7;
             g3.Name = "BadPeng";
 
-
-            //Valross
-            DynamicGameObject g4 = new DynamicCreatureEnemyWalrus();
+            DynamicGameObject g4 = new DynamicCreatureEnemyPenguin();
             ListDynamicObjs.Add(g4);
-            g4.px = 16;
-            g4.py = 11;
-            g4.Name = "walrus";
+            g4.px = 48;
+            g4.py = 9;
+            g4.Name = "BadPeng";
 
-            DynamicGameObject g5 = new DynamicCreatureEnemyWalrus();
+            DynamicGameObject g5 = new DynamicCreatureEnemyPenguin();
             ListDynamicObjs.Add(g5);
-            g5.px = 20;
-            g5.py = 13;
-            g5.Name = "walrus";
-            DynamicGameObject g6 = new DynamicCreatureEnemyWalrus();
-            ListDynamicObjs.Add(g6);
-            g6.px = 14;
-            g6.py = 15;
-            g6.Name = "walrus";
-            DynamicGameObject g7 = new DynamicCreatureEnemyWalrus();
-            ListDynamicObjs.Add(g7);
-            g7.px = 21;
-            g7.py = 16;
-            g7.Name = "walrus";
-            DynamicGameObject g8 = new DynamicCreatureEnemyWalrus();
-            ListDynamicObjs.Add(g8);
-            g8.px = 23;
-            g8.py = 21;
-            g8.Name = "walrus";
-            DynamicGameObject g9 = new DynamicCreatureEnemyWalrus();
-            ListDynamicObjs.Add(g9);
-            g9.px = 50;
-            g9.py = 22;
-            g9.Name = "walrus";
-            DynamicGameObject g10 = new DynamicCreatureEnemyWalrus();
-            ListDynamicObjs.Add(g10);
-            g10.px = 56;
-            g10.py = 15;
-            g10.Name = "walrus";
-            DynamicGameObject g11 = new DynamicCreatureEnemyWalrus();
-            ListDynamicObjs.Add(g11);
-            g11.px = 47;
-            g11.py = 15;
-            g11.Name = "walrus";
+            g5.px = 70;
+            g5.py = 7;
+            g5.Name = "BadPeng";
 
+            DynamicGameObject g6 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g6);
+            g6.px = 86;
+            g6.py = 9;
+            g6.Name = "BadPeng";
+
+            DynamicGameObject g7 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g7);
+            g7.px = 98;
+            g7.py = 10;
+            g7.Name = "BadPeng";
+
+            DynamicGameObject g8 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g8);
+            g8.px = 121;
+            g8.py = 8;
+            g8.Name = "BadPeng";
+
+            DynamicGameObject g9 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g9);
+            g9.px = 131;
+            g9.py = 4;
+            g9.Name = "BadPeng";
+
+            DynamicGameObject g10 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g10);
+            g10.px = 168;
+            g10.py = 6;
+            g10.Name = "BadPeng";
+
+            DynamicGameObject g11 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g11);
+            g11.px = 35;
+            g11.py = 15;
+            g11.Name = "BadPeng";
+
+            DynamicGameObject g12 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g12);
+            g12.px = 36;
+            g12.py = 20;
+            g12.Name = "BadPeng";
+
+            DynamicGameObject g13 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g13);
+            g13.px = 46;
+            g13.py = 19;
+            g13.Name = "BadPeng";
+
+            DynamicGameObject g14 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g14);
+            g14.px = 66;
+            g14.py = 14;
+            g14.Name = "BadPeng";
+
+            DynamicGameObject g15 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g15);
+            g15.px = 58;
+            g15.py = 14;
+            g15.Name = "BadPeng";
+
+            DynamicGameObject g16 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g16);
+            g16.px = 47;
+            g16.py = 13;
+            g16.Name = "BadPeng";
+
+            DynamicGameObject g17 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g17);
+            g17.px = 185;
+            g17.py = 13;
+            g17.Name = "BadPeng";
+
+            DynamicGameObject g18 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g18);
+            g18.px = 176;
+            g18.py = 15;
+            g18.Name = "BadPeng";
+
+            DynamicGameObject g19 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g19);
+            g19.px = 168;
+            g19.py = 17;
+            g19.Name = "BadPeng";
+
+            DynamicGameObject g20 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g20);
+            g20.px = 139;
+            g20.py = 20;
+            g20.Name = "BadPeng";
+
+            DynamicGameObject g21 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g21);
+            g21.px = 124;
+            g21.py = 18;
+            g21.Name = "BadPeng";
+
+            DynamicGameObject g22 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g22);
+            g22.px = 106;
+            g22.py = 18;
+            g22.Name = "BadPeng";
+
+            DynamicGameObject g23 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(g23);
+            g23.px = 96;
+            g23.py = 16;
+            g23.Name = "BadPeng";
+
+
+          
 
 
 
             // Add items
-            ListDynamicObjs.Add(new DynamicItem(8, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(9, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(10, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(11, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(12, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(13, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(14, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(15, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(16, 21, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(17, 21, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(18, 21, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(19, 21, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(74, 15, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(103, 11, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(121, 13, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(122, 13, Core.Aggregate.Instance.GetItem("energi")));
 
-            ListDynamicObjs.Add(new DynamicItem(43, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(44, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(45, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(46, 23, Core.Aggregate.Instance.GetItem("energi"))); 
-            ListDynamicObjs.Add(new DynamicItem(47, 23, Core.Aggregate.Instance.GetItem("energi"))); 
-            ListDynamicObjs.Add(new DynamicItem(48, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(127, 3, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(128, 3, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(190, 3, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(157, 18, Core.Aggregate.Instance.GetItem("energi")));
+            
             #endregion
 
 
             //ListDynamicObjs.Add(new Teleport(50.0f, 3.0f, "mapone", 2.0f, 2.0f)); // placering portal
-            ListDynamicObjs.Add(new Teleport(57.5f, 3.0f, "worldmap", 2.0f, 5.0f));
+            ListDynamicObjs.Add(new Teleport(183.5f, 4.0f, "worldmap", 2.0f, 5.0f));
 
 
             return true;
@@ -482,10 +671,937 @@ namespace OlcSideScrollingConsoleGame.Models
                 {
                     Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = 4;
 
+                }
+                Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 4;
+                Script.AddCommand(new CommandChangeMap((target as Teleport).MapName, (target as Teleport).MapPosX, (target as Teleport).MapPosY));
+            }
+
+            return false;
+        }
+    }
+
+
+    public class MapFive : Map
+    {
+        //TODO
+
+        public CreateObj CreateObj { get; set; }
+
+        public MapFive()
+        {
+            //TODO
+            this.CreateObj = new CreateObj()
+            {
+                levelObj = Core.Aggregate.Instance.GetMapData("mapfive"),
+                sprite = Core.Aggregate.Instance.GetSprite("tilesheetfall"),
+                name = "mapfive",
+            };
+
+            CrateFromChild();
+        }
+
+        public bool CrateFromChild()
+        {
+            return this.Create(CreateObj);
+        }
+
+        public override bool PopulateDynamics(List<DynamicGameObject> ListDynamicObjs)
+        {
+            DynamicGameObject p1 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p1);
+            p1.px = 152;
+            p1.py = 35;
+            p1.Name = "BadPeng";
+
+            DynamicGameObject p2 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p2);
+            p2.px = 84;
+            p2.py = 30;
+            p2.Name = "BadPeng";
+
+            DynamicGameObject p3 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p3);
+            p3.px = 109;
+            p3.py = 27;
+            p3.Name = "BadPeng";
+
+            DynamicGameObject p4 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p4);
+            p4.px = 96;
+            p4.py = 18;
+            p4.Name = "BadPeng";
+
+            DynamicGameObject p5 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p5);
+            p5.px = 104;
+            p5.py = 17;
+            p5.Name = "BadPeng";
+
+            DynamicGameObject p6 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p6);
+            p6.px = 142;
+            p6.py = 16;
+            p6.Name = "BadPeng";
+
+
+            DynamicGameObject w1 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w1);
+            w1.px = 26;
+            w1.py = 35;
+            w1.Name = "walrus";
+
+            DynamicGameObject w2 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w2);
+            w2.px = 49;
+            w2.py = 39;
+            w2.Name = "walrus";
+
+            DynamicGameObject w3 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w3);
+            w3.px = 90;
+            w3.py = 43;
+            w3.Name = "walrus";
+
+            DynamicGameObject w4 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w4);
+            w4.px = 120;
+            w4.py = 46;
+            w4.Name = "walrus";
+
+            DynamicGameObject w5 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w5);
+            w5.px = 157;
+            w5.py = 47;
+            w5.Name = "walrus";
+
+            DynamicGameObject w6 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w6);
+            w6.px = 131;
+            w6.py = 38;
+            w6.Name = "walrus";
+
+            DynamicGameObject w7 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w7);
+            w7.px = 116;
+            w7.py = 23;
+            w7.Name = "walrus";
+
+            DynamicGameObject w8 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w8);
+            w8.px = 116;
+            w8.py = 16;
+            w8.Name = "walrus";
+
+            DynamicGameObject w9 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w9);
+            w9.px = 164;
+            w9.py = 19;
+            w9.Name = "walrus";
+
+            DynamicGameObject w10 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w10);
+            w10.px = 181;
+            w10.py = 18;
+            w10.Name = "walrus";
+
+
+            ListDynamicObjs.Add(new DynamicItem(56, 40, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(141, 48, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(143, 36, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(115, 36, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(86, 30, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(99, 18, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(140, 15, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(183, 17, Core.Aggregate.Instance.GetItem("energi")));
+
+            ListDynamicObjs.Add(new Teleport(188.5f, 17.0f, "worldmap", 2.0f, 5.0f));
+
+            return true;
+        }
+        public override bool OnInteraction(List<DynamicGameObject> ListDynamicObjs, DynamicGameObject target, Enum.NATURE nature)
+        {
+
+            //TODO
+            if (target.Name == "Teleport")
+            {
+                if (Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted < 5)
+                {
+                    Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = 5;
+
+                }
+                Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 5;
+                Script.AddCommand(new CommandChangeMap((target as Teleport).MapName, (target as Teleport).MapPosX, (target as Teleport).MapPosY));
+            }
+
+            return false;
+        }
+
+    }
+    public class MapSix : Map
+    {
+        //TODO
+        public CreateObj CreateObj { get; set; }
+
+        public MapSix()
+        {
+            this.CreateObj = new CreateObj()
+            {
+                levelObj = Core.Aggregate.Instance.GetMapData("mapsix"),
+                sprite = Core.Aggregate.Instance.GetSprite("tilesheetfall"),
+                name = "mapsix",
+            };
+
+            CrateFromChild();
+        }
+
+        public bool CrateFromChild()
+        {
+            return this.Create(CreateObj);
+        }
+
+        public override bool PopulateDynamics(List<DynamicGameObject> ListDynamicObjs)
+        {
+
+            DynamicGameObject p1 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p1);
+            p1.px = 20;
+            p1.py = 21;
+            p1.Name = "BadPeng";
+
+            DynamicGameObject p2 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p2);
+            p2.px = 28;
+            p2.py = 20;
+            p2.Name = "BadPeng";
+
+            DynamicGameObject p3 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p3);
+            p3.px = 86;
+            p3.py = 20;
+            p3.Name = "BadPeng";
+
+            DynamicGameObject p4 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p4);
+            p4.px = 92;
+            p4.py = 18;
+            p4.Name = "BadPeng";
+
+            DynamicGameObject p5 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p5);
+            p5.px = 174;
+            p5.py = 16;
+            p5.Name = "BadPeng";
+
+            DynamicGameObject p6 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p6);
+            p6.px = 234;
+            p6.py = 20;
+            p6.Name = "BadPeng";
+
+
+            DynamicGameObject w1 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w1);
+            w1.px = 34;
+            w1.py = 20;
+            w1.Name = "walrus";
+
+            DynamicGameObject w2 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w2);
+            w2.px = 58;
+            w2.py = 20;
+            w2.Name = "walrus";
+
+            DynamicGameObject w3 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w3);
+            w3.px = 66;
+            w3.py = 20;
+            w3.Name = "walrus";
+
+            DynamicGameObject w4 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w4);
+            w4.px = 104;
+            w4.py = 17;
+            w4.Name = "walrus";
+
+            DynamicGameObject w5 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w5);
+            w5.px = 126;
+            w5.py = 14;
+            w5.Name = "walrus";
+
+            DynamicGameObject w6 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w6);
+            w6.px = 147;
+            w6.py = 17;
+            w6.Name = "walrus";
+
+            DynamicGameObject w7 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w7);
+            w7.px = 161;
+            w7.py = 16;
+            w7.Name = "walrus";
+
+            DynamicGameObject w8 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w8);
+            w8.px = 166;
+            w8.py = 16;
+            w8.Name = "walrus";
+
+            DynamicGameObject w9 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w9);
+            w9.px = 192;
+            w9.py = 19;
+            w9.Name = "walrus";
+
+            DynamicGameObject w10 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w10);
+            w10.px = 208;
+            w10.py = 19;
+            w10.Name = "walrus";
+
+            ListDynamicObjs.Add(new DynamicItem(19, 21, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(21, 21, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(29, 20, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(30, 30, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(33, 20, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(41, 21, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(42, 21, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(51, 20, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(68, 20, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(102, 17, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(152, 18, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(174, 16, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(197, 18, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(198, 18, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(199, 18, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(245, 19, Core.Aggregate.Instance.GetItem("energi")));
+
+
+            ListDynamicObjs.Add(new Teleport(253.5f, 18.0f, "worldmap", 2.0f, 5.0f));
+
+            return true;
+        }
+        public override bool OnInteraction(List<DynamicGameObject> ListDynamicObjs, DynamicGameObject target, Enum.NATURE nature)
+        {
+
+            //TODO
+            if (target.Name == "Teleport")
+            {
+                if (Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted < 6)
+                {
+                    Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = 6;
+
+                    // Flag this is final stage
+
+                }
+                Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 6;
+
+                Script.AddCommand(new CommandChangeMap((target as Teleport).MapName, (target as Teleport).MapPosX, (target as Teleport).MapPosY));
+            }
+
+            return false;
+        }
+    }
+    public class MapSeven : Map
+    {
+        //TODO
+        public CreateObj CreateObj { get; set; }
+
+        public MapSeven()
+        {
+            //TODO
+            this.CreateObj = new CreateObj()
+            {
+                levelObj = Core.Aggregate.Instance.GetMapData("mapseven"),
+                sprite = Core.Aggregate.Instance.GetSprite("tilesheetwinter"),
+                name = "mapseven",
+            };
+
+            CrateFromChild();
+        }
+
+        public bool CrateFromChild()
+        {
+            return this.Create(CreateObj);
+        }
+
+        public override bool PopulateDynamics(List<DynamicGameObject> ListDynamicObjs)
+        {
+
+
+            DynamicGameObject p1 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p1);
+            p1.px = 49;
+            p1.py = 18;
+            p1.Name = "BadPeng";
+
+            DynamicGameObject p2 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p2);
+            p2.px = 93;
+            p2.py = 16;
+            p2.Name = "BadPeng";
+
+            DynamicGameObject p3 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p3);
+            p3.px = 187;
+            p3.py = 19;
+            p3.Name = "BadPeng";
+
+            DynamicGameObject p4 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p4);
+            p4.px = 204;
+            p4.py = 14;
+            p4.Name = "BadPeng";
+
+            DynamicGameObject p5 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p5);
+            p5.px = 220;
+            p5.py = 11;
+            p5.Name = "BadPeng";
+
+            DynamicGameObject p6 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p6);
+            p6.px = 223;
+            p6.py = 13;
+            p6.Name = "BadPeng";
+
+            DynamicGameObject p7 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p7);
+            p7.px = 239;
+            p7.py = 12;
+            p7.Name = "BadPeng";
+
+            DynamicGameObject p8 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p8);
+            p8.px = 268;
+            p8.py = 18;
+            p8.Name = "BadPeng";
+
+            DynamicGameObject p9 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p9);
+            p9.px = 274;
+            p9.py = 20;
+            p9.Name = "BadPeng";
+
+            DynamicGameObject p10 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p10);
+            p10.px = 299;
+            p10.py = 20;
+            p10.Name = "BadPeng";
+
+            DynamicGameObject p11 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p11);
+            p11.px = 315;
+            p11.py = 20;
+            p11.Name = "BadPeng";
+
+            DynamicGameObject p12 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p12);
+            p12.px = 231;
+            p12.py = 6;
+            p12.Name = "BadPeng";
+
+            DynamicGameObject p13 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p13);
+            p13.px = 254;
+            p13.py = 6;
+            p13.Name = "BadPeng";
+
+            DynamicGameObject p14 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p14);
+            p14.px = 237;
+            p14.py = 3;
+            p14.Name = "BadPeng";
+
+            DynamicGameObject p15 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p15);
+            p15.px = 37;
+            p15.py = 7;
+            p15.Name = "BadPeng";
+
+            DynamicGameObject p16 = new DynamicCreatureEnemyPenguin();
+            ListDynamicObjs.Add(p16);
+            p16.px = 62;
+            p16.py = 7;
+            p16.Name = "BadPeng";
+
+
+            DynamicGameObject f01 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f01);
+            f01.px = 22;
+            f01.py = 19;
+            //f01.py = 20;
+            f01.FromX = 18; 
+            f01.ToX = 28;
+            f01.Name = "frost";
+            f01.Id = 1;
+
+
+            DynamicGameObject f02 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f02);
+            f02.px = 65;
+            f02.py = 19;
+            f02.FromX = 65; 
+            f02.ToX = 67; 
+            f02.Name = "frost";
+            f02.Id = 2;
+
+            ///
+            DynamicGameObject f03 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f03);
+            f03.px = 40;
+            f03.py = 17;
+            f03.FromX = 36; 
+            f03.ToX = 46; 
+            f03.Name = "frost";
+            f03.Id = 3;
+
+            DynamicGameObject f04 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f04);
+            f04.px = 98;
+            f04.py = 18;
+            f04.FromX = 96;
+            f04.ToX = 105;
+            f04.Name = "frost";
+            f04.Id = 4;
+           
+
+
+            DynamicGameObject f05 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f05);
+            f05.px = 157;
+            f05.py = 17;
+            f05.FromX = 151;
+            f05.ToX = 162;
+            f05.Name = "frost";
+            f05.Id = 5;
+
+            DynamicGameObject f06 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f06);
+            f06.px = 165;
+            f06.py = 18;
+            f06.FromX = 163;
+            f06.ToX = 169;
+            f06.Name = "frost";
+            f06.Id = 6;
+
+
+            DynamicGameObject f07 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f07);
+            f07.px = 104;
+            f07.py = 7;
+            f07.FromX = 104;
+            f07.ToX = 106;
+            f07.Name = "frost";
+            f07.Id = 7;
+
+            DynamicGameObject f08 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f08);
+            f08.px = 89;
+            f08.py = 8;
+            f08.FromX = 89;
+            f08.ToX = 93;
+            f08.Name = "frost";
+            f08.Id = 8;
+
+
+            DynamicGameObject f09 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f09);
+            f09.px = 72;
+            f09.py = 9;
+            f09.FromX = 71;
+            f09.ToX = 74;
+            f09.Name = "frost";
+            f09.Id = 9;
+
+            DynamicGameObject f10 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f10);
+            f10.px = 74;
+            f10.py = 9;
+            f10.FromX = 74;
+            f10.ToX = 78;
+            f10.Name = "frost";
+            f10.Id = 10;
+
+
+            DynamicGameObject f11 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f11);
+            f11.px = 65;
+            f11.py = 9;
+            f11.FromX = 65;
+            f11.ToX = 67;
+            f11.Name = "frost";
+            f11.Id = 11;
+
+            DynamicGameObject f12 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f12);
+            f12.px = 44;
+            f12.py = 6;
+            f12.FromX = 43;
+            f12.ToX = 50;
+            f12.Name = "frost";
+            f12.Id = 12;
+
+
+            DynamicGameObject f13 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f13);
+            f13.px = 19;
+            f13.py = 7;
+            f13.FromX = 17;
+            f13.ToX = 20;
+            f13.Name = "frost";
+            f13.Id = 13;
+
+            DynamicGameObject f14 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f14);
+            f14.px = 149;
+            f14.py = 9;
+            f14.FromX = 149;
+            f14.ToX = 161;
+            f14.Name = "frost";
+            f14.Id = 14;
+
+
+            DynamicGameObject f15 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f15);
+            f15.px = 179;
+            f15.py = 5;
+            f15.FromX = 177;
+            f15.ToX = 181;
+            f15.Name = "frost";
+            f15.Id = 15;
+
+            DynamicGameObject f16 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f16);
+            f16.px = 234;
+            f16.py = 11;
+            f16.FromX = 234;
+            f16.ToX = 236;
+            f16.Name = "frost";
+            f16.Id = 16;
+
+
+            DynamicGameObject f17 = new DynamicCreatureEnemyFrost();
+            ListDynamicObjs.Add(f17);
+            f17.px = 298;
+            f17.py = 4;
+            f17.FromX = 298;
+            f17.ToX = 302;
+            f17.Name = "frost";
+            f17.Id = 17;
+
+
+
+            DynamicGameObject w1 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w1);
+            w1.px = 32;
+            w1.py = 19;
+            w1.Name = "walrus";
+
+
+            DynamicGameObject w2 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w2);
+            w2.px = 101;
+            w2.py = 14;
+            w2.Name = "walrus";
+
+            DynamicGameObject w3 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w3);
+            w3.px = 110;
+            w3.py = 21;
+            w3.Name = "walrus";
+
+            DynamicGameObject w4 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w4);
+            w4.px = 112;
+            w4.py = 21;
+            w4.Name = "walrus";
+
+            DynamicGameObject w5 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w5);
+            w5.px = 127;
+            w5.py = 20;
+            w5.Name = "walrus";
+
+            DynamicGameObject w6 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w6);
+            w6.px = 143;
+            w6.py = 19;
+            w6.Name = "walrus";
+
+            DynamicGameObject w7 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w7);
+            w7.px = 160;
+            w7.py = 17;
+            w7.Name = "walrus";
+
+            DynamicGameObject w8 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w8);
+            w8.px = 176;
+            w8.py = 19;
+            w8.Name = "walrus";
+
+            DynamicGameObject w9 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w9);
+            w9.px = 121;
+            w9.py = 9;
+            w9.Name = "walrus";
+
+            DynamicGameObject w10 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w10);
+            w10.px = 138;
+            w10.py = 8;
+            w10.Name = "walrus";
+
+            DynamicGameObject w11 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w11);
+            w11.px = 172;
+            w11.py = 7;
+            w11.Name = "walrus";
+
+            DynamicGameObject w12 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w12);
+            w12.px = 186;
+            w12.py = 4;
+            w12.Name = "walrus";
+
+            DynamicGameObject w13 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w13);
+            w13.px = 202;
+            w13.py = 6;
+            w13.Name = "walrus";
+
+            DynamicGameObject w14 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w14);
+            w14.px = 214;
+            w14.py = 7;
+            w14.Name = "walrus";
+
+            DynamicGameObject w15 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w15);
+            w15.px = 223;
+            w15.py = 19;
+            w15.Name = "walrus";
+
+            DynamicGameObject w16 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w16);
+            w16.px = 247;
+            w16.py = 14;
+            w16.Name = "walrus";
+
+            DynamicGameObject w17 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w17);
+            w17.px = 260;
+            w17.py = 15;
+            w17.Name = "walrus";
+
+            DynamicGameObject w18 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w18);
+            w18.px = 278;
+            w18.py = 21;
+            w18.Name = "walrus";
+
+            DynamicGameObject w19 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w19);
+            w19.px = 294;
+            w19.py = 21;
+            w19.Name = "walrus";
+
+            DynamicGameObject w20 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w20);
+            w20.px = 245;
+            w20.py = 3;
+            w20.Name = "walrus";
+
+            DynamicGameObject w21 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w21);
+            w21.px = 291;
+            w21.py = 4;
+            w21.Name = "walrus";
+
+            DynamicGameObject w22 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w22);
+            w22.px = 126;
+            w22.py = 3;
+            w22.Name = "walrus";
+
+            DynamicGameObject w23 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w23);
+            w23.px = 97;
+            w23.py = 7;
+            w23.Name = "walrus";
+
+            DynamicGameObject w24 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w24);
+            w24.px = 55;
+            w24.py = 6;
+            w24.Name = "walrus";
+
+            //DynamicGameObject w25 = new DynamicCreatureEnemyWalrus();
+            //ListDynamicObjs.Add(w25);
+            //w25.px = 126;
+            //w25.py = 14;
+            //w25.Name = "walrus";
+
+            DynamicGameObject w26 = new DynamicCreatureEnemyWalrus();
+            ListDynamicObjs.Add(w26);
+            w26.px = 7;
+            w26.py = 10;
+            w26.Name = "walrus";
+
+
+            ListDynamicObjs.Add(new DynamicItem(205, 14, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(182, 16, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(174, 19, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(159, 17, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(158, 17, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(147, 20, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(131, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(132, 23, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(110, 21, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(94, 15, Core.Aggregate.Instance.GetItem("energi")));
+
+
+            ListDynamicObjs.Add(new DynamicItem(83, 20, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(49, 18, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(118, 11, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(119, 11, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(158, 7, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(192, 7, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(226, 15, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(250, 15, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(317, 20, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(233, 6, Core.Aggregate.Instance.GetItem("energi")));
+
+            ListDynamicObjs.Add(new DynamicItem(256, 6, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(1, 7, Core.Aggregate.Instance.GetItem("energi")));
+
+            ListDynamicObjs.Add(new Teleport(315.5f, 7.0f, "worldmap", 2.0f, 5.0f));
+
+            return true;
+        }
+
+
+        public override bool OnInteraction(List<DynamicGameObject> ListDynamicObjs, DynamicGameObject target, Enum.NATURE nature)
+        {
+
+            if (target.Name == "Teleport")
+            {
+                if (Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted < 7)
+                {
+                    Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = 7;
+
+                    // Flag this is final stage
+                   
+                }
+                Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 7;
+                Script.AddCommand(new CommandChangeMap((target as Teleport).MapName, (target as Teleport).MapPosX, (target as Teleport).MapPosY));
+            }
+
+            return false;
+        }
+    }
+
+    public class MapEight : Map
+    {
+        //TODO
+        public CreateObj CreateObj { get; set; }
+
+        public MapEight()
+        {
+            //TODO
+            this.CreateObj = new CreateObj()
+            {
+                levelObj = Core.Aggregate.Instance.GetMapData("mapeight"),
+                sprite = Core.Aggregate.Instance.GetSprite("tilesheetwinter"),
+                name = "mapeight",
+            };
+
+            CrateFromChild();
+        }
+
+        public bool CrateFromChild()
+        {
+            return this.Create(CreateObj);
+        }
+
+        public override bool PopulateDynamics(List<DynamicGameObject> ListDynamicObjs)
+        {
+
+            //TODO
+            //ListDynamicObjs.Add(new Teleport(58.0f, 3.0f, "worldmap", 2.0f, 5.0f));
+            ListDynamicObjs.Add(new Teleport(58.0f, 3.0f, "mapnine", 2.0f, 5.0f));
+
+            return true;
+        }
+
+
+        public override bool OnInteraction(List<DynamicGameObject> ListDynamicObjs, DynamicGameObject target, Enum.NATURE nature)
+        {
+
+            if (target.Name == "Teleport")
+            {
+                if (Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted < 8)
+                {
+                    Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = 8;
+
+                    // Flag this is final stage
+                    //Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd = true;
+                }
+                Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 8;
+                Script.AddCommand(new CommandChangeMap((target as Teleport).MapName, (target as Teleport).MapPosX, (target as Teleport).MapPosY));
+            }
+
+            return false;
+        }
+    }
+
+    public class MapNine : Map
+    {
+        //TODO
+        public CreateObj CreateObj { get; set; }
+
+        public MapNine()
+        {
+            //TODO
+            this.CreateObj = new CreateObj()
+            {
+                levelObj = Core.Aggregate.Instance.GetMapData("mapnine"),
+                sprite = Core.Aggregate.Instance.GetSprite("tilesheetwinter"),
+                name = "mapnine",
+            };
+
+            CrateFromChild();
+        }
+
+        public bool CrateFromChild()
+        {
+            return this.Create(CreateObj);
+        }
+
+        public override bool PopulateDynamics(List<DynamicGameObject> ListDynamicObjs)
+        {
+
+            //TODO
+            ListDynamicObjs.Add(new Teleport(21.5f, 21.0f, "worldmap", 2.0f, 5.0f));
+
+            return true;
+        }
+
+
+        public override bool OnInteraction(List<DynamicGameObject> ListDynamicObjs, DynamicGameObject target, Enum.NATURE nature)
+        {
+
+            if (target.Name == "Teleport")
+            {
+                if (Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted < 9)
+                {
+                    Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = 9;
+
                     // Flag this is final stage
                     Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd = true;
                 }
-                Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 4;
+                Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 8;
                 Script.AddCommand(new CommandChangeMap((target as Teleport).MapName, (target as Teleport).MapPosX, (target as Teleport).MapPosY));
             }
 

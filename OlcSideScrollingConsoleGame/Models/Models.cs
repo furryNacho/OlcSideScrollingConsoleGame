@@ -76,6 +76,9 @@ namespace OlcSideScrollingConsoleGame.Models
         public TimeSpan TimeSpan { get; set; }
         public DateTime DateTime { get; set; }
 
+
+        public int Percent { get; set; }
+
     }
 
     public class HighScoreEnterName

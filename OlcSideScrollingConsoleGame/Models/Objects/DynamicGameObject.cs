@@ -59,6 +59,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         /// Namnet på dynamiskt objekt
         /// </summary>
         public string Name { get; set; }
+        public int Id { get; set; }
 
         public bool Redundant { get; set; }
 
@@ -71,6 +72,23 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
         public bool IsIdle { get; set; }
         public int IdleCounter { get; set; }
+
+        /// <summary>
+        /// går till och med denna (vänster)
+        /// </summary>
+        public int FromX { get; set; }
+        /// <summary>
+        /// går till och med denna (höger)
+        /// </summary>
+        public int ToX { get; set; }
+
+        public int PrevTick { get; set; }
+        
+
+        public float SampleOne { get; set; }
+        public float SampleTow { get; set; }
+        public float SampleThree { get; set; }
+
 
         public Enum.PlayerOrientation TurnedTo { get; set; }
 

@@ -69,7 +69,8 @@ namespace OlcSideScrollingConsoleGame
         {
             None = 0,
             Right = 1,
-            Left = 2
+            Left = 2,
+            jump = 3
         }
 
         public enum NATURE

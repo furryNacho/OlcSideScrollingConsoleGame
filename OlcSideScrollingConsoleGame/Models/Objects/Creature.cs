@@ -25,15 +25,20 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
         //States
         private Enum.Direction FacingDirection { get; set; }
-        private Enum.GraphicsState sprGraphicsState { get; set; }
-        private int GraphicCounter { get; set; }
+        protected Enum.GraphicsState sprGraphicsState { get; set; }
+        protected int GraphicCounter { get; set; }
         private float Timer { get; set; }
         protected Sprite Sprite { get; set; }
         public int Health { get; set; }
         public int MaxHealth { get; set; }
         public int DamageGiven { get; set; } = 0;
-        
 
+        public int Ticker { get; set; } = 0;
+        public bool DoSpecialAction { get; set; } = false;
+        public bool HasJumped { get; set; } = false;
+        public int DoneSpecialAction { get; set; } = 0;
+
+       
 
         public override void Update(float elapsedTime, DynamicGameObject player)
         {

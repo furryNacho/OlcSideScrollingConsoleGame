@@ -71,13 +71,14 @@ namespace OlcSideScrollingConsoleGame
         //const int ScreenW = 256;
         //const int ScreenH = 192;
         const int ScreenH = 224;
-        const int PixW = 4;
-        const int PixH = 4;
+        const int PixW = 4;//4
+        const int PixH = 4;//4
         const int FrameR = -1;
 
         private TimeSpan ActualTotalTime { get; set; }
         private TimeSpan GameTotalTime { get; set; }
         private TimeSpan EndTotalTime { get; set; }
+       // private int EndTotalPercent { get; set; }
 
         private KonamiObj Konami { get; set; } = new KonamiObj();
 
@@ -111,6 +112,7 @@ namespace OlcSideScrollingConsoleGame
             this.Reset();
              */
 
+            //this.Enable(Game.Subsystem.Fullscreen); // riktigt med lagg
 
             this.Machine = new StateMachine<Enum.State>();
             //this.Machine.Switch(Enum.State.GameMap);
@@ -403,7 +405,7 @@ namespace OlcSideScrollingConsoleGame
                             MenuState = Enum.MenuState.PauseMenu;
                         else
                             MenuState = Enum.MenuState.SettingsMenu;
-                        
+
                         this.Machine.Switch(Enum.State.Menu);
                     }
                     else if (MenuState == Enum.MenuState.Audio)
@@ -484,7 +486,7 @@ namespace OlcSideScrollingConsoleGame
                             {
                                 Load(3);
                             }
-                            
+
                             this.Machine.Switch(Enum.State.WorldMap);
                             HasSwitchedState = true;
                             ButtonsHasGoneIdle = false;
@@ -843,7 +845,7 @@ namespace OlcSideScrollingConsoleGame
                         //Lite extra, just för att testa att lägga till
                         //if (Core.Aggregate.Instance.PlacesOnHighScore(EndTotalTime))
                         //{
-                        Core.Aggregate.Instance.PutOnHighScore(new HighScoreObj { DateTime = DateTime.Now, Handle = highScoreName, TimeSpan = EndTotalTime });
+                        Core.Aggregate.Instance.PutOnHighScore(new HighScoreObj { DateTime = DateTime.Now, Handle = highScoreName, TimeSpan = EndTotalTime, Percent=Hero.Health });
 
                         Core.Aggregate.Instance.SaveHighScoreList();
                         //Core.Aggregate.Instance.ResetHighScore();
@@ -915,7 +917,8 @@ namespace OlcSideScrollingConsoleGame
             string Header = "Penguin After All High Score";
             int HeaderX = (ScreenW / 2) - ((Header.Length * 8) / 2);
             DrawBigText(Header, HeaderX, 10);
-            DrawBigText("    Name  Time     Date", 8, 45);
+            //DrawBigText("    Name  Time     Date", 8, 45);
+            DrawBigText("    Name  Time        %", 8, 45);
             int idx = 0;
             foreach (var HighScoreRow in Core.Aggregate.Instance.GetHighScoreList())
             {
@@ -925,7 +928,8 @@ namespace OlcSideScrollingConsoleGame
                 if (formatHandle.Length < 5)
                     formatHandle = HighScoreRow.Handle + "  ";
 
-                DrawBigText(" " + idx + ". " + formatHandle + " " + HighScoreRow.TimeSpan.ToString("hh':'mm':'ss") + " " + HighScoreRow.DateTime.ToString("dd MMM yy"), 8, HSRY);
+                //DrawBigText(" " + idx + ". " + formatHandle + " " + HighScoreRow.TimeSpan.ToString("hh':'mm':'ss") + " " + HighScoreRow.DateTime.ToString("dd MMM yy"), 8, HSRY);
+                DrawBigText(" " + idx + ". " + formatHandle + " " + HighScoreRow.TimeSpan.ToString("hh':'mm':'ss") + "    " + HighScoreRow.Percent, 8, HSRY);
 
             }
 
@@ -947,7 +951,7 @@ namespace OlcSideScrollingConsoleGame
                 {
                     EndTotalTime = GameTotalTime;
                     RightToAccessPodium = false;
-
+                   
                     if (Core.Aggregate.Instance.PlacesOnHighScore(EndTotalTime))
                     {
                         returnToEndAfterHighScore = true;
@@ -1162,7 +1166,7 @@ namespace OlcSideScrollingConsoleGame
                             ButtonsHasGoneIdle = false;
 
                             this.Machine.Switch(Enum.State.WorldMap);
-                           
+
                             break;
                         case "Resume":
                             selectedMenuItem = 1;
@@ -1275,6 +1279,8 @@ namespace OlcSideScrollingConsoleGame
         bool no4 = false;
         bool no5 = false;
         bool no6 = false;
+        bool no7 = false;
+        bool no8 = false;
         //int runStageNo = 1;
         bool hasAccumulatedAllSpeed = false;
         //public bool WorldmapStartHasBeenReleased { get; set; }
@@ -1321,28 +1327,48 @@ namespace OlcSideScrollingConsoleGame
                 Hero.vy = 0;
             }
 
-            float corrWorldMapPosX = 2;
-            float corrWorldMapPosY = 3;
+            float corrWorldMapPosX = 3;
+            float corrWorldMapPosY = 8;
 
             if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 1)
             {
-                corrWorldMapPosX = 2;
-                corrWorldMapPosY = 3;
+                corrWorldMapPosX = 3;
+                corrWorldMapPosY = 8;
             }
             else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 2)
             {
-                corrWorldMapPosX = 5;
-                corrWorldMapPosY = 3;
+                corrWorldMapPosX = 6;
+                corrWorldMapPosY = 8;
             }
             else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 3)
             {
                 corrWorldMapPosX = 9;
-                corrWorldMapPosY = 3;
+                corrWorldMapPosY = 8;
             }
             else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 4)
             {
-                corrWorldMapPosX = 11;
-                corrWorldMapPosY = 5;
+                corrWorldMapPosX = 12;
+                corrWorldMapPosY = 8;
+            }
+            else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 5)
+            {
+                corrWorldMapPosX = 15;
+                corrWorldMapPosY = 8;
+            }
+            else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 6)
+            {
+                corrWorldMapPosX = 18;
+                corrWorldMapPosY = 8;
+            }
+            else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 7)
+            {
+                corrWorldMapPosX = 21;
+                corrWorldMapPosY = 8;
+            }
+            else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 8)
+            {
+                corrWorldMapPosX = 24;
+                corrWorldMapPosY = 8;
             }
 
             if (CurrentMap.Name != "worldmap")
@@ -1350,7 +1376,7 @@ namespace OlcSideScrollingConsoleGame
                 //TODO: skicka in en placeholder och läsa settings för att avgöra vart på kartan ska placeras
                 ChangeMap("worldmap", corrWorldMapPosX, corrWorldMapPosY, Hero);
                 ButtonsHasGoneIdle = false;
-               
+
             }
 
             if (HasSwitchedState)
@@ -1388,7 +1414,7 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 //Down
-                if (ButtonsHasGoneIdle &&  (GetKey(Key.Down).Down || IIP.down))
+                if (ButtonsHasGoneIdle && (GetKey(Key.Down).Down || IIP.down))
                 {
                     Hero.vy = 3.0f;
                 }
@@ -1413,7 +1439,7 @@ namespace OlcSideScrollingConsoleGame
                     {
 
                         hasAccumulatedAllSpeed = false;
-                        ChangeMap("mapone", 2, 3, Hero);
+                        ChangeMap("mapone", 2, 23, Hero);
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
@@ -1425,7 +1451,7 @@ namespace OlcSideScrollingConsoleGame
                     {
 
                         hasAccumulatedAllSpeed = false;
-                        ChangeMap("maptwo", 2, 3, Hero);
+                        ChangeMap("maptwo", 2, 23, Hero);
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
@@ -1437,7 +1463,7 @@ namespace OlcSideScrollingConsoleGame
                     {
 
                         hasAccumulatedAllSpeed = false;
-                        ChangeMap("mapthree", 2, 3, Hero);
+                        ChangeMap("mapthree", 2, 20, Hero);
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
@@ -1450,6 +1476,54 @@ namespace OlcSideScrollingConsoleGame
 
                         hasAccumulatedAllSpeed = false;
                         ChangeMap("mapfour", 2, 3, Hero);
+
+                        this.Machine.Switch(Enum.State.GameMap);
+                        HasSwitchedState = true;
+                        ButtonsHasGoneIdle = false;
+
+                        return;
+                    }
+                    else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 5)
+                    {
+
+                        hasAccumulatedAllSpeed = false;
+                        ChangeMap("mapfive", 2, 33, Hero);
+
+                        this.Machine.Switch(Enum.State.GameMap);
+                        HasSwitchedState = true;
+                        ButtonsHasGoneIdle = false;
+
+                        return;
+                    }
+                    else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 6)
+                    {
+
+                        hasAccumulatedAllSpeed = false;
+                        ChangeMap("mapsix", 2, 22, Hero);
+
+                        this.Machine.Switch(Enum.State.GameMap);
+                        HasSwitchedState = true;
+                        ButtonsHasGoneIdle = false;
+
+                        return;
+                    }
+                    else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 7)
+                    {
+
+                        hasAccumulatedAllSpeed = false;
+                        ChangeMap("mapseven", 3, 18, Hero);
+
+                        this.Machine.Switch(Enum.State.GameMap);
+                        HasSwitchedState = true;
+                        ButtonsHasGoneIdle = false;
+
+                        return;
+                    }
+                    else if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 8)
+                    {
+
+                        hasAccumulatedAllSpeed = false;
+                        ChangeMap("mapeight", 2, 3, Hero);
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
@@ -1477,6 +1551,8 @@ namespace OlcSideScrollingConsoleGame
 
             #region Update obj's
 
+
+
             foreach (var myObject in listDynamics)
             {
 
@@ -1484,95 +1560,180 @@ namespace OlcSideScrollingConsoleGame
                 if (myObject.IsHero)
                 {
 
-                    if ((!no1 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 0) && (myObject.px >= 2 && myObject.px <= 2.05f))
+                    //if ((!no1 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 0) && (myObject.px >= 3 && myObject.px <= 3.05f))
+                    if (!no1 && (myObject.px >= 3 && myObject.px <= 3.05f))
                     {
                         /*Om vx är possitiv - instruktion att gå höger.
                          *Om vx är negativ - instruktion att gå vänster
                          *Om StageCompleted == 0 förbjud att gå till höger specifikt (i detta fall höger)*/
-                        if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 0)
+                        //if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 0)
+                        //{
+                        //    myObject.vx = 0;
+                        //}
+
+                        if (myObject.vx > 0)
                         {
-                            myObject.vx = 0;
                         }
+                        myObject.vx = 0;
+
+
                         no1 = true;
                         no2 = false;
                         no3 = false;
                         no4 = false;
                         no5 = false;
                         no6 = false;
+                        no7 = false;
+                        no8 = false;
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 1;
 
                     }
-                    else if ((!no2 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 1) && (myObject.px >= 5 && myObject.px <= 5.09f))
+                    else if ((!no2 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 1) && (myObject.px >= 6 && myObject.px <= 6.09f))
                     {
                         // förbjud att gå höger
-                        if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 1)
+                        //if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 1)
+                        //{
+                        //    myObject.vx = 0;
+                        //}
+
+                        if (myObject.vx > 0)
                         {
-                            myObject.vx = 0;
                         }
+                        myObject.vx = 0;
+
                         no1 = false;
                         no2 = true;
                         no3 = false;
                         no4 = false;
                         no5 = false;
                         no6 = false;
+                        no7 = false;
+                        no8 = false;
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 2;
 
                     }
                     else if ((!no3 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 2) && (myObject.px >= 9 && myObject.px <= 9.1f))
                     {
                         // förbjud att gå höger
-                        if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 2)
+                        //if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 2)
+                        //{
+                        //    myObject.vx = 0;
+                        //}
+
+                        if (myObject.vx > 0)
                         {
-                            myObject.vx = 0;
                         }
+                        myObject.vx = 0;
+
                         no1 = false;
                         no2 = false;
                         no3 = true;
                         no4 = false;
                         no5 = false;
                         no6 = false;
+                        no7 = false;
+                        no8 = false;
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 3;
 
                     }
-                    else if (!no4 && (myObject.px >= 11 && myObject.px <= 11.1f && myObject.py < 3.01))
+                    //else if (!no4 && (myObject.px >= 11 && myObject.px <= 11.1f && myObject.py < 3.01))
+                    else if ((!no4 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 3) && (myObject.px >= 12 && myObject.px <= 12.1f))
                     {
                         // förbjud att gå ner
-                        if (myObject.vy > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 3)
+                        //if (myObject.vy > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 3)
+                        //{
+                        //    myObject.vy = 0;
+                        //}
+
+                        if (myObject.vx > 0)
                         {
-                            myObject.vy = 0;
                         }
+                        myObject.vx = 0;
+
                         no1 = false;
                         no2 = false;
                         no3 = false;
                         no4 = true;
                         no5 = false;
                         no6 = false;
+                        no7 = false;
+                        no8 = false;
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 4;
 
                     }
-                    else if (!no5 && (myObject.px >= 11 && myObject.py >= 5f && myObject.py <= 5.1f))
+                    //else if (!no5 && (myObject.px >= 11 && myObject.py >= 5f && myObject.py <= 5.1f))
+                    else if ((!no5 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 4) && (myObject.px >= 15 && myObject.px <= 15.1f))
                     {
+                        if (myObject.vx > 0)
+                        {
+                        }
                         myObject.vx = 0;
-                        myObject.vy = 0;
+
                         no1 = false;
                         no2 = false;
                         no3 = false;
                         no4 = false;
                         no5 = true;
                         no6 = false;
-                        Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 4;
+                        no7 = false;
+                        no8 = false;
+                        Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 5;
                     }
-                    else if (!no6 && (myObject.px >= 11 && myObject.py >= 7f && myObject.py <= 7.01f))
+                    //else if (!no6 && (myObject.px >= 11 && myObject.py >= 7f && myObject.py <= 7.01f))
+                    else if ((!no6 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 5) && (myObject.px >= 18 && myObject.px <= 18.1f))
                     {
+                        if (myObject.vx > 0)
+                        {
+                        }
                         myObject.vx = 0;
-                        myObject.vy = 0;
+
                         no1 = false;
                         no2 = false;
                         no3 = false;
                         no4 = false;
                         no5 = false;
                         no6 = true;
-                        Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 0;
+                        no7 = false;
+                        no8 = false;
+                        Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 6;
+                    }
+                    else if ((!no7 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 6) && (myObject.px >= 21 && myObject.px <= 21.1f))
+                    {
+                        //myObject.vx = 0;
+                        //myObject.vy = 0;
+                        if (myObject.vx > 0)
+                        {
+                        }
+                        myObject.vx = 0;
+
+                        no1 = false;
+                        no2 = false;
+                        no3 = false;
+                        no4 = false;
+                        no5 = false;
+                        no6 = false;
+                        no7 = true;
+                        no8 = false;
+                        Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 7;
+                    }
+                    else if ((!no8 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 7) && (myObject.px >= 24 && myObject.px <= 24.1f))
+                    {
+                        //myObject.vx = 0;
+                        //myObject.vy = 0;
+                        if (myObject.vx > 0)
+                        {
+                        }
+                        myObject.vx = 0;
+
+                        no1 = false;
+                        no2 = false;
+                        no3 = false;
+                        no4 = false;
+                        no5 = false;
+                        no6 = false;
+                        no7 = false;
+                        no8 = true;
+                        Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 8;
                     }
 
                 }
@@ -1799,9 +1960,12 @@ namespace OlcSideScrollingConsoleGame
 
             #region Draw lvl
 
-            //TODO slå ihop
-            CameraPosX = 0;
-            CameraPosY = 0;
+            //Om kamera inte ska följa spelare:
+            //CameraPosX = 0;
+            //CameraPosY = 0;
+            //Låt kamera följa spelare:
+            CameraPosX = Hero.px;
+            CameraPosY = Hero.py;
 
             // Draw Levels
             int nTileWidth = 16;
@@ -2078,6 +2242,11 @@ namespace OlcSideScrollingConsoleGame
         public int tempMemoryJumpCounter { get; set; }
         public int tempMemoryCayotyCounter { get; set; }
         public int enemyJump { get; set; }
+
+        public float fakk { get; set; }
+        public float fakkx { get; set; }
+
+
         private void DisplayStage(float elapsed)
         {
             if (HasSwitchedState)
@@ -2165,7 +2334,7 @@ namespace OlcSideScrollingConsoleGame
                 //Jump 
                 if (GetKey(Key.Space).Down || IIP.Button0)
                 {
-                    if(JumpButtonDownReleaseOnce) // hoppknapp måste ha släppts, hjälten måste vara airborn
+                    if (JumpButtonDownReleaseOnce) // hoppknapp måste ha släppts, hjälten måste vara airborn
                         jumpMemory = 5;
 
                     if (JumpButtonState < 3)
@@ -2263,7 +2432,7 @@ namespace OlcSideScrollingConsoleGame
                             Hero.vx = 6;
                         }
                     }
-                   
+
                     //solidLeft = false;
                 }
 
@@ -2342,14 +2511,27 @@ namespace OlcSideScrollingConsoleGame
 
             }
 
+            //fakk
 
+            var fakkObjList = listDynamics.FirstOrDefault(x => x.Id == 1);
+            if (fakkObjList != null)
+            {
+                fakk = fakkObjList.px;
+                fakkx = fakkObjList.py;
+            }
+            //
 
             foreach (var myObject in listDynamics)
             {
                 myObject.detHarBallatUr = false;
 
+               
+
                 if (!myObject.Redundant)
                 {
+
+                   
+
 
                     // Gravity
                     //myObject.vy += 20.0f * elapsed;
@@ -2364,7 +2546,7 @@ namespace OlcSideScrollingConsoleGame
                         {
                             if (BPower)
                             {
-                                if(rememberJumpCollision < 0)
+                                if (rememberJumpCollision < 0)
                                     myObject.vy += 17.0f * elapsed;
                             }
                             else
@@ -2392,13 +2574,24 @@ namespace OlcSideScrollingConsoleGame
                             if (Math.Abs(myObject.vx) < 0.01f)
                                 myObject.vx = 0.0f;
                          */
+
+                        float slipperiness = 3.0f;
+                        float slipperinessBPower = 0.09f;
+
+                        //Make slippery if ice-lvl
+                        if (CurrentMap.Name == "mapseven" || CurrentMap.Name == "mapeight" || CurrentMap.Name == "mapnine")
+                        {
+                             slipperiness = 0.1f;
+                             slipperinessBPower = 0.08f;
+                        }
+
                         if (!BPower)
                         {
                             myObject.vx += -3.0f * myObject.vx * elapsed;
 
-                            if(!IIP.left && !IIP.right)
+                            if (!IIP.left && !IIP.right)
                             {
-                                if (Math.Abs(myObject.vx) < 3.0f)
+                                if (Math.Abs(myObject.vx) < slipperiness)
                                     myObject.vx = 0.0f;
                             }
 
@@ -2406,12 +2599,13 @@ namespace OlcSideScrollingConsoleGame
                         else if (BPower)
                         {
                             myObject.vx += -2.0f * myObject.vx * elapsed;
+
                             if (!IIP.left && !IIP.right)
                             {
-                                if (Math.Abs(myObject.vx) < 0.09f)
+                                if (Math.Abs(myObject.vx) < slipperinessBPower)
                                     myObject.vx = 0.0f;
                             }
-                           
+
                         }
                     }
 
@@ -2432,7 +2626,7 @@ namespace OlcSideScrollingConsoleGame
                     // Clamp velocities
                     if (myObject.vx > 10.0f) // höger
                     {
-                        if(myObject.vx > 11.0f)
+                        if (myObject.vx > 11.0f)
                         {
                             myObject.detHarBallatUr = true;
                             detHarBallatUrLog = true;
@@ -2491,6 +2685,8 @@ namespace OlcSideScrollingConsoleGame
                     float NewObjectPosX = myObject.px + myObject.vx * elapsed;
                     float NewObjectPosY = myObject.py + myObject.vy * elapsed;
 
+                 
+
                     if (myObject.IsHero && rememberJumpCollision >= 0)
                     {
                         if (NewObjectPosY > myObject.py)
@@ -2516,9 +2712,19 @@ namespace OlcSideScrollingConsoleGame
                             //}
                             //NewObjectPosX = (int)NewObjectPosX + 1;
                             //NewObjectPosX = (int)NewObjectPosX + 0.9f;
-                            NewObjectPosX = (int)(NewObjectPosX + 0.9f);
 
-                            myObject.vx = 0;
+                            if (myObject.Name != "frost")
+                            {
+                                myObject.vx = 0;
+                            }
+                            else
+                            {
+                                
+                            }
+
+                                NewObjectPosX = (int)(NewObjectPosX + 0.9f);
+                           
+
 
                             turnPatrol = true;
                         }
@@ -2530,6 +2736,7 @@ namespace OlcSideScrollingConsoleGame
                         //    }
                         //}
 
+
                         if (myObject.Name == "walrus")
                         {
                             var x1 = (int)(NewObjectPosX + 0.0f);
@@ -2540,7 +2747,7 @@ namespace OlcSideScrollingConsoleGame
                             var y2 = (int)(myObject.py + 0.9f) + 1; // +1 ner ett 
                             bool andra = CurrentMap.GetSolid(x2, y2);
 
-                           
+
 
                             if (!ena || !andra || turnPatrol)
                             {
@@ -2554,15 +2761,121 @@ namespace OlcSideScrollingConsoleGame
                                 myObject.Patrol = Enum.Actions.Left;
                             }
 
+
                         }
+
+
+                        //frost hoppa vänster
+                        if (myObject.Name == "frost")
+                        {
+
+
+                            var frostCreature = (Creature)myObject;
+                           
+                            frostCreature.Ticker++;
+
+                            if (frostCreature.DoSpecialAction)
+                            {
+                                var nextX = (int)(myObject.px + 0.0f);
+                                var nextYPlusOne = (int)(myObject.py + 0.0f) + 1; // +1 ner ett 
+                                bool objIsSolid = CurrentMap.GetSolid(nextX, nextYPlusOne);
+
+
+
+                                if (objIsSolid && !frostCreature.HasJumped)
+                                {
+                                    myObject.vy = -7.7f;
+                                    frostCreature.HasJumped = true;
+                                }
+                                else if (objIsSolid && frostCreature.HasJumped)
+                                {
+
+                                    if (frostCreature.DoneSpecialAction == 1)
+                                    {
+                                        frostCreature.Ticker = 0;
+                                        frostCreature.DoSpecialAction = false;
+                                        frostCreature.DoneSpecialAction = 0;
+                                        frostCreature.HasJumped = false;
+                                    }
+                                    else
+                                    {
+                                        frostCreature.DoneSpecialAction = 1;
+                                    }
+
+
+                                }
+
+                            }
+
+                            if (!frostCreature.DoSpecialAction)
+                            {
+                               
+
+                                if (turnPatrol)
+                                {
+                                    NewObjectPosX = NewObjectPosX + 0.1f;
+                                    myObject.vx = 1;
+                                    myObject.Patrol = Enum.Actions.Right;
+
+
+                                   
+                                }
+                                else
+                                {
+                                    myObject.Patrol = Enum.Actions.Left;
+
+                                    //if (frostCreature.Ticker > 45)
+                                    if (frostCreature.Ticker > 8)
+                                    {
+                                        frostCreature.DoSpecialAction = true;
+                                    }
+
+                                }
+
+
+
+                            }
+
+                            //
+                            if ((int)(NewObjectPosX + 1.0f) <= frostCreature.FromX)
+                            {
+                                NewObjectPosX = NewObjectPosX + 0.1f;
+                                myObject.vx = 1;
+                                myObject.Patrol = Enum.Actions.Right;
+                            }
+                            //
+
+                        }
+
+
+
+
+
                     }
                     else // Moving Right
                     {
+
+
                         var turnPatrol = false;
                         if (CurrentMap.GetSolid((int)(NewObjectPosX + (1.0f - fBorder)), (int)(myObject.py + fBorder + 0.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + (1.0f - fBorder)), (int)(myObject.py + (1.0f - fBorder))))
                         {
-                            NewObjectPosX = (int)NewObjectPosX;
-                            myObject.vx = 0;
+                            if (myObject.Name != "frost")
+                            {
+                               
+                                NewObjectPosX = (int)NewObjectPosX;
+
+                                myObject.vx = 0;
+                            }
+                            else
+                            {
+                                // blir vacko om det är frost och frost hoppar. specialare för att det inte ska se ut som den har hicka
+                                //NewObjectPosX = (int)NewObjectPosX+0.5f;
+                                //myObject.vx = 4;
+                                //myObject.vx = 8;
+
+                              
+                            }
+
 
                             turnPatrol = true;
                         }
@@ -2577,7 +2890,9 @@ namespace OlcSideScrollingConsoleGame
                             var y2 = (int)(myObject.py + (1.0f - fBorder) + 1); // +1 ner ett 
                             bool andra = CurrentMap.GetSolid(x2, y2);
 
-                         
+
+
+
                             if (!ena || !andra || turnPatrol)
                             {
                                 NewObjectPosX = (int)NewObjectPosX;
@@ -2590,6 +2905,101 @@ namespace OlcSideScrollingConsoleGame
                             }
 
                         }
+
+
+                        //frost hoppa höger
+                        if (myObject.Name == "frost")
+                        {
+                           
+
+                            var frostCreature = (Creature)myObject;
+                            frostCreature.Ticker++;
+
+                         
+
+                            if (frostCreature.DoSpecialAction)
+                            {
+                                var nextX = (int)(myObject.px + 0.0f);
+                                var nextYPlusOne = (int)(myObject.py + 0.0f) + 1; // +1 ner ett 
+                                bool objIsSolid = CurrentMap.GetSolid(nextX, nextYPlusOne);
+
+
+
+                                if (objIsSolid && !frostCreature.HasJumped)
+                                {
+                                    myObject.vy = -7.7f;
+                                    frostCreature.HasJumped = true;
+                                }
+                                else if (objIsSolid && frostCreature.HasJumped)
+                                {
+
+                                    if (frostCreature.DoneSpecialAction == 1)
+                                    {
+                                        frostCreature.Ticker = 0;
+                                        frostCreature.DoSpecialAction = false;
+                                        frostCreature.DoneSpecialAction = 0;
+                                        frostCreature.HasJumped = false;
+
+                                    }
+                                    else
+                                    {
+                                        frostCreature.DoneSpecialAction = 1;
+                                    }
+
+
+                                }
+
+                            }
+
+                            if (!frostCreature.DoSpecialAction)
+                            {
+
+                               
+                                if (turnPatrol)
+                                {
+                                    NewObjectPosX = (int)NewObjectPosX;
+                                    myObject.vx = -1;
+                                    myObject.Patrol = Enum.Actions.Left;
+
+
+                                    
+
+                                }
+                                else
+                                {
+                                    myObject.Patrol = Enum.Actions.Right;
+
+                                    //if (frostCreature.Ticker > 45)
+                                    if (frostCreature.Ticker > 8)
+                                    {
+                                        frostCreature.DoSpecialAction = true;
+                                    }
+
+                                }
+
+
+
+                            }
+
+                            //
+                            if ((int)(NewObjectPosX) >= frostCreature.ToX)
+                            {
+                                NewObjectPosX = (int)NewObjectPosX;
+                                myObject.vx = -1;
+                                myObject.Patrol = Enum.Actions.Left;
+                            }
+                            //
+
+                        }
+
+
+
+
+
+
+
+
+
 
                     }
 
@@ -2640,7 +3050,7 @@ namespace OlcSideScrollingConsoleGame
                             HeroLandedState = 0;
                         }
                     }
-                    else if(myObject.vy > 0)// Moving Down
+                    else if (myObject.vy > 0)// Moving Down
                     {
                         //if (myObject.IsHero && myObject.vy > 1 && coyoteTime < 0)
                         //{
@@ -2648,6 +3058,7 @@ namespace OlcSideScrollingConsoleGame
                         //}
                         //if (coyoteTime >= 0)
                         //    coyoteTime--;
+
 
                         if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(NewObjectPosY + 1.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.9f), (int)(NewObjectPosY + 1.0f)))
                         {
@@ -2681,16 +3092,87 @@ namespace OlcSideScrollingConsoleGame
                         if (myObject.IsHero)
                         {
                             HeroAirBornState = 0;
-                            if(jumpMemory >= 0)
+                            if (jumpMemory >= 0)
                                 jumpMemory -= 1;
                         }
 
                         if (myObject.IsHero && myObject.vy > 1 && fallCounter < 10)
                             fallCounter++;
-                        if(fallCounter > 3) //3
+                        if (fallCounter > 3) //3
                             allowCoyoteTime = false;
                     }
 
+
+
+                    //
+                    //
+                    if (myObject.Name == "frost")
+                    {
+
+                        // om pos inte diffar mer än .3 per stickprov, troligen fast..
+
+                        if (myObject.PrevTick == 10)
+                        {
+                            myObject.SampleOne = myObject.px;
+                        }
+                        else if (myObject.PrevTick == 30)
+                        {
+                            myObject.SampleTow = myObject.px;
+                        }
+                        else if (myObject.PrevTick == 50)
+                        {
+                            myObject.SampleThree = myObject.px;
+                        }
+
+                        if (myObject.PrevTick >= 50)
+                        {
+
+                            var checkOne = System.Math.Abs(myObject.SampleOne - myObject.SampleTow);
+                            if (checkOne <= 0.3)
+                            {
+                                var checkTow = System.Math.Abs(myObject.SampleOne - myObject.SampleThree);
+                                if (checkTow <= 0.3)
+                                {
+                                    var currP = myObject.px;
+                                    var extraCheckOne = System.Math.Abs(currP - myObject.SampleOne);
+                                    var extraCheckTow = System.Math.Abs(currP - myObject.SampleTow);
+                                    var extraCheckThree = System.Math.Abs(currP - myObject.SampleThree);
+
+                                    if (extraCheckOne < 5 && extraCheckTow < 5 && extraCheckThree < 5) // kolla änen nuvande mot prev
+                                    {
+                                        //myObject.py = myObject.py - 2;
+                                        //NewObjectPosY = myObject.py;
+                                        myObject.vy = -2;
+
+                                        var logMove = true;
+                                        if (logMove)
+                                        {
+                                            //TODO: logga att creature är flyttad
+                                            Core.Aggregate.Instance.ReadWrite.WriteToLog($"Obj is stuck move");
+
+
+                                        }
+                                    }
+
+
+
+
+
+                                }
+
+                            }
+
+                        }
+
+                        if (myObject.PrevTick >= 60)
+                        {
+                            myObject.PrevTick = 0;
+                        }
+
+                        myObject.PrevTick++;
+                    }
+                    //
+                    //
 
 
                     //Collision dynamiska objekt
@@ -2754,9 +3236,9 @@ namespace OlcSideScrollingConsoleGame
                                     }
 
                                     //if (otherObject.Name == "walrus" || myObject.Name == "walrus")
-                                    if (myObject.Name == "walrus" && !otherObject.Friendly)
+                                    if ((myObject.Name == "walrus" || myObject.Name == "frost") && !otherObject.Friendly)
                                     {
-                                        
+
                                         if (myObject.Patrol == Enum.Actions.Right)
                                         {
                                             myObject.Patrol = Enum.Actions.Left;
@@ -2806,7 +3288,7 @@ namespace OlcSideScrollingConsoleGame
                                             }
                                         }
 
-                                       
+
 
                                     }
                                     else
@@ -2831,7 +3313,7 @@ namespace OlcSideScrollingConsoleGame
                                     }
 
 
-                                   
+
 
                                 }
                             }
@@ -2903,6 +3385,8 @@ namespace OlcSideScrollingConsoleGame
             // Draw Levels
             int nTileWidth = 16;
             int nTileHeight = 16;
+
+
             int nVisibleTilesX = ScreenWidth / nTileWidth;
             int nVisibleTilesY = ScreenHeight / nTileHeight;
 
@@ -2955,11 +3439,19 @@ namespace OlcSideScrollingConsoleGame
             // Draw health to screen
             //string Health ="HP: " + Hero.Health.ToString() + "/"+ Hero.MaxHealth;
             //DisplayDialog(new List<string>() { Health }, 160, 10);
-            //string msg = "player - x: " + Hero.px + " y: " + Hero.py;
-            //DisplayDialog(new List<string>() { msg }, 10, 10);
+
+            string msg = "player - x: " + Hero.px + " y: " + Hero.py;
+            DisplayDialog(new List<string>() { msg }, 10, 10);
+            // fakk
+            string msgx = "player - x: " + fakk + " y: " + fakkx;
+            DisplayDialog(new List<string>() { msgx }, 20, 20);
+
 
             //DisplayDialog(new List<string>() { "Air: " + HeroAirBornState + " Land: " + HeroLandedState + " Jump: " + JumpButtonState }, 10, 10);
             //DisplayDialog(new List<string>() { "maxL: " + maxL + " maxR: " + maxR }, 10, 10);
+
+
+
 
             DrawHUD();
         }
@@ -3018,7 +3510,7 @@ namespace OlcSideScrollingConsoleGame
             if (HasSwitchedState)
                 HasSwitchedState = false;
 
-           
+
 
             this.Clear((Pixel)Pixel.Presets.Black);
 
@@ -3040,7 +3532,7 @@ namespace OlcSideScrollingConsoleGame
             //if (ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || IIP.Button0))
             if (ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !IIP.idle))
             {
-               
+
 
                 //this.Machine.Switch(Enum.State.GameMap);
 
@@ -3281,6 +3773,7 @@ namespace OlcSideScrollingConsoleGame
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.Time = GameTotalTime;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.DateTime = DateTime.Now;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.IsUsed = true;
+                
 
             }
             else if (slot == 2)
@@ -3453,7 +3946,7 @@ namespace OlcSideScrollingConsoleGame
                 //DrawBigText("memoryjump: " + tempMemoryJumpCounter, 25, 30);
                 //DrawBigText("CayotyCounter: " + tempMemoryCayotyCounter, 25, 40);
                 //DrawBigText("allowCoyoteTime: " + allowCoyoteTime, 35, 40);
-                
+
 
             }
 
