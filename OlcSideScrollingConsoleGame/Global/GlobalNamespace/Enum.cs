@@ -79,6 +79,16 @@ namespace OlcSideScrollingConsoleGame
             WALK
         }
 
+        public enum LastStage
+        {
+            StayDown = 3,
+            MovingUp = 4,
+            StayUp = 0,
+            MovingDown = 1,
+        }
+
+
+
     }
   
 }

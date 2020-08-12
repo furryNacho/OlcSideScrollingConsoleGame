@@ -188,114 +188,182 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             int SheetOffsetX = 0; //Uppe till vänster är sheet offset 0. (noll index)
             int SheetOffsetY = 0;// Om y är 1 så är det en rad ner (noll index)
 
-            switch (sprGraphicsState)
+            if (Name == "ice")
             {
-                /*
-                 * längst ner i högra hörnet (5x5)
-                   SheetOffsetY = 4 * 16; (Vertikalen)
-                   SheetOffsetX = 4 * 16; (Horizontalen)
-                 */
-                /*
-                 Right = 0,
-                 Left = 1
-                 */
+                SheetOffsetY = 1 * 16;
+                SheetOffsetX = 4 * 16;
+            }
+            else if (Name == "boss")
+            {
 
-                case Enum.GraphicsState.Standing:
-
-                    if (IsIdle)
+                if (!IsAttackable)
+                {
+                    SheetOffsetY = 1 * 16;
+                    SheetOffsetX = 0 * 16; 
+                }
+                else
+                {
+                    if (this is DynamicCreatureEnemyBoss)
                     {
-                        
-                        //var asdf = this is DynamicCreatureHero;
-                        //if (asdf) // IsHero
-                        //{
-                        //    var qwer = true;
-                        //}
+                        var bossman = this as DynamicCreatureEnemyBoss;
+                        if (bossman.State == Enum.LastStage.MovingUp)
+                        {
 
-                        int oscillera = (int)TurnedTo == 0 ? 0 : 2;
-                        if (GraphicCounter % 2 == 0)
-                        {
-                            SheetOffsetY = 4 * 16; 
-                            SheetOffsetX = (0 + oscillera) * 16; 
+                            if (py <= 12)
+                            {
+                                //"idle", vrid på huvudet
+                                if (TurnedTo == Enum.PlayerOrientation.Left)
+                                {
+                                    SheetOffsetY = 0 * 16;
+                                    SheetOffsetX = 4 * 16;
+                                }
+                                else if (TurnedTo == Enum.PlayerOrientation.Right)
+                                {
+                                    SheetOffsetY = 0 * 16;
+                                    SheetOffsetX = 3 * 16;
+                                }
+
+
+                            }
+                            else
+                            {
+                                //flaxa lite på vägen upp
+                                GraphicCounter = GraphicCounter - 1;
+
+                                SheetOffsetY = 0 * 16;
+                                SheetOffsetX = GraphicCounter * 16;
+                            }
+
+                            
                         }
-                        else
+                    }
+                    else
+                    {
+                        //fall ner
+                        SheetOffsetY = 1 * 16;
+                        SheetOffsetX = 4 * 16;
+
+                    }
+                }
+            }
+            else if (Name == "overlay")
+            {
+                SheetOffsetY = 3 * 16;
+                SheetOffsetX = 4 * 16;
+            }
+            else
+            {
+                switch (sprGraphicsState)
+                {
+                    /*
+                     * längst ner i högra hörnet (5x5)
+                       SheetOffsetY = 4 * 16; (Vertikalen)
+                       SheetOffsetX = 4 * 16; (Horizontalen)
+                     */
+                    /*
+                     Right = 0,
+                     Left = 1
+                     */
+
+                    case Enum.GraphicsState.Standing:
+
+                        if (IsIdle)
                         {
-                            SheetOffsetY = 4 * 16;
-                            SheetOffsetX = (1 + oscillera) * 16; 
+
+                            //var asdf = this is DynamicCreatureHero;
+                            //if (asdf) // IsHero
+                            //{
+                            //    var qwer = true;
+                            //}
+
+                            int oscillera = (int)TurnedTo == 0 ? 0 : 2;
+                            if (GraphicCounter % 2 == 0)
+                            {
+                                SheetOffsetY = 4 * 16;
+                                SheetOffsetX = (0 + oscillera) * 16;
+                            }
+                            else
+                            {
+                                SheetOffsetY = 4 * 16;
+                                SheetOffsetX = (1 + oscillera) * 16;
+                            }
+
+                            break;
                         }
+
+                        if (IsHero) // IsHero
+                        {
+                            var asdf = this as DynamicCreatureHero;
+                            if (asdf.LookDown)
+                            {
+                                // rad tre för höger
+                                // rad fyra för vänster
+                                SheetOffsetY = (int)(TurnedTo + 2) * 16;
+                                // kolumn fyra för titta ner
+                                SheetOffsetX = 48;
+                                break;
+                            }
+
+                            if (asdf.LookUp)
+                            {
+                                // rad tre för höger
+                                // rad fyra för vänster
+                                SheetOffsetY = (int)(TurnedTo + 2) * 16;
+                                // tredje komlumn för titta upp
+                                SheetOffsetX = 32;
+                                break;
+                            }
+                        }
+
+
+                        SheetOffsetX = 0;
+                        SheetOffsetY = (int)TurnedTo * 16;
+                        break;
+
+                    case Enum.GraphicsState.Walking:
+                        //SheetOffsetX = (int)FacingDirection * 16; // så typ den övre raden är åt vilket håll, sen switcha mellan övre raden och undre raden i hans sprite.
+                        //SheetOffsetY = (int)FacingDirection * 16;
+                        SheetOffsetX = GraphicCounter * 16;
+                        SheetOffsetY = (int)TurnedTo * 16;
+                        break;
+
+                    case Enum.GraphicsState.Jumping:
+
+                        SheetOffsetX = 0 * 16;
+                        SheetOffsetY = ((int)TurnedTo + 2) * 16;
 
                         break;
-                    }
-                    
-                    if (IsHero) // IsHero
-                    {
-                        var asdf = this as DynamicCreatureHero;
-                        if (asdf.LookDown)
-                        {
-                            // rad tre för höger
-                            // rad fyra för vänster
-                            SheetOffsetY = (int)(TurnedTo + 2) * 16;
-                            // kolumn fyra för titta ner
-                            SheetOffsetX = 48;
-                            break;
-                        }
 
-                        if (asdf.LookUp)
-                        {
-                            // rad tre för höger
-                            // rad fyra för vänster
-                            SheetOffsetY = (int)(TurnedTo + 2) * 16;
-                            // tredje komlumn för titta upp
-                            SheetOffsetX = 32;
-                            break;
-                        }
-                    }
+                    case Enum.GraphicsState.Falling:
 
+                        SheetOffsetX = 1 * 16;
+                        SheetOffsetY = ((int)TurnedTo + 2) * 16;
 
-                    SheetOffsetX = 0;
-                    SheetOffsetY = (int)TurnedTo * 16;
-                    break;
+                        break;
 
-                case Enum.GraphicsState.Walking:
-                    //SheetOffsetX = (int)FacingDirection * 16; // så typ den övre raden är åt vilket håll, sen switcha mellan övre raden och undre raden i hans sprite.
-                    //SheetOffsetY = (int)FacingDirection * 16;
-                    SheetOffsetX = GraphicCounter * 16;
-                    SheetOffsetY = (int)TurnedTo * 16;
-                    break;
+                    case Enum.GraphicsState.Celebrating:
+                        SheetOffsetX = 4 * 16;
+                        SheetOffsetY = 4 * 16;
+                        break;
 
-                case Enum.GraphicsState.Jumping:
+                    case Enum.GraphicsState.Dead:
 
-                    SheetOffsetX = 0 * 16;
-                    SheetOffsetY = ((int)TurnedTo + 2) * 16;
+                        SheetOffsetX = GraphicCounter * 16;
+                        SheetOffsetY = 4 * 16;
+                        break;
 
-                    break;
+                    case Enum.GraphicsState.TakingDamage:
 
-                case Enum.GraphicsState.Falling:
+                        SheetOffsetY = (int)(TurnedTo + 2) * 16;
+                        SheetOffsetX = 16 * 4;
 
-                    SheetOffsetX = 1 * 16;
-                    SheetOffsetY = ((int)TurnedTo + 2) * 16;
-
-                    break;
-
-                case Enum.GraphicsState.Celebrating:
-                    SheetOffsetX = 4 * 16;
-                    SheetOffsetY = 4 * 16;
-                    break;
-
-                case Enum.GraphicsState.Dead:
-
-                    SheetOffsetX = GraphicCounter * 16;
-                    SheetOffsetY = 4 * 16; 
-                    break;
-
-                case Enum.GraphicsState.TakingDamage:
-                    
-                    SheetOffsetY = (int)(TurnedTo + 2) * 16;
-                    SheetOffsetX = 16*4;
-
-                    break;
+                        break;
+                }
             }
 
+           
 
+           
             //Sen är det dags att rita ut spriten
             // dynamiska objektet finns i world space, men måste rita den i screen space. 1 - 1 translation eftersom alla enheter är en / en enheter.
             //Vi måste bara ta reda på vart kameran titar i world space.

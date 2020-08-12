@@ -78,7 +78,7 @@ namespace OlcSideScrollingConsoleGame
         private TimeSpan ActualTotalTime { get; set; }
         private TimeSpan GameTotalTime { get; set; }
         private TimeSpan EndTotalTime { get; set; }
-       // private int EndTotalPercent { get; set; }
+        // private int EndTotalPercent { get; set; }
 
         private KonamiObj Konami { get; set; } = new KonamiObj();
 
@@ -845,7 +845,7 @@ namespace OlcSideScrollingConsoleGame
                         //Lite extra, just för att testa att lägga till
                         //if (Core.Aggregate.Instance.PlacesOnHighScore(EndTotalTime))
                         //{
-                        Core.Aggregate.Instance.PutOnHighScore(new HighScoreObj { DateTime = DateTime.Now, Handle = highScoreName, TimeSpan = EndTotalTime, Percent=Hero.Health });
+                        Core.Aggregate.Instance.PutOnHighScore(new HighScoreObj { DateTime = DateTime.Now, Handle = highScoreName, TimeSpan = EndTotalTime, Percent = Hero.Health });
 
                         Core.Aggregate.Instance.SaveHighScoreList();
                         //Core.Aggregate.Instance.ResetHighScore();
@@ -951,7 +951,7 @@ namespace OlcSideScrollingConsoleGame
                 {
                     EndTotalTime = GameTotalTime;
                     RightToAccessPodium = false;
-                   
+
                     if (Core.Aggregate.Instance.PlacesOnHighScore(EndTotalTime))
                     {
                         returnToEndAfterHighScore = true;
@@ -1272,7 +1272,7 @@ namespace OlcSideScrollingConsoleGame
         }
 
 
-
+        bool unlockAllStages = true;
         bool no1 = true;
         bool no2 = false;
         bool no3 = false;
@@ -1281,6 +1281,7 @@ namespace OlcSideScrollingConsoleGame
         bool no6 = false;
         bool no7 = false;
         bool no8 = false;
+        int currentStage = 0;
         //int runStageNo = 1;
         bool hasAccumulatedAllSpeed = false;
         //public bool WorldmapStartHasBeenReleased { get; set; }
@@ -1293,6 +1294,11 @@ namespace OlcSideScrollingConsoleGame
 
             //    HasSwitchedState = false;
             //}
+            if (currentStage == 0)
+            {
+                currentStage = Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted;
+            }
+
 
             if (Core.Aggregate.Instance.Sound != null)
             {
@@ -1422,7 +1428,19 @@ namespace OlcSideScrollingConsoleGame
                 //Right
                 if (ButtonsHasGoneIdle && (GetKey(Key.Right).Down || IIP.right))
                 {
-                    Hero.vx = 3;
+                    //Förbjud gå höger
+                    if (!unlockAllStages)
+                    {
+                        if (currentStage != 0 && currentStage <= Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted)
+                        {
+                            Hero.vx = 3;
+                        }
+                    }
+                    else
+                    {
+                        //För test lås upp alla banor
+                        Hero.vx = 3;
+                    }
                 }
 
                 //Left
@@ -1523,7 +1541,7 @@ namespace OlcSideScrollingConsoleGame
                     {
 
                         hasAccumulatedAllSpeed = false;
-                        ChangeMap("mapeight", 2, 3, Hero);
+                        ChangeMap("mapeight", 4, 41, Hero);
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
@@ -1555,8 +1573,7 @@ namespace OlcSideScrollingConsoleGame
 
             foreach (var myObject in listDynamics)
             {
-
-
+              
                 if (myObject.IsHero)
                 {
 
@@ -1566,10 +1583,11 @@ namespace OlcSideScrollingConsoleGame
                         /*Om vx är possitiv - instruktion att gå höger.
                          *Om vx är negativ - instruktion att gå vänster
                          *Om StageCompleted == 0 förbjud att gå till höger specifikt (i detta fall höger)*/
-                        //if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 0)
-                        //{
-                        //    myObject.vx = 0;
-                        //}
+                        //if(!unlockAllStages)
+                        //   if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 0)
+                        //   {
+                        //       myObject.vx = 0;
+                        //   }
 
                         if (myObject.vx > 0)
                         {
@@ -1586,15 +1604,17 @@ namespace OlcSideScrollingConsoleGame
                         no7 = false;
                         no8 = false;
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 1;
+                        currentStage = 1;
 
                     }
                     else if ((!no2 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 1) && (myObject.px >= 6 && myObject.px <= 6.09f))
                     {
                         // förbjud att gå höger
-                        //if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 1)
-                        //{
-                        //    myObject.vx = 0;
-                        //}
+                        //if (!unlockAllStages)
+                        //    if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 1)
+                        //    {
+                        //        myObject.vx = 0;
+                        //    }
 
                         if (myObject.vx > 0)
                         {
@@ -1610,12 +1630,14 @@ namespace OlcSideScrollingConsoleGame
                         no7 = false;
                         no8 = false;
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 2;
+                        currentStage = 2;
 
                     }
                     else if ((!no3 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 2) && (myObject.px >= 9 && myObject.px <= 9.1f))
                     {
                         // förbjud att gå höger
-                        //if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 2)
+                        //if (!unlockAllStages)
+                        //    if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 2)
                         //{
                         //    myObject.vx = 0;
                         //}
@@ -1634,16 +1656,18 @@ namespace OlcSideScrollingConsoleGame
                         no7 = false;
                         no8 = false;
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 3;
+                        currentStage = 3;
 
                     }
                     //else if (!no4 && (myObject.px >= 11 && myObject.px <= 11.1f && myObject.py < 3.01))
                     else if ((!no4 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 3) && (myObject.px >= 12 && myObject.px <= 12.1f))
                     {
-                        // förbjud att gå ner
-                        //if (myObject.vy > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 3)
-                        //{
-                        //    myObject.vy = 0;
-                        //}
+                        // förbjud att gå höger
+                        //if (!unlockAllStages)
+                        //    if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 3)
+                        //    {
+                        //        myObject.vx = 0;
+                        //    }
 
                         if (myObject.vx > 0)
                         {
@@ -1659,11 +1683,20 @@ namespace OlcSideScrollingConsoleGame
                         no7 = false;
                         no8 = false;
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 4;
+                        currentStage = 4;
 
                     }
                     //else if (!no5 && (myObject.px >= 11 && myObject.py >= 5f && myObject.py <= 5.1f))
                     else if ((!no5 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 4) && (myObject.px >= 15 && myObject.px <= 15.1f))
                     {
+
+                        // förbjud att gå höger
+                        //if (!unlockAllStages)
+                        //    if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 4)
+                        //    {
+                        //        myObject.vx = 0;
+                        //    }
+
                         if (myObject.vx > 0)
                         {
                         }
@@ -1678,10 +1711,20 @@ namespace OlcSideScrollingConsoleGame
                         no7 = false;
                         no8 = false;
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 5;
+                        currentStage = 5;
                     }
                     //else if (!no6 && (myObject.px >= 11 && myObject.py >= 7f && myObject.py <= 7.01f))
                     else if ((!no6 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 5) && (myObject.px >= 18 && myObject.px <= 18.1f))
                     {
+
+                        // förbjud att gå höger
+                        //if (!unlockAllStages)
+                        //    if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 5)
+                        //    {
+                        //        myObject.vx = 0;
+                        //    }
+
+
                         if (myObject.vx > 0)
                         {
                         }
@@ -1696,9 +1739,18 @@ namespace OlcSideScrollingConsoleGame
                         no7 = false;
                         no8 = false;
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 6;
+                        currentStage = 6;
                     }
                     else if ((!no7 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 6) && (myObject.px >= 21 && myObject.px <= 21.1f))
                     {
+                        // förbjud att gå höger
+                        //if (!unlockAllStages)
+                        //    if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 6)
+                        //    {
+                        //        myObject.vx = 0;
+                        //    }
+
+
                         //myObject.vx = 0;
                         //myObject.vy = 0;
                         if (myObject.vx > 0)
@@ -1715,11 +1767,20 @@ namespace OlcSideScrollingConsoleGame
                         no7 = true;
                         no8 = false;
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 7;
+                        currentStage = 7;
                     }
                     else if ((!no8 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 7) && (myObject.px >= 24 && myObject.px <= 24.1f))
                     {
                         //myObject.vx = 0;
                         //myObject.vy = 0;
+
+                        // förbjud att gå höger
+                        //if (!unlockAllStages)
+                        //    if (myObject.vx > 0 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted != 7)
+                        //    {
+                        //        myObject.vx = 0;
+                        //    }
+
                         if (myObject.vx > 0)
                         {
                         }
@@ -1734,6 +1795,7 @@ namespace OlcSideScrollingConsoleGame
                         no7 = false;
                         no8 = true;
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 8;
+                        currentStage = 8;
                     }
 
                 }
@@ -2243,9 +2305,14 @@ namespace OlcSideScrollingConsoleGame
         public int tempMemoryCayotyCounter { get; set; }
         public int enemyJump { get; set; }
 
-        public float fakk { get; set; }
-        public float fakkx { get; set; }
+        //public float fakk { get; set; }
+        //public float fakkx { get; set; }
 
+
+        private int XSelector()
+        {
+            return 12;
+        }
 
         private void DisplayStage(float elapsed)
         {
@@ -2292,11 +2359,12 @@ namespace OlcSideScrollingConsoleGame
             IIP = SlimDx.IIP;
 
             detHarBallatUrLog = false;
-            // Handle Input
+
+            // Handle  
             if (Focus)
             {
                 //B
-                if (IIP.Button1)
+                if (IIP.Button1 || IIP.Button2)
                 {
                     BPower = true;
                 }
@@ -2332,7 +2400,7 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 //Jump 
-                if (GetKey(Key.Space).Down || IIP.Button0)
+                if (GetKey(Key.Space).Down || IIP.Button0 || IIP.Button3)
                 {
                     if (JumpButtonDownReleaseOnce) // hoppknapp måste ha släppts, hjälten måste vara airborn
                         jumpMemory = 5;
@@ -2513,24 +2581,56 @@ namespace OlcSideScrollingConsoleGame
 
             //fakk
 
-            var fakkObjList = listDynamics.FirstOrDefault(x => x.Id == 1);
-            if (fakkObjList != null)
-            {
-                fakk = fakkObjList.px;
-                fakkx = fakkObjList.py;
-            }
+            //var fakkObjList = listDynamics.FirstOrDefault(x => x.Id == 1);
+            //if (fakkObjList != null)
+            //{
+            //    fakk = fakkObjList.px;
+            //    fakkx = fakkObjList.py;
+            //}
             //
+
 
             foreach (var myObject in listDynamics)
             {
                 myObject.detHarBallatUr = false;
 
-               
+                //Testar att flytta teleport med villkor
+                if (CurrentMap.Name == "mapnine")
+                {
+
+                    if (!listDynamics.Any(x => x.Name == "boss"))
+                    {
+
+                        if (myObject is Teleport)
+                        {
+                            myObject.px = Hero.px;
+                            myObject.py = Hero.py;
+                        }
+                    }
+                    else 
+                    {
+
+                        if (myObject.Name == "boss")
+                        {
+                            Core.Aggregate.Instance.CheckSwitchX();
+                        }
+
+                        if (myObject.Id > 0)
+                        {
+                            myObject.px = Core.Aggregate.Instance.GetMyX(myObject.Id);
+                        }
+
+                       
+                    }
+
+                }
+                //
+
 
                 if (!myObject.Redundant)
                 {
 
-                   
+
 
 
                     // Gravity
@@ -2581,8 +2681,8 @@ namespace OlcSideScrollingConsoleGame
                         //Make slippery if ice-lvl
                         if (CurrentMap.Name == "mapseven" || CurrentMap.Name == "mapeight" || CurrentMap.Name == "mapnine")
                         {
-                             slipperiness = 0.1f;
-                             slipperinessBPower = 0.08f;
+                            slipperiness = 0.1f;
+                            slipperinessBPower = 0.08f;
                         }
 
                         if (!BPower)
@@ -2685,7 +2785,7 @@ namespace OlcSideScrollingConsoleGame
                     float NewObjectPosX = myObject.px + myObject.vx * elapsed;
                     float NewObjectPosY = myObject.py + myObject.vy * elapsed;
 
-                 
+
 
                     if (myObject.IsHero && rememberJumpCollision >= 0)
                     {
@@ -2700,7 +2800,8 @@ namespace OlcSideScrollingConsoleGame
                     //
                     float fBorder = 0.000000005f;// Hårdkoda hitbox (bevara för rpg!!)
 
-                    if (myObject.vx <= 0) // Moving Left
+                        // Moving Left
+                    if (myObject.vx <= 0) 
                     {
                         var turnPatrol = false;
                         //if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.9f)))
@@ -2719,11 +2820,11 @@ namespace OlcSideScrollingConsoleGame
                             }
                             else
                             {
-                                
+
                             }
 
-                                NewObjectPosX = (int)(NewObjectPosX + 0.9f);
-                           
+                            NewObjectPosX = (int)(NewObjectPosX + 0.9f);
+
 
 
                             turnPatrol = true;
@@ -2771,7 +2872,7 @@ namespace OlcSideScrollingConsoleGame
 
 
                             var frostCreature = (Creature)myObject;
-                           
+
                             frostCreature.Ticker++;
 
                             if (frostCreature.DoSpecialAction)
@@ -2809,7 +2910,7 @@ namespace OlcSideScrollingConsoleGame
 
                             if (!frostCreature.DoSpecialAction)
                             {
-                               
+
 
                                 if (turnPatrol)
                                 {
@@ -2818,7 +2919,7 @@ namespace OlcSideScrollingConsoleGame
                                     myObject.Patrol = Enum.Actions.Right;
 
 
-                                   
+
                                 }
                                 else
                                 {
@@ -2837,7 +2938,7 @@ namespace OlcSideScrollingConsoleGame
                             }
 
                             //
-                            if ((int)(NewObjectPosX + 1.0f) <= frostCreature.FromX)
+                            if ((int)(NewObjectPosX + 1.0f) <= frostCreature.FromCor)
                             {
                                 NewObjectPosX = NewObjectPosX + 0.1f;
                                 myObject.vx = 1;
@@ -2861,7 +2962,7 @@ namespace OlcSideScrollingConsoleGame
                         {
                             if (myObject.Name != "frost")
                             {
-                               
+
                                 NewObjectPosX = (int)NewObjectPosX;
 
                                 myObject.vx = 0;
@@ -2873,7 +2974,7 @@ namespace OlcSideScrollingConsoleGame
                                 //myObject.vx = 4;
                                 //myObject.vx = 8;
 
-                              
+
                             }
 
 
@@ -2910,12 +3011,12 @@ namespace OlcSideScrollingConsoleGame
                         //frost hoppa höger
                         if (myObject.Name == "frost")
                         {
-                           
+
 
                             var frostCreature = (Creature)myObject;
                             frostCreature.Ticker++;
 
-                         
+
 
                             if (frostCreature.DoSpecialAction)
                             {
@@ -2954,7 +3055,7 @@ namespace OlcSideScrollingConsoleGame
                             if (!frostCreature.DoSpecialAction)
                             {
 
-                               
+
                                 if (turnPatrol)
                                 {
                                     NewObjectPosX = (int)NewObjectPosX;
@@ -2962,7 +3063,7 @@ namespace OlcSideScrollingConsoleGame
                                     myObject.Patrol = Enum.Actions.Left;
 
 
-                                    
+
 
                                 }
                                 else
@@ -2982,7 +3083,7 @@ namespace OlcSideScrollingConsoleGame
                             }
 
                             //
-                            if ((int)(NewObjectPosX) >= frostCreature.ToX)
+                            if ((int)(NewObjectPosX) >= frostCreature.ToCor)
                             {
                                 NewObjectPosX = (int)NewObjectPosX;
                                 myObject.vx = -1;
@@ -3006,7 +3107,8 @@ namespace OlcSideScrollingConsoleGame
                     myObject.Grounded = false;
 
 
-                    if (myObject.vy <= 0) // Moving Up
+                        // Moving Up
+                    if (myObject.vy <= 0) 
                     {
 
                         //Hjälten airborn
@@ -3059,7 +3161,7 @@ namespace OlcSideScrollingConsoleGame
                         //if (coyoteTime >= 0)
                         //    coyoteTime--;
 
-
+                        if(myObject.Name != "boss" && myObject.Name != "ice")
                         if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(NewObjectPosY + 1.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.9f), (int)(NewObjectPosY + 1.0f)))
                         {
                             NewObjectPosY = (int)NewObjectPosY;
@@ -3189,17 +3291,18 @@ namespace OlcSideScrollingConsoleGame
 
 
                                 // Check if bounding rectangles overlap
+                                /* if (DynamicObjectPosX < (otherObject.px + 0.0f) &&
+                                   (DynamicObjectPosX + 0.0f) > otherObject.px &&
+                                    myObject.py < (otherObject.py + 0.0f) &&
+                                   (myObject.py + 0.0f) > otherObject.py) */
                                 if (DynamicObjectPosX < (otherObject.px + 1.0f) && (DynamicObjectPosX + 1.0f) > otherObject.px &&
                                      myObject.py < (otherObject.py + 1.0f) && (myObject.py + 1.0f) > otherObject.py)
-                                //if (DynamicObjectPosX < (otherObject.px + 0.0f) &&
-                                //   (DynamicObjectPosX + 0.0f) > otherObject.px &&
-                                //    myObject.py < (otherObject.py + 0.0f) &&
-                                //   (myObject.py + 0.0f) > otherObject.py)
                                 {
                                     // First Check Horizontally 
                                     if (myObject.vx < 0)
                                     {
-                                        DynamicObjectPosX = otherObject.px + 1.0f; // (krock från höger)
+                                        // (krock från höger)
+                                        DynamicObjectPosX = otherObject.px + 1.0f;
 
                                         //skada hero
                                         if (otherObject.Friendly != myObject.Friendly)
@@ -3211,13 +3314,19 @@ namespace OlcSideScrollingConsoleGame
                                                 var victim = (Creature)otherObject;
                                                 DamageHero((Creature)myObject, victim, "3");
                                             }
+                                            else
+                                            {
+                                                //även om vänd bort från varandra
+                                                DamageHero((Creature)otherObject, (Creature)myObject, "2");
+                                            }
                                         }
 
 
                                     }
                                     else
                                     {
-                                        DynamicObjectPosX = otherObject.px - 1.0f; // (krock från vänster)
+                                        // (krock från vänster)
+                                        DynamicObjectPosX = otherObject.px - 1.0f;
 
                                         //  skada hero
                                         if (otherObject.Friendly != myObject.Friendly)
@@ -3228,6 +3337,11 @@ namespace OlcSideScrollingConsoleGame
                                                 var victim = (Creature)otherObject;
 
                                                 DamageHero((Creature)myObject, victim, "2");
+                                            }
+                                            else
+                                            {
+                                                //även om vänd bort från varandra
+                                                DamageHero((Creature)otherObject, (Creature)myObject, "2");
                                             }
                                         }
 
@@ -3253,6 +3367,10 @@ namespace OlcSideScrollingConsoleGame
 
                                 }
 
+
+
+
+
                                 // Check if bounding rectangles overlap
                                 if (DynamicObjectPosX < (otherObject.px + 1.0f) && (DynamicObjectPosX + 1.0f) > otherObject.px &&
                                     DynamicObjectPosY < (otherObject.py + 1.0f) && (DynamicObjectPosY + 1.0f) > otherObject.py)
@@ -3262,7 +3380,8 @@ namespace OlcSideScrollingConsoleGame
                                     if (myObject.vy < 0)
                                     {
 
-                                        DynamicObjectPosY = otherObject.py + 1.0f; // (krock underifrån)
+                                        // (krock underifrån)
+                                        DynamicObjectPosY = otherObject.py + 1.0f;
 
                                         // Kolla om krocken är mellan fiende och hjälte
                                         if (otherObject.Friendly != myObject.Friendly)
@@ -3293,7 +3412,8 @@ namespace OlcSideScrollingConsoleGame
                                     }
                                     else
                                     {
-                                        DynamicObjectPosY = otherObject.py - 1.0f; //(krock från ovan)
+                                        //(krock från ovan)
+                                        DynamicObjectPosY = otherObject.py - 1.0f; 
 
 
                                         // Kolla om krocken är mellan fiende och hjälte
@@ -3301,10 +3421,27 @@ namespace OlcSideScrollingConsoleGame
                                         {
                                             if (!otherObject.Friendly) // otherObject är fiende
                                             {
-                                                //studsa hjälten lite
-                                                Hero.vy = -5.5f;
-                                                Hero.Grounded = true;
-                                                JumpDamage((Creature)Hero, (Creature)otherObject);
+
+                                                if (otherObject.Name == "ice")
+                                                {
+                                                    DamageHero((Creature)otherObject, (Creature)Hero, "1");
+                                                }
+                                                else
+                                                {
+
+                                                    //studsa hjälten lite
+                                                    Hero.vy = -5.5f;
+                                                    Hero.Grounded = true;
+                                                    JumpDamage((Creature)Hero, (Creature)otherObject);
+
+                                                }
+                                            }
+                                            else
+                                            {
+                                                // fiende landar på hjälte?
+                                                //var victim = (Creature)myObject;
+
+                                                DamageHero((Creature)myObject, (Creature)Hero, "1");
                                             }
                                         }
 
@@ -3443,8 +3580,8 @@ namespace OlcSideScrollingConsoleGame
             string msg = "player - x: " + Hero.px + " y: " + Hero.py;
             DisplayDialog(new List<string>() { msg }, 10, 10);
             // fakk
-            string msgx = "player - x: " + fakk + " y: " + fakkx;
-            DisplayDialog(new List<string>() { msgx }, 20, 20);
+            ////string msgx = "player - x: " + fakk + " y: " + fakkx;
+            ////DisplayDialog(new List<string>() { msgx }, 20, 20);
 
 
             //DisplayDialog(new List<string>() { "Air: " + HeroAirBornState + " Land: " + HeroLandedState + " Jump: " + JumpButtonState }, 10, 10);
@@ -3773,7 +3910,7 @@ namespace OlcSideScrollingConsoleGame
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.Time = GameTotalTime;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.DateTime = DateTime.Now;
                 Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.IsUsed = true;
-                
+
 
             }
             else if (slot == 2)
@@ -4034,11 +4171,34 @@ namespace OlcSideScrollingConsoleGame
         }
         public void JumpDamage(Creature assalent, Creature victim)
         {
-            victim.Health = 0;
-            victim.Redundant = true;
-            victim.RemoveCount = 1;
+            if (victim.Name == "boss")
+            {
+                if (victim.IsAttackable)
+                {
+                    victim.IsAttackable = false;
+                    victim.Health = victim.Health - 10;
+                    if (victim.Health <= 0)
+                    {
+                        victim.Health = 0;
+                        victim.Redundant = true;
+                        victim.RemoveCount = 1;
 
-            enemyJump = 5;
+                        enemyJump = 5;
+                    }
+                }
+            }
+            else if (victim.Name == "ice")
+            {
+                //indestructible?
+            }
+            else
+            {
+                victim.Health = 0;
+                victim.Redundant = true;
+                victim.RemoveCount = 1;
+
+                enemyJump = 5;
+            }
 
         }
         public void ShowDialog(List<string> listLines)

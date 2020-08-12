@@ -364,6 +364,80 @@ namespace OlcSideScrollingConsoleGame.Core
             return Random.Next(SmallNumber, BigNumber);
         }
 
+
+        #region SwitchX
+        public bool IsUnderGround { get; set; } = false;
+        public bool IsAboveGround { get; set; } = false;
+        public bool IsMoving { get; set; } = false;
+        public bool HasBeenOnTheTop { get; set; } = true;
+
+        public bool HasBeenOnTheBottom { get; set; } = false;
+
+
+        public void CheckSwitchX()
+        {
+            // är under jorden
+            if (IsUnderGround && HasBeenOnTheTop && !IsMoving)
+            {
+                IsMoving = false;
+                HasBeenOnTheTop = false;
+                HasBeenOnTheBottom = true;
+
+                ChangeX();
+            }
+
+            //nollställ för att kunna switcha igen
+            if (IsAboveGround && HasBeenOnTheBottom && !IsMoving)
+            {
+                IsMoving = false;
+                HasBeenOnTheTop = true;
+                HasBeenOnTheBottom = false;
+            }
+
+        }
+
+
+        public void ChangeX()
+        {
+            var a = 0;
+            var b = 0;
+            var c = 0;
+            var idx = 0;
+            Random rand = new Random();
+            do
+            {
+                idx++;
+                a = rand.Next(0, 5);
+                b = rand.Next(0, 5);
+                c = rand.Next(0, 5);
+            } while ((a == b) || (b == c) || (a == c) || (idx > 25));
+
+            if (idx > 25)
+            {
+                ValueXArray = new int[] { 2, 4, 6 };
+            }
+            else
+            {
+                ValueXArray = new int[] { PossibleValueForX[a], PossibleValueForX[b], PossibleValueForX[c] };
+            }
+
+
+        }
+
+        int[] PossibleValueForX = new int[] { 2, 4, 6, 8, 10, 12 };
+
+
+        int[] ValueXArray = new int[] { 2, 4, 6 };
+
+        public int GetMyX(int id)
+        {
+            return ValueXArray[id-1];
+        }
+
+
+        #endregion
+
+
     }
 
 

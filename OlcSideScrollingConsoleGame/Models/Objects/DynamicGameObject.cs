@@ -60,10 +60,16 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         /// </summary>
         public string Name { get; set; }
         public int Id { get; set; }
+        public int Attr { get; set; }
 
         public bool Redundant { get; set; }
 
         public bool IsAttackable { get; set; }
+        
+
+
+        //public bool SwitchX { get; set; }
+
         public bool IsTempEnergi { get; set; }
 
         public bool IsHero { get; set; } = false;
@@ -76,11 +82,11 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         /// <summary>
         /// går till och med denna (vänster)
         /// </summary>
-        public int FromX { get; set; }
+        public int FromCor { get; set; }
         /// <summary>
         /// går till och med denna (höger)
         /// </summary>
-        public int ToX { get; set; }
+        public int ToCor { get; set; }
 
         public int PrevTick { get; set; }
         
