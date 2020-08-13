@@ -67,6 +67,7 @@ namespace OlcSideScrollingConsoleGame.Core
             LoadHighScore();
 
             LoadSound();
+
         }
 
         public void LoadSound()
@@ -124,6 +125,9 @@ namespace OlcSideScrollingConsoleGame.Core
             LoadSprite("enemyboss", PathSprites, @"\enemyboss", ".png");
 
             LoadSprite("cord", PathSprites, @"\cord", ".bmp"); // tile sheet that is coordinates
+
+
+            LoadSprite("splash", PathSprites, @"\splash", ".png");
 
         }
 

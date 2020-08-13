@@ -862,6 +862,11 @@ namespace OlcSideScrollingConsoleGame
                         //justForNowHighScoreList.Add(new HighScoreObj { Handle = highScoreName });
 
                         //DrawBigText(highScoreName, 10, 180);
+
+
+                        //nollställ allt som är valt
+                        NameInAscii = new List<int>() { 65, 65, 65 }; // sätt alla bokstäver till A
+                        HSSelectX = 0; // sätt markören längst till vänster
                     }
                 }
 
@@ -992,7 +997,8 @@ namespace OlcSideScrollingConsoleGame
 
 
                     ButtonsHasGoneIdle = false;
-                    this.Machine.Switch(Enum.State.WorldMap);
+                    //this.Machine.Switch(Enum.State.WorldMap);
+                    this.Machine.Switch(Enum.State.Menu);
                     HasSwitchedState = true;
                     // return;
                 }
@@ -1004,10 +1010,14 @@ namespace OlcSideScrollingConsoleGame
             DrawBigText("Press any button", 8, 160);
         }
 
+        public int countDownSplach { get; set; } = 60;
         private void DisplaySplashScreen(float elapsed)
         {
             if (HasSwitchedState)
                 HasSwitchedState = false;
+
+            if(countDownSplach > 0)
+                countDownSplach--;
 
             SlimDx.timer_Tick();
             IIP = SlimDx.IIP;
@@ -1024,8 +1034,16 @@ namespace OlcSideScrollingConsoleGame
                 }
             }
 
-            DrawBigText("Penguin After All", 4, 4);
-            DrawBigText("Press any button", 8, 160);
+
+            // Rita bakgrundsbild. 
+            DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite("splash"));
+
+
+
+            //DrawBigText("Penguin After All", 4, 4);
+
+            if (countDownSplach <= 0)
+                DrawBigText("Press any button", 16, 180);
 
         }
 
@@ -1038,7 +1056,10 @@ namespace OlcSideScrollingConsoleGame
         private void DisplayMenu(float elapsed)
         {
             if (HasSwitchedState)
+            {
                 HasSwitchedState = false;
+                return;
+            }
 
             Core.Aggregate.Instance.Sound.pause();
 
@@ -1269,10 +1290,12 @@ namespace OlcSideScrollingConsoleGame
 
             }
 
+           
+
         }
 
 
-        bool unlockAllStages = true;
+        bool unlockAllStages = false;
         bool no1 = true;
         bool no2 = false;
         bool no3 = false;
@@ -1291,14 +1314,15 @@ namespace OlcSideScrollingConsoleGame
 
             //if (HasSwitchedState)
             //{
-
-            //    HasSwitchedState = false;
+            //    //HasSwitchedState = false;
+            //    Hero.vx = 0;
+            //    //return;
             //}
+
             if (currentStage == 0)
             {
                 currentStage = Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted;
             }
-
 
             if (Core.Aggregate.Instance.Sound != null)
             {
@@ -1331,6 +1355,7 @@ namespace OlcSideScrollingConsoleGame
                 hasAccumulatedAllSpeed = true;
                 Hero.vx = 0;
                 Hero.vy = 0;
+                Hero.ChangeStageKnockBackReset();
             }
 
             float corrWorldMapPosX = 3;
@@ -1411,6 +1436,7 @@ namespace OlcSideScrollingConsoleGame
                 if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
                 {
                     ButtonsHasGoneIdle = true;
+                  
                 }
 
                 //Up
@@ -1446,7 +1472,9 @@ namespace OlcSideScrollingConsoleGame
                 //Left
                 if (ButtonsHasGoneIdle && (GetKey(Key.Left).Down || IIP.left))
                 {
-                    Hero.vx = -3;
+
+                    //Ska man någonsin få gå vänster? (blivit nåt knas om man gör höger får man ändå inte gå vänster igen. Om man inte hått höger får man gå vänster..?)
+                    //Hero.vx = -3;
                 }
 
                 // A ("jump button")
@@ -1800,7 +1828,24 @@ namespace OlcSideScrollingConsoleGame
 
                 }
 
-
+                //Sätta värder för att rätt overlay ska visas
+                if (myObject.Name == "overlayworldmap")
+                {
+                    // StageCompleted ska vara blå. Alla under ska sättas till passed. Alla över not passed 
+                    var CurrentStageThatIsCompleted = Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted;
+                    if (myObject.Id < (CurrentStageThatIsCompleted+1))
+                    {
+                        myObject.StageStatus = Enum.StageStatus.Passed;
+                    }
+                    else if (myObject.Id == (CurrentStageThatIsCompleted+1))
+                    {
+                        myObject.StageStatus = Enum.StageStatus.Current;
+                    }
+                    else if (myObject.Id > (CurrentStageThatIsCompleted+1))
+                    {
+                        myObject.StageStatus = Enum.StageStatus.NotPassed;
+                    }
+                }
 
                 float NewObjectPosX = myObject.px + myObject.vx * elapsed;
                 float NewObjectPosY = myObject.py + myObject.vy * elapsed;
@@ -2047,7 +2092,6 @@ namespace OlcSideScrollingConsoleGame
             if (fOffsetY > CurrentMap.Height - nVisibleTilesY) fOffsetY = CurrentMap.Height - nVisibleTilesY;
 
 
-
             // Get offsets for smooth movement
             float fTileOffsetX = (fOffsetX - (int)fOffsetX) * nTileWidth;
             float fTileOffsetY = (fOffsetY - (int)fOffsetY) * nTileHeight;
@@ -2085,13 +2129,23 @@ namespace OlcSideScrollingConsoleGame
             {
                 myObject.DrawSelf(this, fOffsetX, fOffsetY);
             }
-            #endregion
 
-            DrawBigText("World map", 25, 25);
+            //Hack, rita alltid hjälten sist..
+            var dynamicHeroObj = listDynamics.FirstOrDefault(x=>x.IsHero);
+            if (dynamicHeroObj != null)
+            {
+                dynamicHeroObj.DrawSelf(this, fOffsetX, fOffsetY);
+            }
+            //
+
+            #endregion
+            //DrawBigText(wordMapText, 25, 25);
+            var wordMapText = "        World Map. Stage: " + (currentStage == 0 ?  1 : currentStage)+"                     ";
+            DrawBigText(wordMapText, 0, 217);
             DrawHUD();
 
-            string msg = "player - x: " + Hero.px + " y: " + Hero.py;
-            DisplayDialog(new List<string>() { msg }, 10, 10);
+            //string msg = "player - x: " + Hero.px + " y: " + Hero.py;
+            //DisplayDialog(new List<string>() { msg }, 10, 10);
         }
 
         //public bool PauseStartHasBeenReleased { get; set; }
@@ -2308,11 +2362,6 @@ namespace OlcSideScrollingConsoleGame
         //public float fakk { get; set; }
         //public float fakkx { get; set; }
 
-
-        private int XSelector()
-        {
-            return 12;
-        }
 
         private void DisplayStage(float elapsed)
         {
@@ -3577,8 +3626,9 @@ namespace OlcSideScrollingConsoleGame
             //string Health ="HP: " + Hero.Health.ToString() + "/"+ Hero.MaxHealth;
             //DisplayDialog(new List<string>() { Health }, 160, 10);
 
-            string msg = "player - x: " + Hero.px + " y: " + Hero.py;
-            DisplayDialog(new List<string>() { msg }, 10, 10);
+            // vart är jag på kartan
+            //string msg = "player - x: " + Hero.px + " y: " + Hero.py;splach
+            //DisplayDialog(new List<string>() { msg }, 10, 10);
             // fakk
             ////string msgx = "player - x: " + fakk + " y: " + fakkx;
             ////DisplayDialog(new List<string>() { msgx }, 20, 20);
@@ -3676,13 +3726,18 @@ namespace OlcSideScrollingConsoleGame
                 if (GetKey(Key.Space).Pressed || IIP.Button0)
                 {
                     Reset();
-                    this.Machine.Switch(Enum.State.WorldMap);
-                }
-                else
-                {
+                    //this.Machine.Switch(Enum.State.WorldMap);
+                    ButtonsHasGoneIdle = false;
                     MenuState = Enum.MenuState.StartMenu;
                     this.Machine.Switch(Enum.State.Menu);
                 }
+                else
+                {
+                    ButtonsHasGoneIdle = false;
+                    MenuState = Enum.MenuState.StartMenu;
+                    this.Machine.Switch(Enum.State.Menu);
+                }
+
 
                 HasSwitchedState = true;
                 AnimateCirkle = ScreenH;
@@ -3789,10 +3844,11 @@ namespace OlcSideScrollingConsoleGame
             {
                 // statisk bild
                 this.Clear((Pixel)Pixel.Presets.Black);
-                DrawBigText("Player Dead", 4, 4);
+                DrawBigText("Player Dead", 8, 4);
                 //DrawBigText("YOLO", 8, 8);
-                DrawBigText("Jump = restart. Any = Menu", 4, 32);
-                DrawBigText("Press button to continue", 8, 160);
+                //DrawBigText("Jump = restart. Any = Menu", 4, 32);
+                //DrawBigText("Press button to continue", 8, 160);
+                DrawBigText("Press any button", 8, 217);
             }
 
             AnimationCount--;
@@ -3802,6 +3858,8 @@ namespace OlcSideScrollingConsoleGame
         #region Reset / Load / Save
         private void Reset()
         {
+            //TODO: reset enterhighscore
+
             //var fakeTeleport = listDynamics.FirstOrDefault(x => x.Name == "Teleport");
             //CurrentMap.OnInteraction(listDynamics, fakeTeleport, Enum.NATURE.WALK);
 
@@ -4072,8 +4130,8 @@ namespace OlcSideScrollingConsoleGame
                 if (mode == "pause")
                 {
                     DrawBigText("Pause", 25, 25);
-                    DrawBigText("Press Start to resume.", 25, 35);
-                    DrawBigText("Press Select to return to world map.", 25, 45);
+                    DrawBigText("Start resume.", 25, 35);
+                    DrawBigText("Select go back.", 25, 45);
                 }
             }
             else

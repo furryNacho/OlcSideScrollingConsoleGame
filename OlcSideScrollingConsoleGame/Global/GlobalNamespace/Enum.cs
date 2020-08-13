@@ -87,7 +87,12 @@ namespace OlcSideScrollingConsoleGame
             MovingDown = 1,
         }
 
-
+        public enum StageStatus
+        {
+            NotPassed = 0,
+            Current = 1,
+            Passed = 2,
+        }
 
     }
   

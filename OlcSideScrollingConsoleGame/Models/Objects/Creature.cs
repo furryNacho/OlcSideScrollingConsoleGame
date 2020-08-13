@@ -251,6 +251,11 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
                 SheetOffsetY = 3 * 16;
                 SheetOffsetX = 4 * 16;
             }
+            //else if (Name == "overlayworldmap")
+            //{
+            //    SheetOffsetY = 0 * 16;
+            //    SheetOffsetX = 0 * 16;
+            //}
             else
             {
                 switch (sprGraphicsState)
@@ -403,6 +408,16 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             SolidVsDynamic = false;
             Controllable = false;
             IsAttackable = false;
+        }
+
+        public virtual void ChangeStageKnockBackReset()
+        {
+            KnockBackDX = 0;
+            KnockBackDY = 0;
+            KnockBackTimer = 0;
+            SolidVsDynamic = true;
+            Controllable = true;
+            IsAttackable = true;
         }
 
         public int GetFacingDirection()

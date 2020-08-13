@@ -100,6 +100,8 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
         public Enum.Actions Patrol { get; set; }
 
+        public Enum.StageStatus StageStatus { get; set; }
+
         public bool Controllable { get; set; } = true;
         protected float KnockBackTimer = 0.0f;
         protected float KnockBackDX = 0.0f;

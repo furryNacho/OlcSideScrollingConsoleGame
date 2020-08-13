@@ -703,6 +703,82 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         #endregion
     }
 
+    public class DynamicCreatureOverlayWorldMap : Creature
+    {
+
+        //public DynamicCreatureOverlayWorldMap() : base("overlayworldmap", Core.Aggregate.Instance.GetSprite("worldmap"))
+        public DynamicCreatureOverlayWorldMap() : base("overlayworldmap", Core.Aggregate.Instance.GetSprite("tilesheetwm"))
+        {
+            Friendly = true;
+            Health = 100;
+            MaxHealth = 100;
+            SolidVsDynamic = false;
+            SolidVsMap = true;
+            DamageGiven = 0;
+        }
+
+        
+
+        public override void DrawSelf(Program gfx, float ox, float oy)
+        {
+
+            int SheetOffsetX = 0; //Uppe till vänster är sheet offset 0. (noll index) (Horizontal)
+            int SheetOffsetY = 0;// Om y är 1 så är det en rad ner (noll index) (Vertikal)
+
+            // vilken sprite som ska visas
+            //Inte klarad, visa rödisch
+            if (StageStatus == Enum.StageStatus.NotPassed)
+            {
+                SheetOffsetX = 2 * 16;
+                SheetOffsetY = 1 * 16;
+            }
+            //Nuvarande, visa blå
+            else if (StageStatus == Enum.StageStatus.Current)
+            {
+                SheetOffsetX = 1 * 16;
+                SheetOffsetY = 1 * 16;
+            }
+            //Klarad, visa ingen (grön default)
+            else if (StageStatus == Enum.StageStatus.Passed)
+            {
+                SheetOffsetX = 0 * 16;
+                SheetOffsetY = 1 * 16;
+            }
+            else
+            {
+                SheetOffsetX = 0 * 16;
+                SheetOffsetY = 1 * 16;
+            }
+
+            
+
+            //var spriteSize = 32;
+            var firstMagicalPlayerParam = new Point();
+            firstMagicalPlayerParam = new Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
+
+            // SheetOffsetX och SheetOffsetY ger top left in en sprite
+            var secondMagicalPlayerParam = new Point(SheetOffsetX, SheetOffsetY); // Vilken tile i spritesheeten som ska ritas.
+
+            gfx.DrawPartialSprite(firstMagicalPlayerParam, Sprite, secondMagicalPlayerParam, 16, 32);
+
+        }
+
+        //public override void Behaviour(float fElapsedTime, DynamicGameObject player = null)
+        //{
+        //    if (Health <= 0)
+        //    {
+        //        vx = 0;
+        //        vy = 0;
+        //        SolidVsDynamic = false;
+        //        IsAttackable = false;
+        //        // Patrol = Enum.Actions.Left;
+        //        return;
+        //    }
+        //px = 3;
+        //py = 8;
+        //        }
+    }
+
     public class DynamicCreatureOverlay : Creature
     {
 

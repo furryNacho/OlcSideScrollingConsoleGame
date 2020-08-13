@@ -130,6 +130,75 @@ namespace OlcSideScrollingConsoleGame.Models
             ListDynamicObjs.Add(new Teleport(placeraPortalX, placeraPortalY, "maptwo", skickaTillX, skickaTillY)); // Placering hamna, plcering visa
 
 
+            //Overlay
+            #region overlay
+            DynamicGameObject overlay1 = new DynamicCreatureOverlayWorldMap();
+            ListDynamicObjs.Add(overlay1);
+            overlay1.px = 3;
+            overlay1.py = 8;
+            overlay1.Name = "overlayworldmap";
+            overlay1.Id = 1;
+            overlay1.StageStatus = Enum.StageStatus.NotPassed;
+
+            DynamicGameObject overlay2 = new DynamicCreatureOverlayWorldMap();
+            ListDynamicObjs.Add(overlay2);
+            overlay2.px = 6;
+            overlay2.py = 8;
+            overlay2.Name = "overlayworldmap";
+            overlay2.Id = 2;
+            overlay2.StageStatus = Enum.StageStatus.NotPassed;
+
+            DynamicGameObject overlay3 = new DynamicCreatureOverlayWorldMap();
+            ListDynamicObjs.Add(overlay3);
+            overlay3.px = 9;
+            overlay3.py = 8;
+            overlay3.Name = "overlayworldmap";
+            overlay3.Id = 3;
+            overlay3.StageStatus = Enum.StageStatus.NotPassed;
+
+            DynamicGameObject overlay4 = new DynamicCreatureOverlayWorldMap();
+            ListDynamicObjs.Add(overlay4);
+            overlay4.px = 12;
+            overlay4.py = 8;
+            overlay4.Name = "overlayworldmap";
+            overlay4.Id = 4;
+            overlay4.StageStatus = Enum.StageStatus.NotPassed;
+
+            DynamicGameObject overlay5 = new DynamicCreatureOverlayWorldMap();
+            ListDynamicObjs.Add(overlay5);
+            overlay5.px = 15;
+            overlay5.py = 8;
+            overlay5.Name = "overlayworldmap";
+            overlay5.Id = 5;
+            overlay5.StageStatus = Enum.StageStatus.NotPassed;
+
+            DynamicGameObject overlay6 = new DynamicCreatureOverlayWorldMap();
+            ListDynamicObjs.Add(overlay6);
+            overlay6.px = 18;
+            overlay6.py = 8;
+            overlay6.Name = "overlayworldmap";
+            overlay6.Id = 6;
+            overlay6.StageStatus = Enum.StageStatus.NotPassed;
+
+            DynamicGameObject overlay7 = new DynamicCreatureOverlayWorldMap();
+            ListDynamicObjs.Add(overlay7);
+            overlay7.px = 21;
+            overlay7.py = 8;
+            overlay7.Name = "overlayworldmap";
+            overlay7.Id = 7;
+            overlay7.StageStatus = Enum.StageStatus.NotPassed;
+
+            DynamicGameObject overlay8 = new DynamicCreatureOverlayWorldMap();
+            ListDynamicObjs.Add(overlay8);
+            overlay8.px = 24;
+            overlay8.py = 8;
+            overlay8.Name = "overlayworldmap";
+            overlay8.Id = 8;
+            overlay8.StageStatus = Enum.StageStatus.NotPassed;
+
+            #endregion
+
+
             return true;
         }
 
@@ -1949,7 +2018,7 @@ namespace OlcSideScrollingConsoleGame.Models
 
             #endregion
 
-            //ListDynamicObjs.Add(new Teleport(377.5f, 8.0f, "mapnine", 2.0f, 5.0f));
+           // ListDynamicObjs.Add(new Teleport(377.5f, 8.0f, "mapnine", 2.0f, 5.0f));
 
             // för test att snabbt komma till sista banan
             ListDynamicObjs.Add(new Teleport(3f, 41f, "mapnine", 1.0f, 5.0f));
