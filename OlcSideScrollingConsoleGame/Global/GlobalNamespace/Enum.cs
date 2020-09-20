@@ -28,6 +28,7 @@ namespace OlcSideScrollingConsoleGame
             ClearSavedGame,
             Load,
             Save,
+            CreditsMenu
 
             /*"Start New Game",
 "Load Saved Game",

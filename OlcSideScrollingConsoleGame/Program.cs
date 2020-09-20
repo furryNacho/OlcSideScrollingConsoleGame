@@ -48,6 +48,7 @@ namespace OlcSideScrollingConsoleGame
         private float Dialogy = 0.0f;
         private List<Quest> ListQuests { get; set; } = new List<Quest>();
         private List<Item> ListItems { get; set; } = new List<Item>();
+        public List<int> EnergiIdLista { get; set; } = new List<int>();
         private EnergiRainObject EnergiRainObj { get; set; } = new EnergiRainObject();
         /// <summary>
         /// 0 = Hjälten på väg ner. Mellan 1 till 3 så länge har hjälten varit i luften.
@@ -845,7 +846,8 @@ namespace OlcSideScrollingConsoleGame
                         //Lite extra, just för att testa att lägga till
                         //if (Core.Aggregate.Instance.PlacesOnHighScore(EndTotalTime))
                         //{
-                        Core.Aggregate.Instance.PutOnHighScore(new HighScoreObj { DateTime = DateTime.Now, Handle = highScoreName, TimeSpan = EndTotalTime, Percent = Hero.Health });
+                        //Core.Aggregate.Instance.PutOnHighScore(new HighScoreObj { DateTime = DateTime.Now, Handle = highScoreName, TimeSpan = EndTotalTime, Percent = Hero.Health }); TODO: EnergiIdLista
+                        Core.Aggregate.Instance.PutOnHighScore(new HighScoreObj { DateTime = DateTime.Now, Handle = highScoreName, TimeSpan = EndTotalTime, Percent = EnergiIdLista.Count }); 
 
                         Core.Aggregate.Instance.SaveHighScoreList();
                         //Core.Aggregate.Instance.ResetHighScore();
@@ -1004,10 +1006,43 @@ namespace OlcSideScrollingConsoleGame
                 }
             }
 
-            DrawBigText("End", 4, 4);
-            DrawBigText("You are super player", 4, 20);
-            DrawBigText("Thank you for playing game", 4, 36);
-            DrawBigText("Press any button", 8, 160);
+
+            //100%
+            //TODO: alternativt slut.
+            if (EnergiIdLista.Count == 100)
+            {
+                //100% av alla energier och 100% hälsa kvar
+                if (Hero.Health == 100)
+                {
+                    //DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite("splash"));
+                    DrawBigText("End", 4, 4);
+                    DrawBigText("100%", 4, 20);
+                    DrawBigText("Press any button", 8, 160);
+                }
+                else
+                {
+                    //DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite("splash"));
+                    DrawBigText("End", 4, 4);
+                    DrawBigText("Exemplary display of skills", 4, 20);
+                    DrawBigText("Press any button", 8, 160);
+                }
+
+            }
+            else
+            {
+                //Klarade spelet
+                //DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite("splash"));
+                DrawBigText("End", 4, 4);
+                DrawBigText("You are super player", 4, 20);
+                DrawBigText("Thank you for playing game", 4, 36);
+                DrawBigText("Press any button", 8, 160);
+
+            }
+
+            //DrawBigText("End", 4, 4);
+            //DrawBigText("You are super player", 4, 20);
+            //DrawBigText("Thank you for playing game", 4, 36);
+            //DrawBigText("Press any button", 8, 160);
         }
 
         public int countDownSplach { get; set; } = 60;
@@ -1074,6 +1109,8 @@ namespace OlcSideScrollingConsoleGame
 
             var menuList = new List<string>();
 
+
+      
             //Pause on world map or start menu
             if (MenuState == Enum.MenuState.StartMenu)
             {
@@ -1083,6 +1120,7 @@ namespace OlcSideScrollingConsoleGame
                     "Load Saved Game",
                     "View High Score",
                     "Settings",
+                    "Credits",
                     "Exit Game"
                 };
             }
@@ -1106,6 +1144,26 @@ namespace OlcSideScrollingConsoleGame
                     "Clear Saved Game",
                     "Back"
                  };
+            }
+            else if (MenuState == Enum.MenuState.CreditsMenu)
+            {
+                Header = "Credits";
+
+                menuList = new List<string>()
+                {
+                    "Developer:",
+                    "FurryNacho",
+                    "olcPixelGameEngine:",
+                    "Javidx9",
+                    "Game Engine Port:",
+                    "DevChrome",
+                    "Music and Sound:",
+                    "Fisk-i-fickorna",
+                    "",
+                    "Back"
+                 };
+                
+                selectedMenuItem = menuList.Count;
             }
             //else if (MenuState == Enum.MenuState.Audio)
             //{
@@ -1154,8 +1212,11 @@ namespace OlcSideScrollingConsoleGame
                 //Up
                 if (selectedMenuItem > 1 && (GetKey(Key.Up).Pressed || IIP.up) && ButtonsHasGoneIdle)
                 {
-                    selectedMenuItem--;
-                    ButtonsHasGoneIdle = false;
+                    if (MenuState != Enum.MenuState.CreditsMenu)
+                    {
+                        selectedMenuItem--;
+                        ButtonsHasGoneIdle = false;
+                    }
                 }
 
                 //Down
@@ -1241,6 +1302,7 @@ namespace OlcSideScrollingConsoleGame
                             this.Machine.Switch(Enum.State.Settings);
                             break;
                         case "Back":
+                            selectedMenuItem = 1;
                             ButtonsHasGoneIdle = false;
 
                             //if (MenuState == Enum.MenuState.StartMenu)
@@ -1271,8 +1333,13 @@ namespace OlcSideScrollingConsoleGame
                             break;
                         case "View High Score":
                             ButtonsHasGoneIdle = false;
-                            // DrawBigText(menuList[selectedMenuItem - 1], 45, 4);
                             this.Machine.Switch(Enum.State.HighScore);
+                            HasSwitchedState = true;
+                            break;
+                        case "Credits":
+                            selectedMenuItem = 3;
+                            ButtonsHasGoneIdle = false;
+                            MenuState = Enum.MenuState.CreditsMenu;
                             HasSwitchedState = true;
                             break;
 
@@ -2365,23 +2432,38 @@ namespace OlcSideScrollingConsoleGame
 
         private void DisplayStage(float elapsed)
         {
-            if (HasSwitchedState)
-                HasSwitchedState = false;
-
             Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
 
-            if (Core.Aggregate.Instance.Sound != null)
+
+            Audio.Library.Sound playSounds = null;
+
+            if (HasSwitchedState)
             {
-                if (Core.Aggregate.Instance.Sound.isPlaying("uno.wav"))
+                HasSwitchedState = false;
+
+                // gå igenom listDynamics kolla picups. finns id i EnergiIdLista ta bort från listDynamics
+                listDynamics.RemoveAll(x => EnergiIdLista.Any(y => y == x.CoinId));
+
+                playSounds = Core.Aggregate.Instance.Sound;
+                if (playSounds != null)
                 {
-                    Core.Aggregate.Instance.Sound.stop("uno.wav");
+                    if (Core.Aggregate.Instance.Sound.isPlaying("uno.wav"))
+                    {
+                        Core.Aggregate.Instance.Sound.stop("uno.wav");
+                    }
+
+                    if (!Core.Aggregate.Instance.Sound.isPlaying("puttekong.wav"))
+                    {
+                        Core.Aggregate.Instance.Sound.play("puttekong.wav");
+                    }
                 }
 
-                if (!Core.Aggregate.Instance.Sound.isPlaying("puttekong.wav"))
-                {
-                    Core.Aggregate.Instance.Sound.play("puttekong.wav");
-                }
+                //inget hopp när enter banan första gången
+                Hero.vx = 0;
             }
+
+
+           
 
             if (enemyJump > -1)
             {
@@ -3511,6 +3593,27 @@ namespace OlcSideScrollingConsoleGame
                                     if (DynamicObjectPosX < (otherObject.px + 1.0f) && (DynamicObjectPosX + 1.0f) > otherObject.px &&
                                         myObject.py < (otherObject.py + 1.0f) && (myObject.py + 1.0f) > otherObject.py)
                                     {
+
+
+                                        //
+                                        //Plocka upp energi
+                                        //
+                                        if (playSounds != null)
+                                        {
+                                            //TODO: ljud plocka upp energi
+                                            //if (!Core.Aggregate.Instance.Sound.isPlaying("puttekong.wav"))
+                                            //{
+                                            //    Core.Aggregate.Instance.Sound.play("puttekong.wav");
+                                            //}
+                                        }
+                                        Core.Aggregate.Instance.Sound.play("Click.wav");
+
+                                        if (otherObject.CoinId > 0)
+                                        {
+                                            EnergiIdLista.Add(otherObject.CoinId);
+                                        }
+
+
                                         //// First check if object is part of a quest
                                         //foreach (var quest in listQuests)
                                         //{
@@ -3523,6 +3626,9 @@ namespace OlcSideScrollingConsoleGame
 
                                         // Finally just check the object
                                         otherObject.OnInteract(myObject);
+
+                                       
+
                                     }
                                 }
                             }
@@ -3887,6 +3993,8 @@ namespace OlcSideScrollingConsoleGame
             //Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd = false;
             Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = 0;
 
+            EnergiIdLista = new List<int>();
+
         }
         private void Load(int slot)
         {
@@ -3901,11 +4009,13 @@ namespace OlcSideScrollingConsoleGame
                     HeroEnergi = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.HeroEnergi,
                     StageCompleted = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.StageCompleted,
                     SpawnAtWorldMap = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.SpawnAtWorldMap,
-                    ShowEnd = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.ShowEnd
+                    ShowEnd = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.ShowEnd,
+                    EnergiCollected = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.EnergiCollected
                 };
                 ActualTotalTime = copyObj.Time;
                 Core.Aggregate.Instance.Settings.ActivePlayer = copyObj;
                 Hero.Health = copyObj.HeroEnergi;
+                EnergiIdLista = copyObj.EnergiCollected;
             }
             else if (slot == 2)
             {
@@ -3918,11 +4028,13 @@ namespace OlcSideScrollingConsoleGame
                     HeroEnergi = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.HeroEnergi,
                     StageCompleted = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.StageCompleted,
                     SpawnAtWorldMap = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.SpawnAtWorldMap,
-                    ShowEnd = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.ShowEnd
+                    ShowEnd = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.ShowEnd,
+                    EnergiCollected = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.EnergiCollected
                 };
                 ActualTotalTime = copyObj.Time;
                 Core.Aggregate.Instance.Settings.ActivePlayer = copyObj;
                 Hero.Health = copyObj.HeroEnergi;
+                EnergiIdLista = copyObj.EnergiCollected;
             }
             else
             {
@@ -3935,11 +4047,13 @@ namespace OlcSideScrollingConsoleGame
                     HeroEnergi = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.HeroEnergi,
                     StageCompleted = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.StageCompleted,
                     SpawnAtWorldMap = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.SpawnAtWorldMap,
-                    ShowEnd = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.ShowEnd
+                    ShowEnd = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.ShowEnd,
+                    EnergiCollected = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.EnergiCollected
                 };
                 ActualTotalTime = copyObj.Time;
                 Core.Aggregate.Instance.Settings.ActivePlayer = copyObj;
                 Hero.Health = copyObj.HeroEnergi;
+                EnergiIdLista = copyObj.EnergiCollected;
             }
 
 
@@ -3958,7 +4072,8 @@ namespace OlcSideScrollingConsoleGame
                 HeroEnergi = Core.Aggregate.Instance.Settings.ActivePlayer.HeroEnergi,
                 StageCompleted = Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted,
                 SpawnAtWorldMap = Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap,
-                ShowEnd = Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd
+                ShowEnd = Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd,
+                EnergiCollected = EnergiIdLista
             };
 
             if (slot == 3)

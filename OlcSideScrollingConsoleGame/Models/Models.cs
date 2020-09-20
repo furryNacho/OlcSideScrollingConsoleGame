@@ -67,6 +67,7 @@ namespace OlcSideScrollingConsoleGame.Models
 
         //public float PosX { get; set; }
         //public float PosY { get; set; }
+        public List<int> EnergiCollected { get; set; } = new List<int>();
 
     }
 

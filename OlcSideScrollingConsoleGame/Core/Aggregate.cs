@@ -77,7 +77,7 @@ namespace OlcSideScrollingConsoleGame.Core
                 Sound = Audio.Library.Sound.Instance;
                 //var initSuccess = Sound.init();
                 Sound.loadSound("uno.wav");
-                Sound.loopSound("uno.wav");
+                //Sound.loopSound("uno.wav");
                 Sound.loadSound("Click.wav");
                 Sound.loadSound("puttekong.wav");
                 //Sound.loopSound("Click.wav");

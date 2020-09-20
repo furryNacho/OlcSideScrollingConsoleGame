@@ -292,10 +292,10 @@ namespace OlcSideScrollingConsoleGame.Models
 
 
             // Add items
-            ListDynamicObjs.Add(new DynamicItem(20, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(25, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(43, 22, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(47, 22, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(20, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 1));
+            ListDynamicObjs.Add(new DynamicItem(25, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 2));
+            ListDynamicObjs.Add(new DynamicItem(43, 22, Core.Aggregate.Instance.GetItem("energi"), 0, 3));
+            ListDynamicObjs.Add(new DynamicItem(47, 22, Core.Aggregate.Instance.GetItem("energi"), 0, 4));
 
 
             return true;
@@ -395,15 +395,14 @@ namespace OlcSideScrollingConsoleGame.Models
             g8.py = 22;
             g8.Name = "walrus";
 
-            ListDynamicObjs.Add(new DynamicItem(29, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(30, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(31, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(32, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(65, 18, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(97, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(98, 23, Core.Aggregate.Instance.GetItem("energi")));
-
-            ListDynamicObjs.Add(new DynamicItem(40, 18, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(29, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 5));
+            ListDynamicObjs.Add(new DynamicItem(30, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 6));
+            ListDynamicObjs.Add(new DynamicItem(31, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 7));
+            ListDynamicObjs.Add(new DynamicItem(32, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 8));
+            ListDynamicObjs.Add(new DynamicItem(65, 18, Core.Aggregate.Instance.GetItem("energi"), 0, 9));
+            ListDynamicObjs.Add(new DynamicItem(97, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 10));
+            ListDynamicObjs.Add(new DynamicItem(98, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 11));
+            ListDynamicObjs.Add(new DynamicItem(40, 18, Core.Aggregate.Instance.GetItem("energi"), 0, 12));
 
 
             return true;
@@ -456,15 +455,14 @@ namespace OlcSideScrollingConsoleGame.Models
             ListDynamicObjs.Add(new Teleport(187.5f, 3.0f, "worldmap", 2.0f, 5.0f));
 
 
-            ListDynamicObjs.Add(new DynamicItem(31, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(32, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(33, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(34, 23, Core.Aggregate.Instance.GetItem("energi")));
-
-            ListDynamicObjs.Add(new DynamicItem(189, 17, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(172, 19, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(155, 22, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(83, 8, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(31, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 13));
+            ListDynamicObjs.Add(new DynamicItem(32, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 14));
+            ListDynamicObjs.Add(new DynamicItem(33, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 15));
+            ListDynamicObjs.Add(new DynamicItem(34, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 16));
+            ListDynamicObjs.Add(new DynamicItem(189, 17, Core.Aggregate.Instance.GetItem("energi"), 0, 17));
+            ListDynamicObjs.Add(new DynamicItem(172, 19, Core.Aggregate.Instance.GetItem("energi"), 0, 18));
+            ListDynamicObjs.Add(new DynamicItem(155, 22, Core.Aggregate.Instance.GetItem("energi"), 0, 19));
+            ListDynamicObjs.Add(new DynamicItem(83, 8, Core.Aggregate.Instance.GetItem("energi"), 0, 20));
 
 
             DynamicGameObject g1 = new DynamicCreatureEnemyPenguin();
@@ -707,19 +705,18 @@ namespace OlcSideScrollingConsoleGame.Models
 
 
             // Add items
-            ListDynamicObjs.Add(new DynamicItem(16, 21, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(17, 21, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(18, 21, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(19, 21, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(74, 15, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(103, 11, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(121, 13, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(122, 13, Core.Aggregate.Instance.GetItem("energi")));
-
-            ListDynamicObjs.Add(new DynamicItem(127, 3, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(128, 3, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(190, 3, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(157, 18, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(16, 21, Core.Aggregate.Instance.GetItem("energi"), 0, 21));
+            ListDynamicObjs.Add(new DynamicItem(17, 21, Core.Aggregate.Instance.GetItem("energi"), 0, 22));
+            ListDynamicObjs.Add(new DynamicItem(18, 21, Core.Aggregate.Instance.GetItem("energi"), 0, 23));
+            ListDynamicObjs.Add(new DynamicItem(19, 21, Core.Aggregate.Instance.GetItem("energi"), 0, 24));
+            ListDynamicObjs.Add(new DynamicItem(74, 15, Core.Aggregate.Instance.GetItem("energi"), 0, 25));
+            ListDynamicObjs.Add(new DynamicItem(103, 11, Core.Aggregate.Instance.GetItem("energi"), 0, 26));
+            ListDynamicObjs.Add(new DynamicItem(121, 13, Core.Aggregate.Instance.GetItem("energi"), 0, 27));
+            ListDynamicObjs.Add(new DynamicItem(122, 13, Core.Aggregate.Instance.GetItem("energi"), 0, 28));
+            ListDynamicObjs.Add(new DynamicItem(127, 3, Core.Aggregate.Instance.GetItem("energi"), 0, 29));
+            //ListDynamicObjs.Add(new DynamicItem(128, 3, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(190, 3, Core.Aggregate.Instance.GetItem("energi"), 0, 30));
+            ListDynamicObjs.Add(new DynamicItem(157, 18, Core.Aggregate.Instance.GetItem("energi"), 0, 31));
             
             #endregion
 
@@ -874,14 +871,14 @@ namespace OlcSideScrollingConsoleGame.Models
             w10.Name = "walrus";
 
 
-            ListDynamicObjs.Add(new DynamicItem(56, 40, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(141, 48, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(143, 36, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(115, 36, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(86, 30, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(99, 18, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(140, 15, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(183, 17, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(56, 40, Core.Aggregate.Instance.GetItem("energi"), 0, 32));
+            ListDynamicObjs.Add(new DynamicItem(141, 48, Core.Aggregate.Instance.GetItem("energi"), 0, 33));
+            ListDynamicObjs.Add(new DynamicItem(143, 36, Core.Aggregate.Instance.GetItem("energi"), 0, 34));
+            ListDynamicObjs.Add(new DynamicItem(115, 36, Core.Aggregate.Instance.GetItem("energi"), 0, 35));
+            ListDynamicObjs.Add(new DynamicItem(86, 30, Core.Aggregate.Instance.GetItem("energi"), 0, 36));
+            ListDynamicObjs.Add(new DynamicItem(99, 18, Core.Aggregate.Instance.GetItem("energi"), 0, 37));
+            ListDynamicObjs.Add(new DynamicItem(140, 15, Core.Aggregate.Instance.GetItem("energi"), 0, 38));
+            ListDynamicObjs.Add(new DynamicItem(183, 17, Core.Aggregate.Instance.GetItem("energi"), 0, 39));
 
             ListDynamicObjs.Add(new Teleport(188.5f, 17.0f, "worldmap", 2.0f, 5.0f));
 
@@ -1028,22 +1025,22 @@ namespace OlcSideScrollingConsoleGame.Models
             w10.py = 19;
             w10.Name = "walrus";
 
-            ListDynamicObjs.Add(new DynamicItem(19, 21, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(21, 21, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(29, 20, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(30, 30, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(33, 20, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(41, 21, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(42, 21, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(51, 20, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(68, 20, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(102, 17, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(152, 18, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(174, 16, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(197, 18, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(198, 18, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(199, 18, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(245, 19, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(19, 21, Core.Aggregate.Instance.GetItem("energi"), 0, 40));
+            ListDynamicObjs.Add(new DynamicItem(21, 21, Core.Aggregate.Instance.GetItem("energi"), 0, 41));
+            ListDynamicObjs.Add(new DynamicItem(29, 20, Core.Aggregate.Instance.GetItem("energi"), 0, 42));
+            ListDynamicObjs.Add(new DynamicItem(30, 30, Core.Aggregate.Instance.GetItem("energi"), 0, 43));
+            ListDynamicObjs.Add(new DynamicItem(33, 20, Core.Aggregate.Instance.GetItem("energi"), 0, 44));
+            ListDynamicObjs.Add(new DynamicItem(41, 21, Core.Aggregate.Instance.GetItem("energi"), 0, 45));
+            ListDynamicObjs.Add(new DynamicItem(42, 21, Core.Aggregate.Instance.GetItem("energi"), 0, 46));
+            ListDynamicObjs.Add(new DynamicItem(51, 20, Core.Aggregate.Instance.GetItem("energi"), 0, 47));
+            ListDynamicObjs.Add(new DynamicItem(68, 20, Core.Aggregate.Instance.GetItem("energi"), 0, 48));
+            ListDynamicObjs.Add(new DynamicItem(102, 17, Core.Aggregate.Instance.GetItem("energi"), 0, 49));
+            ListDynamicObjs.Add(new DynamicItem(152, 18, Core.Aggregate.Instance.GetItem("energi"), 0, 50));
+            ListDynamicObjs.Add(new DynamicItem(174, 16, Core.Aggregate.Instance.GetItem("energi"), 0, 51));
+            ListDynamicObjs.Add(new DynamicItem(197, 18, Core.Aggregate.Instance.GetItem("energi"), 0, 52));
+            ListDynamicObjs.Add(new DynamicItem(198, 18, Core.Aggregate.Instance.GetItem("energi"), 0, 53));
+            ListDynamicObjs.Add(new DynamicItem(199, 18, Core.Aggregate.Instance.GetItem("energi"), 0, 54));
+            ListDynamicObjs.Add(new DynamicItem(245, 19, Core.Aggregate.Instance.GetItem("energi"), 0, 55));
 
 
             ListDynamicObjs.Add(new Teleport(253.5f, 18.0f, "worldmap", 2.0f, 5.0f));
@@ -1519,31 +1516,31 @@ namespace OlcSideScrollingConsoleGame.Models
             w26.Name = "walrus";
 
 
-            ListDynamicObjs.Add(new DynamicItem(205, 14, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(182, 16, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(174, 19, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(159, 17, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(158, 17, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(147, 20, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(131, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(132, 23, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(110, 21, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(94, 15, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(205, 14, Core.Aggregate.Instance.GetItem("energi"), 0, 56));
+            ListDynamicObjs.Add(new DynamicItem(182, 16, Core.Aggregate.Instance.GetItem("energi"), 0, 57));
+            ListDynamicObjs.Add(new DynamicItem(174, 19, Core.Aggregate.Instance.GetItem("energi"), 0, 58));
+            ListDynamicObjs.Add(new DynamicItem(159, 17, Core.Aggregate.Instance.GetItem("energi"), 0, 59));
+            ListDynamicObjs.Add(new DynamicItem(158, 17, Core.Aggregate.Instance.GetItem("energi"), 0, 60));
+            ListDynamicObjs.Add(new DynamicItem(147, 20, Core.Aggregate.Instance.GetItem("energi"), 0, 61));
+            ListDynamicObjs.Add(new DynamicItem(131, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 62));
+            ListDynamicObjs.Add(new DynamicItem(132, 23, Core.Aggregate.Instance.GetItem("energi"), 0, 63));
+            ListDynamicObjs.Add(new DynamicItem(110, 21, Core.Aggregate.Instance.GetItem("energi"), 0, 64));
+            ListDynamicObjs.Add(new DynamicItem(94, 15, Core.Aggregate.Instance.GetItem("energi"), 0, 65));
 
 
-            ListDynamicObjs.Add(new DynamicItem(83, 20, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(49, 18, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(118, 11, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(119, 11, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(158, 7, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(192, 7, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(226, 15, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(250, 15, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(317, 20, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(233, 6, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(83, 20, Core.Aggregate.Instance.GetItem("energi"), 0, 66));
+            ListDynamicObjs.Add(new DynamicItem(49, 18, Core.Aggregate.Instance.GetItem("energi"), 0, 67));
+            ListDynamicObjs.Add(new DynamicItem(118, 11, Core.Aggregate.Instance.GetItem("energi"), 0, 68));
+            ListDynamicObjs.Add(new DynamicItem(119, 11, Core.Aggregate.Instance.GetItem("energi"), 0, 69));
+            ListDynamicObjs.Add(new DynamicItem(158, 7, Core.Aggregate.Instance.GetItem("energi"), 0, 70));
+            ListDynamicObjs.Add(new DynamicItem(192, 7, Core.Aggregate.Instance.GetItem("energi"), 0, 71));
+            ListDynamicObjs.Add(new DynamicItem(226, 15, Core.Aggregate.Instance.GetItem("energi"), 0, 72));
+            ListDynamicObjs.Add(new DynamicItem(250, 15, Core.Aggregate.Instance.GetItem("energi"), 0, 73));
+            ListDynamicObjs.Add(new DynamicItem(317, 20, Core.Aggregate.Instance.GetItem("energi"), 0, 74));
+            ListDynamicObjs.Add(new DynamicItem(233, 6, Core.Aggregate.Instance.GetItem("energi"), 0, 75));
 
-            ListDynamicObjs.Add(new DynamicItem(256, 6, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(1, 7, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(256, 6, Core.Aggregate.Instance.GetItem("energi"), 0, 76));
+            ListDynamicObjs.Add(new DynamicItem(1, 7, Core.Aggregate.Instance.GetItem("energi"), 0, 77));
 
             ListDynamicObjs.Add(new Teleport(315.5f, 7.0f, "worldmap", 2.0f, 5.0f));
 
@@ -1995,33 +1992,33 @@ namespace OlcSideScrollingConsoleGame.Models
             #region Energie
 
 
-            ListDynamicObjs.Add(new DynamicItem(36, 42, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(45, 42, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(66, 36, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(79, 32, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(119, 29, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(126, 27, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(154, 26, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(180, 31, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(192, 28, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(201, 24, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(36, 42, Core.Aggregate.Instance.GetItem("energi"), 0, 78));
+            ListDynamicObjs.Add(new DynamicItem(45, 42, Core.Aggregate.Instance.GetItem("energi"), 0, 79));
+            ListDynamicObjs.Add(new DynamicItem(66, 36, Core.Aggregate.Instance.GetItem("energi"), 0, 80));
+            ListDynamicObjs.Add(new DynamicItem(79, 32, Core.Aggregate.Instance.GetItem("energi"), 0, 81));
+            ListDynamicObjs.Add(new DynamicItem(119, 29, Core.Aggregate.Instance.GetItem("energi"), 0, 82));
+            ListDynamicObjs.Add(new DynamicItem(126, 27, Core.Aggregate.Instance.GetItem("energi"), 0, 83));
+            ListDynamicObjs.Add(new DynamicItem(154, 26, Core.Aggregate.Instance.GetItem("energi"), 0, 84));
+            ListDynamicObjs.Add(new DynamicItem(180, 31, Core.Aggregate.Instance.GetItem("energi"), 0, 85));
+            ListDynamicObjs.Add(new DynamicItem(192, 28, Core.Aggregate.Instance.GetItem("energi"), 0, 86));
+            ListDynamicObjs.Add(new DynamicItem(201, 24, Core.Aggregate.Instance.GetItem("energi"), 0, 87));
 
-            ListDynamicObjs.Add(new DynamicItem(195, 20, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(185, 18, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(189, 14, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(200, 10, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(195, 20, Core.Aggregate.Instance.GetItem("energi"), 0, 88));
+            ListDynamicObjs.Add(new DynamicItem(185, 18, Core.Aggregate.Instance.GetItem("energi"), 0, 89));
+            ListDynamicObjs.Add(new DynamicItem(189, 14, Core.Aggregate.Instance.GetItem("energi"), 0, 90));
+            ListDynamicObjs.Add(new DynamicItem(200, 10, Core.Aggregate.Instance.GetItem("energi"), 0, 91));
 
             //ListDynamicObjs.Add(new DynamicItem(222, 10, Core.Aggregate.Instance.GetItem("energi")));
 
-            ListDynamicObjs.Add(new DynamicItem(274, 4, Core.Aggregate.Instance.GetItem("energi")));
-            ListDynamicObjs.Add(new DynamicItem(371, 14, Core.Aggregate.Instance.GetItem("energi")));
+            ListDynamicObjs.Add(new DynamicItem(274, 4, Core.Aggregate.Instance.GetItem("energi"), 0, 92));
+            ListDynamicObjs.Add(new DynamicItem(371, 14, Core.Aggregate.Instance.GetItem("energi"), 0, 93));
 
             #endregion
 
-           // ListDynamicObjs.Add(new Teleport(377.5f, 8.0f, "mapnine", 2.0f, 5.0f));
+           ListDynamicObjs.Add(new Teleport(377.5f, 8.0f, "mapnine", 2.0f, 5.0f));
 
             // för test att snabbt komma till sista banan
-            ListDynamicObjs.Add(new Teleport(3f, 41f, "mapnine", 1.0f, 5.0f));
+            //ListDynamicObjs.Add(new Teleport(3f, 41f, "mapnine", 1.0f, 5.0f));
 
             return true;
         }

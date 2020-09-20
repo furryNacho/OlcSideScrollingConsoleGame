@@ -60,6 +60,9 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         /// </summary>
         public string Name { get; set; }
         public int Id { get; set; }
+
+        public int CoinId { get; set; }
+
         public int Attr { get; set; }
 
         public bool Redundant { get; set; }

@@ -12,7 +12,7 @@ namespace OlcSideScrollingConsoleGame.Models.Items
     {
 
 
-        public DynamicItem(float x, float y, Item item, int Collectable = 0)
+        public DynamicItem(float x, float y, Item item, int Collectable = 0, int id = 0)
         : base("pickup")
         {
             px = x;
@@ -28,6 +28,7 @@ namespace OlcSideScrollingConsoleGame.Models.Items
             {
                 IsTempEnergi = true;
             }
+            CoinId = id;
         }
 
 
