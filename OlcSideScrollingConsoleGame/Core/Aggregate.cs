@@ -76,12 +76,33 @@ namespace OlcSideScrollingConsoleGame.Core
             {
                 Sound = Audio.Library.Sound.Instance;
                 //var initSuccess = Sound.init();
-                Sound.loadSound("uno.wav");
+                //Sound.loadSound("uno.wav");
+
                 //Sound.loopSound("uno.wav");
-                Sound.loadSound("Click.wav");
-                Sound.loadSound("puttekong.wav");
+                //Sound.loadSound("Click.wav");
+
+                //Sound.loadSound("puttekong.wav");
                 //Sound.loopSound("Click.wav");
                 //Sound.play("Piano.wav");
+
+                Sound.loadSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Jump); 
+                Sound.loadSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Land); 
+                Sound.loadSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Damage);
+                Sound.loadSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.DamageHero);
+                Sound.loadSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.PickUp);
+
+                Sound.loadSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundWorld);
+                Sound.loopSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundWorld);
+
+                Sound.loadSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundGame);
+                Sound.loopSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundGame);
+
+                Sound.loadSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
+                Sound.loopSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
+
+                Sound.loadSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd);
+                Sound.loopSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd);
+
 
                 if (Settings != null)
                     if (Settings.AudioOn)
@@ -100,6 +121,12 @@ namespace OlcSideScrollingConsoleGame.Core
                 throw;
             }
         }
+
+        //används direkt på Sound ifrån program..
+        //private void UnLoadSound()
+        //{
+        //    Sound.cleanUp();
+        //}
 
         private void LoadSprites()
         {
@@ -127,7 +154,10 @@ namespace OlcSideScrollingConsoleGame.Core
             LoadSprite("cord", PathSprites, @"\cord", ".bmp"); // tile sheet that is coordinates
 
 
-            LoadSprite("splash", PathSprites, @"\splash", ".png");
+            LoadSprite("splashstart", PathSprites, @"\splashstart", ".png");
+            LoadSprite("splashend", PathSprites, @"\splashend", ".png");
+            LoadSprite("splashaltend", PathSprites, @"\splashaltend", ".png");
+            LoadSprite("splashsuperaltend", PathSprites, @"\splashsuperaltend", ".png");
 
         }
 

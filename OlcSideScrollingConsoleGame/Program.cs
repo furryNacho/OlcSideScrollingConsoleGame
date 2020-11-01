@@ -908,7 +908,7 @@ namespace OlcSideScrollingConsoleGame
                     if (returnToEndAfterHighScore)
                     {
                         returnToEndAfterHighScore = false;
-
+                        
                         this.Machine.Switch(Enum.State.End);
                     }
                     else
@@ -946,6 +946,34 @@ namespace OlcSideScrollingConsoleGame
         bool returnToEndAfterHighScore = false;
         private void DisplayEnd(float elapsed)
         {
+
+            if (HasSwitchedState)
+            {
+                HasSwitchedState = false;
+                if (Core.Aggregate.Instance.Sound != null)
+                {
+
+                    if (Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundWorld))
+                    {
+                        Core.Aggregate.Instance.Sound.pause(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundWorld);
+                    }
+
+                    if (Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundGame))
+                    {
+                        Core.Aggregate.Instance.Sound.pause(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundGame);
+                    }
+
+                    if (Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundFinalStage))
+                    {
+                        Core.Aggregate.Instance.Sound.pause(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
+                    }
+
+                    if (!Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd))
+                        Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd);
+                }
+            }
+
+
             Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
 
             Core.Aggregate.Instance.Sound.stop();
@@ -1015,6 +1043,7 @@ namespace OlcSideScrollingConsoleGame
                 if (Hero.Health == 100)
                 {
                     //DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite("splash"));
+                    DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite(Global.GlobalNamespace.SplashScreenRef.SuperAltEnd));
                     DrawBigText("End", 4, 4);
                     DrawBigText("100%", 4, 20);
                     DrawBigText("Press any button", 8, 160);
@@ -1022,6 +1051,7 @@ namespace OlcSideScrollingConsoleGame
                 else
                 {
                     //DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite("splash"));
+                    DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite(Global.GlobalNamespace.SplashScreenRef.AltEnd));
                     DrawBigText("End", 4, 4);
                     DrawBigText("Exemplary display of skills", 4, 20);
                     DrawBigText("Press any button", 8, 160);
@@ -1032,6 +1062,7 @@ namespace OlcSideScrollingConsoleGame
             {
                 //Klarade spelet
                 //DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite("splash"));
+                DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite(Global.GlobalNamespace.SplashScreenRef.End));
                 DrawBigText("End", 4, 4);
                 DrawBigText("You are super player", 4, 20);
                 DrawBigText("Thank you for playing game", 4, 36);
@@ -1071,7 +1102,7 @@ namespace OlcSideScrollingConsoleGame
 
 
             // Rita bakgrundsbild. 
-            DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite("splash"));
+            DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite(Global.GlobalNamespace.SplashScreenRef.Start));
 
 
 
@@ -1393,14 +1424,24 @@ namespace OlcSideScrollingConsoleGame
 
             if (Core.Aggregate.Instance.Sound != null)
             {
-                if (Core.Aggregate.Instance.Sound.isPlaying("puttekong.wav"))
+                if (Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundGame))
                 {
-                    Core.Aggregate.Instance.Sound.stop("puttekong.wav");
+                    Core.Aggregate.Instance.Sound.stop(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundGame);
                 }
 
-                if (!Core.Aggregate.Instance.Sound.isPlaying("uno.wav"))
+                if (Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd))
                 {
-                    Core.Aggregate.Instance.Sound.play("uno.wav");
+                    Core.Aggregate.Instance.Sound.pause(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd);
+                }
+
+                if (Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundFinalStage))
+                {
+                    Core.Aggregate.Instance.Sound.pause(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
+                }
+
+                if (!Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundWorld))
+                {
+                    Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundWorld);
                 }
             }
 
@@ -2224,15 +2265,26 @@ namespace OlcSideScrollingConsoleGame
 
             if (Core.Aggregate.Instance.Sound != null)
             {
-                if (Core.Aggregate.Instance.Sound.isPlaying("uno.wav"))
+                if (Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundWorld))
                 {
-                    Core.Aggregate.Instance.Sound.pause("uno.wav");
+                    Core.Aggregate.Instance.Sound.pause(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundWorld);
                 }
 
-                if (Core.Aggregate.Instance.Sound.isPlaying("puttekong.wav"))
+                if (Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundGame))
                 {
-                    Core.Aggregate.Instance.Sound.pause("puttekong.wav");
+                    Core.Aggregate.Instance.Sound.pause(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundGame);
                 }
+
+                if (Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd))
+                {
+                    Core.Aggregate.Instance.Sound.pause(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd);
+                }
+
+                if (Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundFinalStage))
+                {
+                    Core.Aggregate.Instance.Sound.pause(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
+                }
+
             }
 
             //Exempel på att nolla klockan 
@@ -2365,10 +2417,14 @@ namespace OlcSideScrollingConsoleGame
                                                             HasSwitchedState = true;
                                                             ActualTotalTime += new TimeSpan(1, 0, 0);
 
-                                                            if (Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted < Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap)
-                                                            {
-                                                                Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap;
-                                                            }
+                                                            //Låsa upp alla banor:
+                                                            unlockAllStages = true;
+
+                                                            //"Klara av" den banan man är på:
+                                                            //if (Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted < Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap)
+                                                            //{
+                                                            //    Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap;
+                                                            //}
 
                                                             Konami.nope();
                                                             return;
@@ -2447,14 +2503,26 @@ namespace OlcSideScrollingConsoleGame
                 playSounds = Core.Aggregate.Instance.Sound;
                 if (playSounds != null)
                 {
-                    if (Core.Aggregate.Instance.Sound.isPlaying("uno.wav"))
+                    if (Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundWorld))
                     {
-                        Core.Aggregate.Instance.Sound.stop("uno.wav");
+                        Core.Aggregate.Instance.Sound.stop(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundWorld);
                     }
 
-                    if (!Core.Aggregate.Instance.Sound.isPlaying("puttekong.wav"))
+
+                    //todo: kolla om sista bannan. spela sista låten
+                    if (CurrentMap.Name != "mapnine")
                     {
-                        Core.Aggregate.Instance.Sound.play("puttekong.wav");
+                        if (!Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundGame))
+                        {
+                            Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundGame);
+                        }
+                    }
+                    else
+                    {
+                        if (!Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundFinalStage))
+                        {
+                            Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
+                        }
                     }
                 }
 
@@ -2548,7 +2616,9 @@ namespace OlcSideScrollingConsoleGame
                         if (Hero.vy != 0 && allowCoyoteTime)
                             tempMemoryCayotyCounter++;
 
-                        Core.Aggregate.Instance.Sound.play("Click.wav");
+                        if (Core.Aggregate.Instance.Sound != null)
+                            Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Jump); // TODO: hoppljud
+
                         Hero.vy = -9.3f;
                         JumpButtonDownRelease = false;
                         jumpMemory = -1;
@@ -2606,7 +2676,8 @@ namespace OlcSideScrollingConsoleGame
                 if (jumpMemory > 0 && Hero.Grounded)// && kanske Hero.vy == 0
                 {
                     tempMemoryJumpCounter++;
-                    Core.Aggregate.Instance.Sound.play("Click.wav");
+     //               Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Jump); 
+
                     Hero.vy = -9.3f;
                     JumpButtonDownRelease = false;
                     jumpMemory = -1;
@@ -3314,7 +3385,8 @@ namespace OlcSideScrollingConsoleGame
 
                                 if (HeroLandedState <= 1)
                                 {
-                                    // Core.Aggregate.Instance.Sound.play("Click.wav");
+                                        if (Core.Aggregate.Instance.Sound != null)
+                                            Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Land); // spelaren landar
                                 }
                             }
 
@@ -3605,8 +3677,12 @@ namespace OlcSideScrollingConsoleGame
                                             //{
                                             //    Core.Aggregate.Instance.Sound.play("puttekong.wav");
                                             //}
+
                                         }
-                                        Core.Aggregate.Instance.Sound.play("Click.wav");
+                                        if (Core.Aggregate.Instance.Sound != null)
+                                            if(Hero.IsAttackable)
+                                                Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.PickUp);  // TODO: ljud för att plocka upp
+
 
                                         if (otherObject.CoinId > 0)
                                         {
@@ -4300,6 +4376,26 @@ namespace OlcSideScrollingConsoleGame
         }
         public void DamageHero(Creature assalent, Creature victim, string från = "")
         {
+
+            if (Core.Aggregate.Instance.Sound != null)
+            {
+                //mutePickup = true;
+
+                Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.DamageHero);
+
+
+                //if (!Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Jump))
+                //{
+                //    Core.Aggregate.Instance.Sound.stop(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Jump);
+                //}
+                //if (!Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.PickUp))
+                //{
+                //    Core.Aggregate.Instance.Sound.stop(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.PickUp);
+                //}
+            }
+
+
+
             if (victim != null && victim.IsAttackable)
             {
                 // cascade energi
@@ -4344,6 +4440,9 @@ namespace OlcSideScrollingConsoleGame
         }
         public void JumpDamage(Creature assalent, Creature victim)
         {
+            if (Core.Aggregate.Instance.Sound != null)
+                Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Damage);
+
             if (victim.Name == "boss")
             {
                 if (victim.IsAttackable)
@@ -4431,7 +4530,7 @@ namespace OlcSideScrollingConsoleGame
         }
 
 
-
+      
 
     }
 
