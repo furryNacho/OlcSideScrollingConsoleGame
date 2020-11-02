@@ -251,6 +251,11 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
                 SheetOffsetY = 3 * 16;
                 SheetOffsetX = 4 * 16;
             }
+            else if (Name == "overlayice")
+            {
+                SheetOffsetY = 3 * 16;
+                SheetOffsetX = 3 * 16;
+            }
             //else if (Name == "overlayworldmap")
             //{
             //    SheetOffsetY = 0 * 16;

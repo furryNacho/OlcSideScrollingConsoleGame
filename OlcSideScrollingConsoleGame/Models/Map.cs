@@ -2106,6 +2106,49 @@ namespace OlcSideScrollingConsoleGame.Models
 
 
             //Overlay
+            DynamicGameObject overlay1ice = new DynamicCreatureOverlay();
+            ListDynamicObjs.Add(overlay1ice);
+            overlay1ice.px = 1;
+            overlay1ice.py = 13;
+            overlay1ice.Name = "overlayice";
+
+            DynamicGameObject overlay2ice = new DynamicCreatureOverlay();
+            ListDynamicObjs.Add(overlay2ice);
+            overlay2ice.px = 3;
+            overlay2ice.py = 13;
+            overlay2ice.Name = "overlayice";
+
+            DynamicGameObject overlay3ice = new DynamicCreatureOverlay();
+            ListDynamicObjs.Add(overlay3ice);
+            overlay3ice.px = 5;
+            overlay3ice.py = 13;
+            overlay3ice.Name = "overlayice";
+
+            DynamicGameObject overlay4ice = new DynamicCreatureOverlay();
+            ListDynamicObjs.Add(overlay4ice);
+            overlay4ice.px = 7;
+            overlay4ice.py = 13;
+            overlay4ice.Name = "overlayice";
+
+            DynamicGameObject overlay5ice = new DynamicCreatureOverlay();
+            ListDynamicObjs.Add(overlay5ice);
+            overlay5ice.px = 9;
+            overlay5ice.py = 13;
+            overlay5ice.Name = "overlayice";
+
+            DynamicGameObject overlay6ice = new DynamicCreatureOverlay();
+            ListDynamicObjs.Add(overlay6ice);
+            overlay6ice.px = 11;
+            overlay6ice.py = 13;
+            overlay6ice.Name = "overlayice";
+
+            DynamicGameObject overlay7ice = new DynamicCreatureOverlay();
+            ListDynamicObjs.Add(overlay7ice);
+            overlay7ice.px = 13;
+            overlay7ice.py = 13;
+            overlay7ice.Name = "overlayice";
+            //
+
             DynamicGameObject overlay1 = new DynamicCreatureOverlay();
             ListDynamicObjs.Add(overlay1);
             overlay1.px = 2;
@@ -2141,6 +2184,14 @@ namespace OlcSideScrollingConsoleGame.Models
             overlay6.px = 12;
             overlay6.py = 13;
             overlay6.Name = "overlay";
+
+
+
+            DynamicGameObject overlay7 = new DynamicCreatureOverlay();
+            ListDynamicObjs.Add(overlay7);
+            overlay7.px = 14;
+            overlay7.py = 13;
+            overlay7.Name = "overlay";
 
 
             //ListDynamicObjs.Add(new Teleport(12f, 12.0f, "worldmap", 2.0f, 5.0f));

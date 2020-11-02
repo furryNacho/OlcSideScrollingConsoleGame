@@ -436,14 +436,18 @@ namespace OlcSideScrollingConsoleGame.Core
             var a = 0;
             var b = 0;
             var c = 0;
+
+            //var d = 0;
+            //var e = 0;
+
             var idx = 0;
             Random rand = new Random();
             do
             {
                 idx++;
-                a = rand.Next(0, 5);
-                b = rand.Next(0, 5);
-                c = rand.Next(0, 5);
+                a = rand.Next(0, 7);
+                b = rand.Next(0, 7);
+                c = rand.Next(0, 7);
             } while ((a == b) || (b == c) || (a == c) || (idx > 25));
 
             if (idx > 25)
@@ -458,7 +462,7 @@ namespace OlcSideScrollingConsoleGame.Core
 
         }
 
-        int[] PossibleValueForX = new int[] { 2, 4, 6, 8, 10, 12 };
+        int[] PossibleValueForX = new int[] { 2, 4, 6, 8, 10, 12, 14 };
 
 
         int[] ValueXArray = new int[] { 2, 4, 6 };

@@ -373,6 +373,7 @@ namespace OlcSideScrollingConsoleGame
 
                     ButtonsHasGoneIdle = false;
                 }
+                //Down
                 if (ButtonsHasGoneIdle && (GetKey(Key.Down).Pressed || IIP.down))
                 {
 
@@ -1593,7 +1594,8 @@ namespace OlcSideScrollingConsoleGame
                     {
 
                         hasAccumulatedAllSpeed = false;
-                        ChangeMap("mapone", 2, 23, Hero);
+                        ChangeMap("mapone", 2, 23, Hero); // Gör första banan till sista banan
+                        //ChangeMap("mapnine", 1, 4, Hero);
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
@@ -2425,6 +2427,8 @@ namespace OlcSideScrollingConsoleGame
                                                             //{
                                                             //    Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap;
                                                             //}
+                                                            
+
 
                                                             Konami.nope();
                                                             return;
@@ -2490,7 +2494,6 @@ namespace OlcSideScrollingConsoleGame
         {
             Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
 
-
             Audio.Library.Sound playSounds = null;
 
             if (HasSwitchedState)
@@ -2530,9 +2533,6 @@ namespace OlcSideScrollingConsoleGame
                 Hero.vx = 0;
             }
 
-
-           
-
             if (enemyJump > -1)
             {
                 enemyJump--;
@@ -2559,11 +2559,11 @@ namespace OlcSideScrollingConsoleGame
 
             detHarBallatUrLog = false;
 
-            // Handle  
+            // Handle input
             if (Focus)
             {
                 //B
-                if (IIP.Button1 || IIP.Button2)
+                if (IIP.Button1 || IIP.Button2 || GetKey(Key.B).Down)
                 {
                     BPower = true;
                 }
@@ -2572,16 +2572,18 @@ namespace OlcSideScrollingConsoleGame
                     BPower = false;
                 }
 
+                var tempHeroObj = (DynamicCreatureHero)Hero;
+
                 //Up
                 if (GetKey(Key.Up).Down || IIP.up)
                 {
                     //Hero.vy = -6.0f;
-                    var tempHeroObj = (DynamicCreatureHero)Hero;
+                    //var tempHeroObj = (DynamicCreatureHero)Hero;
                     tempHeroObj.LookUp = true;
                 }
                 else
                 {
-                    var tempHeroObj = (DynamicCreatureHero)Hero;
+                    //var tempHeroObj = (DynamicCreatureHero)Hero;
                     tempHeroObj.LookUp = false;
                 }
 
@@ -2589,12 +2591,12 @@ namespace OlcSideScrollingConsoleGame
                 if (GetKey(Key.Down).Down || IIP.down)
                 {
                     //Hero.vy = 6.0f;
-                    var tempHeroObj = (DynamicCreatureHero)Hero;
+                    //var tempHeroObj = (DynamicCreatureHero)Hero;
                     tempHeroObj.LookDown = true;
                 }
                 else
                 {
-                    var tempHeroObj = (DynamicCreatureHero)Hero;
+                    //var tempHeroObj = (DynamicCreatureHero)Hero;
                     tempHeroObj.LookDown = false;
                 }
 
@@ -2673,6 +2675,7 @@ namespace OlcSideScrollingConsoleGame
                         JumpButtonCounter = 0;
                     }
                 }
+
                 if (jumpMemory > 0 && Hero.Grounded)// && kanske Hero.vy == 0
                 {
                     tempMemoryJumpCounter++;
@@ -2887,11 +2890,13 @@ namespace OlcSideScrollingConsoleGame
                             slipperinessBPower = 0.08f;
                         }
 
+
+                       
+                        var anyDirectionAtAll = GetKey(Key.Left).Down || GetKey(Key.Right).Down || IIP.left || IIP.right;
                         if (!BPower)
                         {
                             myObject.vx += -3.0f * myObject.vx * elapsed;
-
-                            if (!IIP.left && !IIP.right)
+                            if (!anyDirectionAtAll) 
                             {
                                 if (Math.Abs(myObject.vx) < slipperiness)
                                     myObject.vx = 0.0f;
@@ -2901,8 +2906,7 @@ namespace OlcSideScrollingConsoleGame
                         else if (BPower)
                         {
                             myObject.vx += -2.0f * myObject.vx * elapsed;
-
-                            if (!IIP.left && !IIP.right)
+                            if (!anyDirectionAtAll) 
                             {
                                 if (Math.Abs(myObject.vx) < slipperinessBPower)
                                     myObject.vx = 0.0f;
@@ -3296,20 +3300,12 @@ namespace OlcSideScrollingConsoleGame
                         }
 
 
-
-
-
-
-
-
-
-
                     }
 
                     myObject.Grounded = false;
 
 
-                        // Moving Up
+                    // Moving Up
                     if (myObject.vy <= 0) 
                     {
 
@@ -3817,7 +3813,7 @@ namespace OlcSideScrollingConsoleGame
 
 
             //DisplayDialog(new List<string>() { "Air: " + HeroAirBornState + " Land: " + HeroLandedState + " Jump: " + JumpButtonState }, 10, 10);
-            //DisplayDialog(new List<string>() { "maxL: " + maxL + " maxR: " + maxR }, 10, 10);
+            //DisplayDialog(new List<string>() { "vx: " + Hero.vx + " vy: " + Hero.vy }, 10, 10);
 
 
 
