@@ -848,7 +848,7 @@ namespace OlcSideScrollingConsoleGame
                         //if (Core.Aggregate.Instance.PlacesOnHighScore(EndTotalTime))
                         //{
                         //Core.Aggregate.Instance.PutOnHighScore(new HighScoreObj { DateTime = DateTime.Now, Handle = highScoreName, TimeSpan = EndTotalTime, Percent = Hero.Health }); TODO: EnergiIdLista
-                        Core.Aggregate.Instance.PutOnHighScore(new HighScoreObj { DateTime = DateTime.Now, Handle = highScoreName, TimeSpan = EndTotalTime, Percent = EnergiIdLista.Count }); 
+                        Core.Aggregate.Instance.PutOnHighScore(new HighScoreObj { DateTime = DateTime.Now, Handle = highScoreName, TimeSpan = EndTotalTime, Percent = EnergiIdLista.Count });
 
                         Core.Aggregate.Instance.SaveHighScoreList();
                         //Core.Aggregate.Instance.ResetHighScore();
@@ -909,7 +909,7 @@ namespace OlcSideScrollingConsoleGame
                     if (returnToEndAfterHighScore)
                     {
                         returnToEndAfterHighScore = false;
-                        
+
                         this.Machine.Switch(Enum.State.End);
                     }
                     else
@@ -950,7 +950,7 @@ namespace OlcSideScrollingConsoleGame
 
             if (HasSwitchedState)
             {
-                HasSwitchedState = false;
+                //HasSwitchedState = false;
                 if (Core.Aggregate.Instance.Sound != null)
                 {
 
@@ -1078,13 +1078,58 @@ namespace OlcSideScrollingConsoleGame
         }
 
         public int countDownSplach { get; set; } = 60;
+        public int counterSnowFallSlow { get; set; } = 1;
+        public int counterSnowFallFast { get; set; } = 1;
+        public float incrementerSlow { get; set; }
+        public float incrementerFast { get; set; }
+        private Core.Aggregate.MakeItSnow MakeItSnowSlow { get; set; }
+        private Core.Aggregate.MakeItSnow MakeItSnowFast { get; set; }
         private void DisplaySplashScreen(float elapsed)
         {
             if (HasSwitchedState)
                 HasSwitchedState = false;
 
-            if(countDownSplach > 0)
+            if (MakeItSnowSlow == null || MakeItSnowFast == null)
+            {
+                MakeItSnowSlow = new Core.Aggregate.MakeItSnow(1, 400);
+                MakeItSnowFast = new Core.Aggregate.MakeItSnow(1, 400);
+            }
+
+            if (countDownSplach > 0)
                 countDownSplach--;
+
+            //Hastighet för långsam snö
+            incrementerSlow += elapsed;
+            if (incrementerSlow >= 0.5)  // Har det gått typ en halv sekund
+            {
+                incrementerSlow = 0; // nolla sekundmätaren
+
+                if (counterSnowFallSlow < 59)
+                {
+                    counterSnowFallSlow++; // plussa första klockan
+                }
+                else if (counterSnowFallSlow >= 59)
+                {
+                    counterSnowFallSlow = 1; // nolla första klockan när 60
+
+                }
+            }
+
+            incrementerFast += elapsed;
+            if (incrementerFast >= 0.2)  // Har det gått typ en halv sekund
+            {
+                incrementerFast = 0; // nolla sekundmätaren
+
+                if (counterSnowFallFast < 59)
+                {
+                    counterSnowFallFast++; // plussa första klockan
+                }
+                else if (counterSnowFallFast >= 59)
+                {
+                    counterSnowFallFast = 1; // nolla första klockan när 60
+                }
+            }
+
 
             SlimDx.timer_Tick();
             IIP = SlimDx.IIP;
@@ -1098,6 +1143,9 @@ namespace OlcSideScrollingConsoleGame
                     MenuState = Enum.MenuState.StartMenu;
                     this.Machine.Switch(Enum.State.Menu);
                     HasSwitchedState = true;
+
+                    MakeItSnowSlow = null;
+                    MakeItSnowFast = null;
                 }
             }
 
@@ -1106,14 +1154,65 @@ namespace OlcSideScrollingConsoleGame
             DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite(Global.GlobalNamespace.SplashScreenRef.Start));
 
 
-
-            //DrawBigText("Penguin After All", 4, 4);
-
             if (countDownSplach <= 0)
-                DrawBigText("Press any button", 16, 180);
+            {
+                DrawBigText("Press any button", 4, 100);
+            }
+
+
+            if (MakeItSnowSlow != null && MakeItSnowFast != null)
+            {
+
+                //Make it snow Slow
+                var color = (Pixel)Pixel.Presets.White;
+
+                for (int i = 59; i > 0; i--)
+                {
+                    var absI = System.Math.Abs(counterSnowFallSlow - i);
+                    if (absI < 1)
+                    {
+                        absI = 1;
+                    }
+                    if (absI > 60)
+                    {
+                        absI = 60;
+                    }
+
+                    var rowCollection = MakeItSnowSlow.arrayList[absI];
+
+                    foreach (var snowPixelW in rowCollection)
+                    {
+                         Draw(new Point(snowPixelW, i), color);
+                    }
+                }
+
+
+                //Make it snow Fast
+                for (int i = 59; i > 0; i--)
+                {
+                    var absI = System.Math.Abs(counterSnowFallFast - i);
+                    if (absI < 1)
+                    {
+                        absI = 1;
+                    }
+                    if (absI > 60)
+                    {
+                        absI = 60;
+                    }
+
+                    var rowCollection = MakeItSnowFast.arrayList[absI];
+
+                    foreach (var snowPixelW in rowCollection)
+                    {
+                        Draw(new Point(snowPixelW, i), color);
+                    }
+                }
+
+            }
+
 
         }
-
+ 
 
         //public bool MenuStartHasBeenReleased { get; set; }
         int selectedMenuItem = 1;
@@ -1142,7 +1241,7 @@ namespace OlcSideScrollingConsoleGame
             var menuList = new List<string>();
 
 
-      
+
             //Pause on world map or start menu
             if (MenuState == Enum.MenuState.StartMenu)
             {
@@ -1190,11 +1289,11 @@ namespace OlcSideScrollingConsoleGame
                     "Game Engine Port:",
                     "DevChrome",
                     "Music and Sound:",
-                    "Fisk-i-fickorna",
+                    "FiskIFickorna",
                     "",
                     "Back"
                  };
-                
+
                 selectedMenuItem = menuList.Count;
             }
             //else if (MenuState == Enum.MenuState.Audio)
@@ -1389,7 +1488,7 @@ namespace OlcSideScrollingConsoleGame
 
             }
 
-           
+
 
         }
 
@@ -1545,7 +1644,7 @@ namespace OlcSideScrollingConsoleGame
                 if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
                 {
                     ButtonsHasGoneIdle = true;
-                  
+
                 }
 
                 //Up
@@ -1594,8 +1693,10 @@ namespace OlcSideScrollingConsoleGame
                     {
 
                         hasAccumulatedAllSpeed = false;
-                        ChangeMap("mapone", 2, 23, Hero); // Gör första banan till sista banan
+                        ChangeMap("mapone", 2, 23, Hero); 
+                        // Gör första banan till sista banan
                         //ChangeMap("mapnine", 1, 4, Hero);
+
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
@@ -1711,7 +1812,7 @@ namespace OlcSideScrollingConsoleGame
 
             foreach (var myObject in listDynamics)
             {
-              
+
                 if (myObject.IsHero)
                 {
 
@@ -1943,15 +2044,15 @@ namespace OlcSideScrollingConsoleGame
                 {
                     // StageCompleted ska vara blå. Alla under ska sättas till passed. Alla över not passed 
                     var CurrentStageThatIsCompleted = Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted;
-                    if (myObject.Id < (CurrentStageThatIsCompleted+1))
+                    if (myObject.Id < (CurrentStageThatIsCompleted + 1))
                     {
                         myObject.StageStatus = Enum.StageStatus.Passed;
                     }
-                    else if (myObject.Id == (CurrentStageThatIsCompleted+1))
+                    else if (myObject.Id == (CurrentStageThatIsCompleted + 1))
                     {
                         myObject.StageStatus = Enum.StageStatus.Current;
                     }
-                    else if (myObject.Id > (CurrentStageThatIsCompleted+1))
+                    else if (myObject.Id > (CurrentStageThatIsCompleted + 1))
                     {
                         myObject.StageStatus = Enum.StageStatus.NotPassed;
                     }
@@ -2241,7 +2342,7 @@ namespace OlcSideScrollingConsoleGame
             }
 
             //Hack, rita alltid hjälten sist..
-            var dynamicHeroObj = listDynamics.FirstOrDefault(x=>x.IsHero);
+            var dynamicHeroObj = listDynamics.FirstOrDefault(x => x.IsHero);
             if (dynamicHeroObj != null)
             {
                 dynamicHeroObj.DrawSelf(this, fOffsetX, fOffsetY);
@@ -2250,7 +2351,7 @@ namespace OlcSideScrollingConsoleGame
 
             #endregion
             //DrawBigText(wordMapText, 25, 25);
-            var wordMapText = "        World Map. Stage: " + (currentStage == 0 ?  1 : currentStage)+"                     ";
+            var wordMapText = "        World Map. Stage: " + (currentStage == 0 ? 1 : currentStage) + "                     ";
             DrawBigText(wordMapText, 0, 217);
             DrawHUD();
 
@@ -2427,7 +2528,7 @@ namespace OlcSideScrollingConsoleGame
                                                             //{
                                                             //    Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap;
                                                             //}
-                                                            
+
 
 
                                                             Konami.nope();
@@ -2679,7 +2780,7 @@ namespace OlcSideScrollingConsoleGame
                 if (jumpMemory > 0 && Hero.Grounded)// && kanske Hero.vy == 0
                 {
                     tempMemoryJumpCounter++;
-     //               Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Jump); 
+                    //               Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Jump); 
 
                     Hero.vy = -9.3f;
                     JumpButtonDownRelease = false;
@@ -2812,7 +2913,7 @@ namespace OlcSideScrollingConsoleGame
                             myObject.py = Hero.py;
                         }
                     }
-                    else 
+                    else
                     {
 
                         if (myObject.Name == "boss")
@@ -2825,7 +2926,7 @@ namespace OlcSideScrollingConsoleGame
                             myObject.px = Core.Aggregate.Instance.GetMyX(myObject.Id);
                         }
 
-                       
+
                     }
 
                 }
@@ -2891,12 +2992,12 @@ namespace OlcSideScrollingConsoleGame
                         }
 
 
-                       
+
                         var anyDirectionAtAll = GetKey(Key.Left).Down || GetKey(Key.Right).Down || IIP.left || IIP.right;
                         if (!BPower)
                         {
                             myObject.vx += -3.0f * myObject.vx * elapsed;
-                            if (!anyDirectionAtAll) 
+                            if (!anyDirectionAtAll)
                             {
                                 if (Math.Abs(myObject.vx) < slipperiness)
                                     myObject.vx = 0.0f;
@@ -2906,7 +3007,7 @@ namespace OlcSideScrollingConsoleGame
                         else if (BPower)
                         {
                             myObject.vx += -2.0f * myObject.vx * elapsed;
-                            if (!anyDirectionAtAll) 
+                            if (!anyDirectionAtAll)
                             {
                                 if (Math.Abs(myObject.vx) < slipperinessBPower)
                                     myObject.vx = 0.0f;
@@ -3006,8 +3107,8 @@ namespace OlcSideScrollingConsoleGame
                     //
                     float fBorder = 0.000000005f;// Hårdkoda hitbox (bevara för rpg!!)
 
-                        // Moving Left
-                    if (myObject.vx <= 0) 
+                    // Moving Left
+                    if (myObject.vx <= 0)
                     {
                         var turnPatrol = false;
                         //if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.9f)))
@@ -3306,7 +3407,7 @@ namespace OlcSideScrollingConsoleGame
 
 
                     // Moving Up
-                    if (myObject.vy <= 0) 
+                    if (myObject.vy <= 0)
                     {
 
                         //Hjälten airborn
@@ -3359,35 +3460,35 @@ namespace OlcSideScrollingConsoleGame
                         //if (coyoteTime >= 0)
                         //    coyoteTime--;
 
-                        if(myObject.Name != "boss" && myObject.Name != "ice")
-                        if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(NewObjectPosY + 1.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.9f), (int)(NewObjectPosY + 1.0f)))
-                        {
-                            NewObjectPosY = (int)NewObjectPosY;
-                            myObject.vy = 0;
-                            myObject.Grounded = true;
-
-
-                            //Hjälten landat
-                            if (myObject.IsHero)
+                        if (myObject.Name != "boss" && myObject.Name != "ice")
+                            if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(NewObjectPosY + 1.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.9f), (int)(NewObjectPosY + 1.0f)))
                             {
-                                fallCounter = 0;
-                                allowCoyoteTime = true;
+                                NewObjectPosY = (int)NewObjectPosY;
+                                myObject.vy = 0;
+                                myObject.Grounded = true;
 
-                                if (HeroLandedState < 3)
+
+                                //Hjälten landat
+                                if (myObject.IsHero)
                                 {
-                                    HeroLandedState++;
-                                }
+                                    fallCounter = 0;
+                                    allowCoyoteTime = true;
+
+                                    if (HeroLandedState < 3)
+                                    {
+                                        HeroLandedState++;
+                                    }
 
 
-                                if (HeroLandedState <= 1)
-                                {
+                                    if (HeroLandedState <= 1)
+                                    {
                                         if (Core.Aggregate.Instance.Sound != null)
                                             Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Land); // spelaren landar
+                                    }
                                 }
+
+
                             }
-
-
-                        }
 
                         //Hjälten airborn - reset 
                         if (myObject.IsHero)
@@ -3612,7 +3713,7 @@ namespace OlcSideScrollingConsoleGame
                                     else
                                     {
                                         //(krock från ovan)
-                                        DynamicObjectPosY = otherObject.py - 1.0f; 
+                                        DynamicObjectPosY = otherObject.py - 1.0f;
 
 
                                         // Kolla om krocken är mellan fiende och hjälte
@@ -3676,7 +3777,7 @@ namespace OlcSideScrollingConsoleGame
 
                                         }
                                         if (Core.Aggregate.Instance.Sound != null)
-                                            if(Hero.IsAttackable)
+                                            if (Hero.IsAttackable)
                                                 Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.PickUp);  // TODO: ljud för att plocka upp
 
 
@@ -3699,7 +3800,7 @@ namespace OlcSideScrollingConsoleGame
                                         // Finally just check the object
                                         otherObject.OnInteract(myObject);
 
-                                       
+
 
                                     }
                                 }
@@ -4526,7 +4627,7 @@ namespace OlcSideScrollingConsoleGame
         }
 
 
-      
+
 
     }
 

@@ -476,6 +476,32 @@ namespace OlcSideScrollingConsoleGame.Core
         #endregion
 
 
+        #region Snow
+        public class MakeItSnow
+        {
+            public List<int[]> arrayList = new List<int[]>();
+
+            public MakeItSnow(int from=1, int to=100)
+            {
+                for (int i = 0; i < 59; i++)
+                {
+                    var rowToAdd = new List<int>();
+
+                    for (int j = 0; j < 254; j++)
+                    {
+                        var randomNo = Core.Aggregate.Instance.RNG(from, to);
+                        if (randomNo < 10)
+                        {
+                            rowToAdd.Add(j);
+                        }
+                    }
+
+                    arrayList.Add(rowToAdd.ToArray());
+                }
+            }
+        }
+        #endregion
+
     }
 
 

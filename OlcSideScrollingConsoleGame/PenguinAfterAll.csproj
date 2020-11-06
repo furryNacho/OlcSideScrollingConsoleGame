@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>PAAIcon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Audio.Library">
       <HintPath>..\Audio.Library.dll</HintPath>
@@ -83,6 +86,9 @@
     <Folder Include="Resources\Assets\Sound\" />
     <Folder Include="Resources\Assets\Sprites\" />
     <Folder Include="Resources\Settings\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="PAAIcon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
