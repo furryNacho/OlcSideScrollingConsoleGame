@@ -16,6 +16,7 @@ namespace OlcSideScrollingConsoleGame
 {
     public class Program : Game
     {
+        private Enum.DevState devState = Enum.DevState.GoToEnding;
         public Program()
         {
             this.AppName = "Penguin After All";
@@ -29,7 +30,7 @@ namespace OlcSideScrollingConsoleGame
 
         private bool HasSwitchedState { get; set; } = false;
 
-        private bool RightToAccessPodium { get; set; } = true; // once per game. must reset on new game!
+        private bool RightToAccessPodium { get; set; } = true; // once per game. must reset on new game! 
 
         private List<DynamicGameObject> listDynamics { get; set; } = new List<DynamicGameObject>();
 
@@ -945,6 +946,7 @@ namespace OlcSideScrollingConsoleGame
         }
 
         bool returnToEndAfterHighScore = false;
+
         private void DisplayEnd(float elapsed)
         {
 
@@ -1025,90 +1027,763 @@ namespace OlcSideScrollingConsoleGame
                 if (ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !IIP.idle))
                 {
                     // TODO: om klar med spelet... Menu och eller reset. Kanske skulle ha reset som ett gamestate, där allt nollas och sätts igång
-
-
                     ButtonsHasGoneIdle = false;
-                    //this.Machine.Switch(Enum.State.WorldMap);
-                    this.Machine.Switch(Enum.State.Menu);
-                    HasSwitchedState = true;
-                    // return;
+
+                    if (typingEndTextIsDone || (GetKey(Key.P).Pressed || IIP.Button7))
+                    {
+                        this.Machine.Switch(Enum.State.Menu);
+                        HasSwitchedState = true;
+                        ReSetForEnd();
+                    }
+                    else
+                    {
+                        skippTypingRow = true;
+                    }
+
                 }
             }
 
+            DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite(Global.GlobalNamespace.SplashScreenRef.End));
 
-            //100%
-            //TODO: alternativt slut.
+            MakeItSnow(elapsed, 220);
+
+
+            //TODO some kind of animation 
+
             if (EnergiIdLista.Count == 100)
             {
-                //100% av alla energier och 100% hälsa kvar
                 if (Hero.Health == 100)
                 {
-                    //DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite("splash"));
-                    DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite(Global.GlobalNamespace.SplashScreenRef.SuperAltEnd));
-                    DrawBigText("End", 4, 4);
-                    DrawBigText("100%", 4, 20);
-                    DrawBigText("Press any button", 8, 160);
+                    //100, 100
+                    //:TODO Gå in i igloo
+                    // Börja utanför bild
+                    // Gå in i bild
+                    // efter ett tag kommer igloo in i bild
+                    // stanna framför igloo
+                    // flaxa
+                    // fotsätt gå (gå in i igloo)
+                    typeOfEnding = Enum.TypeOfEnding.Perfect;
+                    AnimationEnd(elapsed);
+
                 }
                 else
                 {
-                    //DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite("splash"));
-                    DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite(Global.GlobalNamespace.SplashScreenRef.AltEnd));
-                    DrawBigText("End", 4, 4);
-                    DrawBigText("Exemplary display of skills", 4, 20);
-                    DrawBigText("Press any button", 8, 160);
+                    //100
+                    //:TODO visa att det finns en igloo, läna scarlet utanför bild.
+                    // Börja utanför bild
+                    // Gå in i bild
+                    // stanna en stund
+                    //( flaxa ) alt titta upp
+                    // fortsätt gå
+                    // Börja moonwalka.
+                    // Låt träd och buske komma i bild
+                    // Låt igloo komma i bild.
+                    // stanna
+                    typeOfEnding = Enum.TypeOfEnding.NerePerfect;
+                    AnimationEnd(elapsed);
                 }
-
             }
             else
             {
                 //Klarade spelet
-                //DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite("splash"));
-                DrawSprite(new Point(0, 0), Core.Aggregate.Instance.GetSprite(Global.GlobalNamespace.SplashScreenRef.End));
-                DrawBigText("End", 4, 4);
-                DrawBigText("You are super player", 4, 20);
-                DrawBigText("Thank you for playing game", 4, 36);
-                DrawBigText("Press any button", 8, 160);
+                typeOfEnding = Enum.TypeOfEnding.Done;
+
+                //För test
+                //typeOfEnding = Enum.TypeOfEnding.Perfect;
+
+                AnimationEnd(elapsed);
 
             }
 
-            //DrawBigText("End", 4, 4);
-            //DrawBigText("You are super player", 4, 20);
-            //DrawBigText("Thank you for playing game", 4, 36);
-            //DrawBigText("Press any button", 8, 160);
+
+
+
+            //Draw endtext
+            DrawEndTextList(elapsed);
+        }
+        #region End Text
+
+        #region Animation End
+        Enum.TypeOfEnding typeOfEnding { get; set; } = Enum.TypeOfEnding.None;
+        public int GraphicCounter { get; set; }
+        public float time { get; set; }
+        public int timeTotalCounter { get; set; }
+        int scarletEndPos { get; set; } = 0;
+        int worldPosIncrement { get; set; } = -15;
+        int worldPosIncrementIgloo { get; set; } = 160;
+        int doGest { get; set; } = 0;
+        bool drawHeroEnd { get; set; } = true;
+        private void ReSetForEnd()
+        {
+            ListEndText = new List<string>();
+            typingEndTextIsDone = false;
+            scarletEndPos = 0;
+            typeOfEnding = Enum.TypeOfEnding.None;
+            worldPosIncrement = -15;
+            drawHeroEnd = true;
+            timeTotalCounter = 0;
+            worldPosIncrementIgloo = 160;
+        }
+        private void AnimationEnd(float elapsed)
+        {
+
+            if (typeOfEnding == Enum.TypeOfEnding.Done)
+            {
+                var SpriteToUseHero = Core.Aggregate.Instance.GetSprite("hero");
+
+
+                time += elapsed;
+                if (time <= 0.3f)
+                {
+                    GraphicCounter = 1;
+                }
+                else if (time <= 0.6f)
+                {
+                    GraphicCounter = 2;
+                }
+                else if (time <= 0.9f)
+                {
+                    GraphicCounter = 3;
+                }
+                else
+                {
+                    GraphicCounter = 4;
+                    time = 0.0f;
+
+                    timeTotalCounter++;
+
+
+                    if (timeTotalCounter < 85)
+                    {
+                        // walk in to screen
+                        worldPosIncrement++;
+                        doGest = 1;
+                    }
+                    else if (timeTotalCounter > 85 && timeTotalCounter < 87)
+                    {
+                        //idle animation
+                        doGest = 0;
+                    }
+                    else if (timeTotalCounter > 87 && timeTotalCounter < 95)
+                    {
+                        //look up
+                        doGest = 2;
+                    }
+                    else if (timeTotalCounter > 95 && timeTotalCounter < 96)
+                    {
+                        //idle animation
+                        doGest = 0;
+                    }
+                    else if (timeTotalCounter > 96 && timeTotalCounter < 400)
+                    {
+                        // walk in to screen
+                        worldPosIncrement++;
+                        doGest = 1;
+                    }
+                }
+
+
+                int WorldX = worldPosIncrement;
+                int WorldY = 202;// Marknivå
+                var WorldPoint = new Point(WorldX, WorldY);
+
+                int SpriteX = 0;
+                int SpriteY = 0;
+                if (doGest == 0)
+                {
+                    //Gör inget
+                    SpriteX = 0;
+                    SpriteY = 0;
+                }
+                else if (doGest == 1)
+                {
+                    //Gå
+                    SpriteX = 16 * GraphicCounter;
+                    SpriteY = 0;
+                }
+                else if (doGest == 2)
+                {
+                    //Titta upp
+                    SpriteX = 16 * 2;
+                    SpriteY = 16 * 2;
+                }
+                var SpritePoint = new Point(SpriteX, SpriteY);
+
+
+                DrawPartialSprite(WorldPoint, SpriteToUseHero, SpritePoint, 16, 16);
+
+            }
+            else if (typeOfEnding == Enum.TypeOfEnding.NerePerfect)
+            {
+                var SpriteToUseHero = Core.Aggregate.Instance.GetSprite("hero");
+                var SpriteToUseIgloo = Core.Aggregate.Instance.GetSprite("endart");
+
+                time += elapsed;
+                float speed1 = 0.3f;
+                float speed2 = 0.6f;
+                float speed3 = 0.9f;
+                if (!drawHeroEnd)
+                {
+                    speed1 = 0.1f;
+                    speed2 = 0.2f;
+                    speed3 = 0.4f;
+                }
+                if (time <= speed1)
+                {
+                    GraphicCounter = 1;
+                }
+                else if (time <= speed2)
+                {
+                    GraphicCounter = 2;
+                }
+                else if (time <= speed3)
+                {
+                    GraphicCounter = 3;
+                }
+                else
+                {
+                    GraphicCounter = 4;
+                    time = 0.0f;
+
+                    if (timeTotalCounter < 1000)
+                    {
+                        timeTotalCounter++;
+                    }
+
+
+                    if (timeTotalCounter < 65)
+                    {
+                        // walk in to screen
+                        worldPosIncrement++;
+                        doGest = 1;
+                    }
+                    else if (timeTotalCounter > 65 && timeTotalCounter < 67)
+                    {
+                        //idle animation
+                        doGest = 0;
+                    }
+                    else if (timeTotalCounter > 67 && timeTotalCounter < 75)
+                    {
+                        //look up
+                        doGest = 2;
+                    }
+                    else if (timeTotalCounter > 75 && timeTotalCounter < 76)
+                    {
+                        //idle animation
+                        doGest = 0;
+                    }
+                    else if (timeTotalCounter > 76 && timeTotalCounter < 80)
+                    {
+                        // walk in to screen
+                        worldPosIncrement++;
+                        doGest = 1;
+                    }
+                    else if (timeTotalCounter > 80 && timeTotalCounter < 149)
+                    {
+                        // walk in to screen
+                        worldPosIncrement--;
+                        doGest = 1;
+                    }
+
+
+                    if (timeTotalCounter > 149 && drawHeroEnd)
+                    {
+                        drawHeroEnd = false;
+                        timeTotalCounter = 0;
+                    }
+                }
+
+                if (drawHeroEnd)
+                {
+                    int WorldX = worldPosIncrement;
+                    int WorldY = 202;// Marknivå
+                    var WorldPoint = new Point(WorldX, WorldY);
+
+                    int SpriteX = 0;
+                    int SpriteY = 0;
+                    if (doGest == 0)
+                    {
+                        //Gör inget
+                        SpriteX = 0;
+                        SpriteY = 0;
+                    }
+                    else if (doGest == 1)
+                    {
+                        //Gå
+                        SpriteX = 16 * GraphicCounter;
+                        SpriteY = 0;
+                    }
+                    else if (doGest == 2)
+                    {
+                        //Titta upp
+                        SpriteX = 16 * 2;
+                        SpriteY = 16 * 2;
+                    }
+                    var SpritePoint = new Point(SpriteX, SpriteY);
+
+                    DrawPartialSprite(WorldPoint, SpriteToUseHero, SpritePoint, 16, 16);
+                }
+                else
+                {
+
+                    int iglooPos = 0;
+                    if (timeTotalCounter < 120)
+                    {
+                        iglooPos = 120 - timeTotalCounter;
+                    }
+                    else
+                    {
+                        iglooPos = 0;
+                    }
+
+                    //igloo port
+                    int WorldXIGate = 137 + iglooPos;
+                    int WorldYIGate = 184;
+                    var WorldPointGate = new Point(WorldXIGate, WorldYIGate);
+                    int SpriteXIGate = 0;
+                    int SpriteYIGate = 0;
+                    var SpritePointGate = new Point(SpriteXIGate, SpriteYIGate);
+                    DrawPartialSprite(WorldPointGate, SpriteToUseIgloo, SpritePointGate, 24, 34);
+
+                    //Igloo
+                    int WorldXIgloo = 146 + iglooPos;
+                    int WorldYIgloo = 143;
+                    var WorldPointIgloo = new Point(WorldXIgloo, WorldYIgloo);
+                    int SpriteXIgloo = 48;
+                    int SpriteYIgloo = 0;
+                    var SpritePointIgloo = new Point(SpriteXIgloo, SpriteYIgloo);
+                    DrawPartialSprite(WorldPointIgloo, SpriteToUseIgloo, SpritePointIgloo, 160, 160);
+
+                }
+
+            }
+            else if (typeOfEnding == Enum.TypeOfEnding.Perfect)
+            {
+                var SpriteToUseHero = Core.Aggregate.Instance.GetSprite("hero");
+                var SpriteToUseIgloo = Core.Aggregate.Instance.GetSprite("endart");
+
+                time += elapsed;
+                float speed1 = 0.3f;
+                float speed2 = 0.6f;
+                float speed3 = 0.9f;
+
+
+                if (time <= speed1)
+                {
+                    GraphicCounter = 1;
+                }
+                else if (time <= speed2)
+                {
+                    GraphicCounter = 2;
+                }
+                else if (time <= speed3)
+                {
+                    GraphicCounter = 3;
+                }
+                else
+                {
+                    GraphicCounter = 4;
+                    time = 0.0f;
+
+                    if (timeTotalCounter < 1000)
+                        timeTotalCounter++;
+                    
+
+
+                    if (timeTotalCounter < 129)
+                    {
+                        // walk in to screen
+                        worldPosIncrement++;
+                        worldPosIncrementIgloo--;
+                        doGest = 1;
+                    }
+                    //else if (timeTotalCounter >= 129 && timeTotalCounter < 130)
+                    //{
+                    //    //idle animation
+                    //    doGest = 0;
+                    //}
+                    else if (timeTotalCounter >= 129 && timeTotalCounter < 138)
+                    {
+                        //look up
+                        doGest = 2;
+                    }
+                    //else if (timeTotalCounter >= 138 && timeTotalCounter < 139)
+                    //{
+                    //    //idle animation
+                    //    doGest = 0;
+                    //}
+                    else if (timeTotalCounter >= 138 && timeTotalCounter < 179)
+                    {
+                        // walk in to screen
+                        worldPosIncrement++;
+                        worldPosIncrementIgloo--;
+                        doGest = 1;
+                    }
+                    else if (timeTotalCounter >= 179 && timeTotalCounter < 180)
+                    {
+                        worldPosIncrementIgloo--;
+                    }
+
+                    if (timeTotalCounter > 179)
+                    {
+                        drawHeroEnd = false;
+                    }
+
+                    //174
+
+                }
+
+
+
+                //igloo port
+                int iglooPos = worldPosIncrementIgloo;
+                int WorldXIGate = 137 + iglooPos;
+                int WorldYIGate = 184;
+                var WorldPointGate = new Point(WorldXIGate, WorldYIGate);
+                int SpriteXIGate = 0;
+                int SpriteYIGate = 0;
+                var SpritePointGate = new Point(SpriteXIGate, SpriteYIGate);
+                DrawPartialSprite(WorldPointGate, SpriteToUseIgloo, SpritePointGate, 24, 34);
+
+                //Hero
+                if (drawHeroEnd)
+                {
+
+                    int WorldX = worldPosIncrement;
+                    int WorldY = 202;// Marknivå
+                    var WorldPoint = new Point(WorldX, WorldY);
+
+                    int SpriteX = 0;
+                    int SpriteY = 0;
+                    if (doGest == 0)
+                    {
+                        //Gör inget
+                        SpriteX = 0;
+                        SpriteY = 0;
+                    }
+                    else if (doGest == 1)
+                    {
+                        //Gå
+                        SpriteX = 16 * GraphicCounter;
+                        SpriteY = 0;
+                    }
+                    else if (doGest == 2)
+                    {
+                        //Titta upp
+                        SpriteX = 16 * 2;
+                        SpriteY = 16 * 2;
+                    }
+                    var SpritePoint = new Point(SpriteX, SpriteY);
+
+                    DrawPartialSprite(WorldPoint, SpriteToUseHero, SpritePoint, 16, 16);
+                }
+
+
+                //Igloo
+                int WorldXIgloo = 146 + iglooPos;
+                int WorldYIgloo = 143;
+                var WorldPointIgloo = new Point(WorldXIgloo, WorldYIgloo);
+                int SpriteXIgloo = 48;
+                int SpriteYIgloo = 0;
+                var SpritePointIgloo = new Point(SpriteXIgloo, SpriteYIgloo);
+                DrawPartialSprite(WorldPointIgloo, SpriteToUseIgloo, SpritePointIgloo, 160, 160);
+
+
+            }
         }
 
-        public int countDownSplach { get; set; } = 60;
+        #endregion
+
+
+        // Isogamy Mouthier - Shigeru Miyamoto
+        // Scarlet
+        float incrementerDisplayEnd { get; set; }
+        List<string> ListEndText { get; set; } = new List<string>();
+        bool typingEndTextIsDone { get; set; } = false;
+        bool skippTypingRow { get; set; } = false;
+        public void DrawEndTextList(float elapsed)
+        {
+
+            var ListEndTextMall = new List<string>();
+            if (typeOfEnding == Enum.TypeOfEnding.Perfect)
+            {
+                //100% av alla energier och 100% hälsa kvar
+                ListEndTextMall = new List<string>()
+                    {
+                      "\"Please bring strange things.",
+                      "Please come bringing new things.",
+                      "Let very old things come into",
+                      " your hands.",
+                      "Let what you do not know come",
+                      " into your eyes.",
+                      "Let desert sand harden your",
+                      " feet.",
+                      "Let the arch of your feet be",
+                      " the mountains.",
+                      "Let the paths of your",
+                      " fingertips be your maps",
+                      "And the ways you go be the",
+                      " lines of your palms.",
+                      "Let there be deep snow in your",
+                      " inbreathing",
+                      "And your outbreath be the",
+                      " shining of ice.",
+                      "May your mouth contain the",
+                      " shapes of strange words.",
+                      "May you smell food cooking",
+                      " you have not eaten.",
+                      "May the spring of a foreign",
+                      " river be your navel.",
+                      "May your soul be at home where",
+                      " there are no houses.",
+                      "Walk carefully, well-loved one,",
+                      "Walk mindfully, well-loved one,",
+                      "Walk fearlessly, well-loved one.",
+                      "Return with us, return to us,",
+                      "Be always coming home.\"",
+                      "-Ursula K. Le Guin",
+                      "Press any button -to exit"
+                    };
+
+            }
+            else if (typeOfEnding == Enum.TypeOfEnding.NerePerfect)
+            {
+                // 100% av alla energier, fast tog skada
+                ListEndTextMall = new List<string>()
+                    {
+                     "\"When I take you to the Valley," ,
+                     "you'll see the blue hills on" ,
+                     "the left and the blue hills on" ,
+                     "the right, the rainbow and the" ,
+                     "vineyards under the rainbow" ,
+                     "late in the rainy season," ,
+                     "and maybe you'll say," ,
+                     "'There it is, that's it!'" ,
+                     "But I'll say." ,
+                     "'A little farther.'" ,
+                     "We'll go on, I hope," ,
+                     "and you'll see the roofs of" ,
+                     "the little towns and the" ,
+                     "hillsides yellow with wild" ,
+                     "oats, a buzzard soaring" ,
+                     "and a woman singing by the" ,
+                     "shadows of a creek in the dry" ,
+                     "season, and maybe you'll say," ,
+                     "'Let's stop here, this is it!'" ,
+                     " But I'll say," ,
+                     "'A little farther yet.'" ,
+                     "We'll go on, and you'll hear" ,
+                     "the quail calling on the" ,
+                     "mountain by the springs" ,
+                     "of the river," ,
+                     "and looking back you'll see" ,
+                     "the river running downward" ,
+                     "through the wild hills behind," ,
+                     "below, and you'll say," ,
+                     "'Isn't that the Valley?'" ,
+                     "And all I will be able",
+                     "to say is" ,
+                     "'Drink this water of the spring," ,
+                     "rest here awhile," ,
+                     "we have a long way yet to go" ,
+                     "and I can't go without you.'\"",
+                     "-Ursula K. Le Guin",
+                     "Press any button -to exit"
+                    };
+            }
+            else if (typeOfEnding == Enum.TypeOfEnding.Done)
+            {
+                //Klarade spelet
+                ListEndTextMall = new List<string>() {
+                      "Congratulations!",
+                      "You beat the game.",
+                      "Thank you so much for",
+                      "trying to help Scarlet",
+                      "find her way back home and",
+                      "playing Penguin After All.",
+                      "This game was built on the",
+                      "olcPixelGameEngine",
+                      "created by Javidx9",
+                      "and then ported to C# by",
+                      "DevChrome.",
+                      "The music was created by",
+                      "Fisk i fickorna.",
+                      "And the guy who put it",
+                      "all together goes by",
+                      "the name",
+                      "FurryNacho.",
+                      "We are penguins.. after all.",
+                      "Much in common after all.",
+                      "Thank you for plaing",
+                      "Penguin After All",
+                      "Press any button -to exit"
+                };
+
+
+            }
+
+
+            bool AddLetter = false;
+            incrementerDisplayEnd += elapsed;
+            float typingSpeed = 0.2f;
+            if (typingEndTextIsDone)
+                typingSpeed = 1.0f;
+            if (incrementerDisplayEnd >= typingSpeed)  // Har det gått typ en halv sekund
+            {
+                incrementerDisplayEnd = 0; // nolla sekundmätaren
+
+                AddLetter = true;
+            }
+
+            if (AddLetter && !typingEndTextIsDone)
+            {
+
+                var wordRowIndex = 0;
+
+                foreach (var textRow in ListEndTextMall)
+                {
+                    wordRowIndex++;
+
+                    if (ListEndText.Count < wordRowIndex)
+                    {
+                        ListEndText.Add("");
+                    }
+
+                    if (ListEndText[wordRowIndex - 1].Length == textRow.Length)
+                    {
+                        //Om rad redan är tillaggd
+                        continue;
+                    }
+                    else if (ListEndTextMall.Count == wordRowIndex)
+                    {
+                        //Kasta in hela raden.
+                        ListEndText[wordRowIndex - 1] = textRow;
+                        break;
+                    }
+                    else if (skippTypingRow)
+                    {
+                        ListEndText[wordRowIndex - 1] = textRow;
+                        //ListEndText.Add("asdfasdf");
+                        skippTypingRow = false;
+                        ButtonsHasGoneIdle = false;
+                        //continue;
+                        break;
+                    }
+                    else if (ListEndText[wordRowIndex - 1].Length < textRow.Length)
+                    {
+                        //Add letter
+                        var letterToAdd = textRow[ListEndText[wordRowIndex - 1].Length];
+                        ListEndText[wordRowIndex - 1] = ListEndText[wordRowIndex - 1] + letterToAdd;
+                        break;
+                    }
+
+                }
+
+                //En koll för att se om vi är klara med texten
+                if (ListEndText.Count == ListEndTextMall.Count)
+                {
+                    if (ListEndText[ListEndText.Count - 1].Length == ListEndTextMall[ListEndTextMall.Count - 1].Length)
+                    {
+                        typingEndTextIsDone = true;
+                    }
+                }
+
+                //if (ListEndText.Count >= 11)
+                //{
+                //    ListEndText.RemoveRange(0, 1);
+                //}
+
+            }
+
+
+            var rowNumber = 0;
+            var rowNumberActual = 0;
+            int jumpToRowToStartDrawingIfToManyRows = 0;
+            foreach (var textRow in ListEndText)
+            {
+                //Only show max 11 rows of text
+                if (ListEndText.Count > 11)
+                {
+                    jumpToRowToStartDrawingIfToManyRows = ListEndText.Count - 11;
+                }
+
+                if (jumpToRowToStartDrawingIfToManyRows <= rowNumber)
+                {
+
+                    string printString = textRow;
+                    int spacing = 10;
+                    if (textRow.StartsWith(" "))
+                    {
+                        //spacing = 9;
+                        printString = textRow.Substring(1);
+                    }
+
+                    DrawBigText(printString, 4, 4 + (rowNumberActual * spacing));
+
+                    rowNumberActual++;
+                }
+                rowNumber++;
+            }
+
+
+            // empty up text on the screen when done (Do i want this?)
+            //if (typingEndTextIsDone && AddLetter)
+            //{
+            //    if (ListEndText.Count > 1)
+            //    {
+            //        if (ListEndText.Count > 11)
+            //        {
+            //            var tempListReplace = new List<string>();
+            //            for (int i = 0; i < ListEndText.Count; i++)
+            //            {
+            //                if (i > jumpToRowToStartDrawingIfToManyRows)
+            //                {
+            //                    tempListReplace.Add(ListEndText[i]);
+            //                }
+            //            }
+            //            ListEndText = tempListReplace;
+            //        }
+            //        else
+            //        {
+            //            ListEndText.RemoveAt(0);
+            //        }
+            //    }
+            //}
+
+        }
+        #endregion
+
+
+        #region Make it snow
         public int counterSnowFallSlow { get; set; } = 1;
         public int counterSnowFallFast { get; set; } = 1;
         public float incrementerSlow { get; set; }
         public float incrementerFast { get; set; }
         private Core.Aggregate.MakeItSnow MakeItSnowSlow { get; set; }
         private Core.Aggregate.MakeItSnow MakeItSnowFast { get; set; }
-        private void DisplaySplashScreen(float elapsed)
+        public void MakeItSnow(float elapsed, int hight = 59)
         {
-            if (HasSwitchedState)
-                HasSwitchedState = false;
-
             if (MakeItSnowSlow == null || MakeItSnowFast == null)
             {
-                MakeItSnowSlow = new Core.Aggregate.MakeItSnow(1, 400);
-                MakeItSnowFast = new Core.Aggregate.MakeItSnow(1, 400);
+                MakeItSnowSlow = new Core.Aggregate.MakeItSnow(1, 400, hight);
+                MakeItSnowFast = new Core.Aggregate.MakeItSnow(1, 400, hight);
+            }
+            if (MakeItSnowSlow != null && MakeItSnowSlow.arrayList.Count <= hight - 1)
+            {
+                MakeItSnowSlow = new Core.Aggregate.MakeItSnow(1, 400, hight);
+                MakeItSnowFast = new Core.Aggregate.MakeItSnow(1, 400, hight);
             }
 
-            if (countDownSplach > 0)
-                countDownSplach--;
-
-            //Hastighet för långsam snö
             incrementerSlow += elapsed;
             if (incrementerSlow >= 0.5)  // Har det gått typ en halv sekund
             {
                 incrementerSlow = 0; // nolla sekundmätaren
 
-                if (counterSnowFallSlow < 59)
+                if (counterSnowFallSlow < hight)
                 {
                     counterSnowFallSlow++; // plussa första klockan
                 }
-                else if (counterSnowFallSlow >= 59)
+                else if (counterSnowFallSlow >= hight)
                 {
                     counterSnowFallSlow = 1; // nolla första klockan när 60
 
@@ -1120,15 +1795,115 @@ namespace OlcSideScrollingConsoleGame
             {
                 incrementerFast = 0; // nolla sekundmätaren
 
-                if (counterSnowFallFast < 59)
+                if (counterSnowFallFast < hight)
                 {
                     counterSnowFallFast++; // plussa första klockan
                 }
-                else if (counterSnowFallFast >= 59)
+                else if (counterSnowFallFast >= hight)
                 {
                     counterSnowFallFast = 1; // nolla första klockan när 60
                 }
             }
+
+            if (MakeItSnowSlow != null && MakeItSnowFast != null)
+            {
+
+                //Make it snow Slow
+                var color = (Pixel)Pixel.Presets.White;
+
+                for (int i = hight; i > 0; i--)
+                {
+                    var absI = System.Math.Abs(counterSnowFallSlow - i);
+                    if (absI < 1)
+                    {
+                        absI = 1;
+                    }
+                    if (absI > hight - 1)
+                    {
+                        absI = hight - 1;
+                    }
+
+                    var rowCollection = MakeItSnowSlow.arrayList[absI];
+
+                    foreach (var snowPixelW in rowCollection)
+                    {
+                        Draw(new Point(snowPixelW, i), color);
+                    }
+                }
+
+
+                //Make it snow Fast
+                for (int i = hight; i > 0; i--)
+                {
+                    var absI = System.Math.Abs(counterSnowFallFast - i);
+                    if (absI < 1)
+                    {
+                        absI = 1;
+                    }
+                    if (absI > hight - 1)
+                    {
+                        absI = hight - 1;
+                    }
+
+                    var rowCollection = MakeItSnowFast.arrayList[absI];
+
+                    foreach (var snowPixelW in rowCollection)
+                    {
+                        Draw(new Point(snowPixelW, i), color);
+                    }
+                }
+
+            }
+        }
+        #endregion
+
+        public int countDownSplach { get; set; } = 60;
+
+        private void DisplaySplashScreen(float elapsed)
+        {
+            if (HasSwitchedState)
+                HasSwitchedState = false;
+
+            //if (MakeItSnowSlow == null || MakeItSnowFast == null)
+            //{
+            //    MakeItSnowSlow = new Core.Aggregate.MakeItSnow(1, 400);
+            //    MakeItSnowFast = new Core.Aggregate.MakeItSnow(1, 400);
+            //}
+
+            if (countDownSplach > 0)
+                countDownSplach--;
+
+            ////Hastighet för långsam snö
+            //incrementerSlow += elapsed;
+            //if (incrementerSlow >= 0.5)  // Har det gått typ en halv sekund
+            //{
+            //    incrementerSlow = 0; // nolla sekundmätaren
+
+            //    if (counterSnowFallSlow < 59)
+            //    {
+            //        counterSnowFallSlow++; // plussa första klockan
+            //    }
+            //    else if (counterSnowFallSlow >= 59)
+            //    {
+            //        counterSnowFallSlow = 1; // nolla första klockan när 60
+
+            //    }
+            //}
+
+            //incrementerFast += elapsed;
+            //if (incrementerFast >= 0.2)  // Har det gått typ en halv sekund
+            //{
+            //    incrementerFast = 0; // nolla sekundmätaren
+
+            //    if (counterSnowFallFast < 59)
+            //    {
+            //        counterSnowFallFast++; // plussa första klockan
+            //    }
+            //    else if (counterSnowFallFast >= 59)
+            //    {
+            //        counterSnowFallFast = 1; // nolla första klockan när 60
+            //    }
+            //}
 
 
             SlimDx.timer_Tick();
@@ -1160,59 +1935,51 @@ namespace OlcSideScrollingConsoleGame
             }
 
 
-            if (MakeItSnowSlow != null && MakeItSnowFast != null)
-            {
+            //if (MakeItSnowSlow != null && MakeItSnowFast != null)
+            //{
+            //    //Make it snow Slow
+            //    var color = (Pixel)Pixel.Presets.White;
+            //    for (int i = 59; i > 0; i--)
+            //    {
+            //        var absI = System.Math.Abs(counterSnowFallSlow - i);
+            //        if (absI < 1)
+            //        {
+            //            absI = 1;
+            //        }
+            //        if (absI > 60)
+            //        {
+            //            absI = 60;
+            //        }
+            //        var rowCollection = MakeItSnowSlow.arrayList[absI];
+            //        foreach (var snowPixelW in rowCollection)
+            //        {
+            //             Draw(new Point(snowPixelW, i), color);
+            //        }
+            //    }
+            //    //Make it snow Fast
+            //    for (int i = 59; i > 0; i--)
+            //    {
+            //        var absI = System.Math.Abs(counterSnowFallFast - i);
+            //        if (absI < 1)
+            //        {
+            //            absI = 1;
+            //        }
+            //        if (absI > 60)
+            //        {
+            //            absI = 60;
+            //        }
+            //        var rowCollection = MakeItSnowFast.arrayList[absI];
+            //        foreach (var snowPixelW in rowCollection)
+            //        {
+            //            Draw(new Point(snowPixelW, i), color);
+            //        }
+            //    }
+            //}
 
-                //Make it snow Slow
-                var color = (Pixel)Pixel.Presets.White;
-
-                for (int i = 59; i > 0; i--)
-                {
-                    var absI = System.Math.Abs(counterSnowFallSlow - i);
-                    if (absI < 1)
-                    {
-                        absI = 1;
-                    }
-                    if (absI > 60)
-                    {
-                        absI = 60;
-                    }
-
-                    var rowCollection = MakeItSnowSlow.arrayList[absI];
-
-                    foreach (var snowPixelW in rowCollection)
-                    {
-                         Draw(new Point(snowPixelW, i), color);
-                    }
-                }
-
-
-                //Make it snow Fast
-                for (int i = 59; i > 0; i--)
-                {
-                    var absI = System.Math.Abs(counterSnowFallFast - i);
-                    if (absI < 1)
-                    {
-                        absI = 1;
-                    }
-                    if (absI > 60)
-                    {
-                        absI = 60;
-                    }
-
-                    var rowCollection = MakeItSnowFast.arrayList[absI];
-
-                    foreach (var snowPixelW in rowCollection)
-                    {
-                        Draw(new Point(snowPixelW, i), color);
-                    }
-                }
-
-            }
-
+            MakeItSnow(elapsed);
 
         }
- 
+
 
         //public bool MenuStartHasBeenReleased { get; set; }
         int selectedMenuItem = 1;
@@ -1289,7 +2056,7 @@ namespace OlcSideScrollingConsoleGame
                     "Game Engine Port:",
                     "DevChrome",
                     "Music and Sound:",
-                    "FiskIFickorna",
+                    "Fisk i fickorna",
                     "",
                     "Back"
                  };
@@ -1691,16 +2458,39 @@ namespace OlcSideScrollingConsoleGame
                     // TODO : hantera vilken värld man ska till
                     if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 1)
                     {
+                        //First stage is used as alternet develop stage
+                        if (devState == Enum.DevState.None)
+                        {
+                            // original
+                            hasAccumulatedAllSpeed = false;
+                            ChangeMap("mapone", 2, 23, Hero);
+                            this.Machine.Switch(Enum.State.GameMap);
+                            HasSwitchedState = true;
+                            ButtonsHasGoneIdle = false;
+                            return;
+                        }
+                        else if (devState == Enum.DevState.GoToLastStage)
+                        {
+                            // sim last stage
+                            hasAccumulatedAllSpeed = false;
+                            ChangeMap("mapnine", 1, 4, Hero);
+                            this.Machine.Switch(Enum.State.GameMap);
+                            HasSwitchedState = true;
+                            ButtonsHasGoneIdle = false;
+                            return;
+                        }
+                        else if (devState == Enum.DevState.GoToEnding)
+                        {
+                            // sim ending 
+                            hasAccumulatedAllSpeed = false;
+                            HasSwitchedState = true;
+                            ButtonsHasGoneIdle = false;
+                            returnToEndAfterHighScore = false;
+                            this.Machine.Switch(Enum.State.End);
+                            return;
+                        }
 
-                        hasAccumulatedAllSpeed = false;
-                        ChangeMap("mapone", 2, 23, Hero); 
-                        // Gör första banan till sista banan
-                        //ChangeMap("mapnine", 1, 4, Hero);
 
-
-                        this.Machine.Switch(Enum.State.GameMap);
-                        HasSwitchedState = true;
-                        ButtonsHasGoneIdle = false;
 
                         return;
                     }
@@ -3938,24 +4728,24 @@ namespace OlcSideScrollingConsoleGame
             var point = new Point((x - 1), (y - 1));
             var colorA = Pixel.FromRgb((uint)Pixel.Presets.DarkGrey);
             //FillRect(point, (nMaxLineLength * 8 + 1), (y + nLines * 8 + 1), colorA);
-            FillRect(point, (nMaxLineLength * 8 + 2), (y + nLines), colorA);
+            //FillRect(point, (nMaxLineLength * 8 + 2), (y + nLines), colorA);
 
             var point1 = new Point((x - 2), (y - 2));
             var point2 = new Point((x - 2), (y + nLines * 8 + 1));
             var color = Pixel.FromRgb((uint)Pixel.Presets.White);
-            DrawLine(point1, point2, color);
+            //DrawLine(point1, point2, color);
 
             var point3 = new Point((x + nMaxLineLength * 8 + 1), (y - 2));
             var point4 = new Point((x + nMaxLineLength * 8 + 1), (y + nLines * 8 + 1));
-            DrawLine(point3, point4, color);
+            //DrawLine(point3, point4, color);
 
             var point5 = new Point((x - 2), (y - 2));
             var point6 = new Point((x + nMaxLineLength * 8 + 1), (y - 2));
-            DrawLine(point5, point6, color);
+            //DrawLine(point5, point6, color);
 
             var point7 = new Point((x - 2), (y + nLines * 8 + 1));
             var point8 = new Point((x + nMaxLineLength * 8 + 1), (y + nLines * 8 + 1));
-            DrawLine(point7, point8, color);
+            //DrawLine(point7, point8, color);
 
             for (int i = 0; i < listText.Count; i++)
             {

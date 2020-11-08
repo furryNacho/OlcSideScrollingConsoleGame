@@ -3,6 +3,21 @@ namespace OlcSideScrollingConsoleGame
 {
     public class Enum
     {
+        public enum DevState
+        {
+            None,
+            GoToLastStage,
+            GoToEnding
+        };
+
+        public enum TypeOfEnding
+        {
+            None,
+            Done,
+            NerePerfect,
+            Perfect
+        }
+
         public enum State
         {
             SplashScreen,

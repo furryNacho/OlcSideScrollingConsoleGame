@@ -156,8 +156,9 @@ namespace OlcSideScrollingConsoleGame.Core
 
             LoadSprite("splashstart", PathSprites, @"\splashstart", ".png");
             LoadSprite("splashend", PathSprites, @"\splashend", ".png");
-            LoadSprite("splashaltend", PathSprites, @"\splashaltend", ".png");
-            LoadSprite("splashsuperaltend", PathSprites, @"\splashsuperaltend", ".png");
+            //LoadSprite("splashaltend", PathSprites, @"\splashaltend", ".png");
+            //LoadSprite("splashsuperaltend", PathSprites, @"\splashsuperaltend", ".png");
+            LoadSprite("endart", PathSprites, @"\endart", ".png");
 
         }
 
@@ -475,15 +476,16 @@ namespace OlcSideScrollingConsoleGame.Core
 
         #endregion
 
+      
 
         #region Snow
         public class MakeItSnow
         {
             public List<int[]> arrayList = new List<int[]>();
 
-            public MakeItSnow(int from=1, int to=100)
+            public MakeItSnow(int from=1, int to=100, int hight = 224)
             {
-                for (int i = 0; i < 59; i++)
+                for (int i = 0; i < hight; i++)
                 {
                     var rowToAdd = new List<int>();
 
