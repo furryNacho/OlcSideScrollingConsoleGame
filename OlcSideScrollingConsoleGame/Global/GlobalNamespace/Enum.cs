@@ -7,7 +7,10 @@ namespace OlcSideScrollingConsoleGame
         {
             None,
             GoToLastStage,
-            GoToEnding
+            GoToEnding, // #1
+            GoToEndingDone,// #1
+            GoToEndingNearPrefect,
+            GoToEndingPertect
         };
 
         public enum TypeOfEnding

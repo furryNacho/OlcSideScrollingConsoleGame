@@ -1,4 +1,21 @@
-﻿using System;
+﻿
+/***************************************************************************************************************************************
+* Developer notes                                                                                                                      *
+*                                                                                                                                      *   
+* This project (Penguin After All) was never intended for public view (if you're reading this I feel kinda bad for you).               *      
+* With that said I shouldn't have to apologize for breaking good coding practice.                                                      * 
+* If you came here looking for good examples on how to go about i advise you to look elsewhere.                                        *
+*                                                                                                                                      *               
+* This project started out as a pure tinker project with absolute disregard of any rules or guidelines for coding convention.          *      
+* (I did whatever i felt lika at the moment not concerning myself with code etiket or anyone's opinion.)                               *     
+* As the project progressed I started indulging the thought of actually publishing the compiled version to the public for free.        *        
+* I want to remind you that all creative content belonging to this project is copyright protected.                                     *           
+*                                                                                                                                      *
+* 2020-11-14, Dev.                                                                                                                     *    
+*                                                                                                                                      *       
+***************************************************************************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,10 +33,21 @@ namespace OlcSideScrollingConsoleGame
 {
     public class Program : Game
     {
-        private Enum.DevState devState = Enum.DevState.GoToEnding;
+        private Enum.DevState devState { get; set; } = Enum.DevState.None;
+        // EnergiIdLista.Count
+        // Hero.Health
+        // 
+
+
         public Program()
         {
             this.AppName = "Penguin After All";
+
+
+            //devState = Enum.DevState.GoToLastStage;
+            //devState = Enum.DevState.GoToEndingDone;
+            //devState = Enum.DevState.GoToEndingNearPrefect;
+            //devState = Enum.DevState.GoToEndingPertect;
         }
 
         private StateMachine<Enum.State> Machine { get; set; }
@@ -102,18 +130,6 @@ namespace OlcSideScrollingConsoleGame
 
         public override void OnCreate()
         {
-            //TODO: ljud.. Ingenting fungerar som det ska med den här skiten
-            //this.Enable(Game.Subsystem.Audio);
-            /*
-            this.Enable(Game.Subsystem.Audio);
-            Resx.Load((Game)this);
-            this.PlaySound(Resx.BgMusic);
-            this.Volume = 0.5f;
-            this.machine = new StateMachine<HorseRun.Scenes>();
-            this.machine.Switch(HorseRun.Scenes.Menu);
-            this.Reset();
-             */
-
             //this.Enable(Game.Subsystem.Fullscreen); // riktigt med lagg
 
             this.Machine = new StateMachine<Enum.State>();
@@ -949,10 +965,31 @@ namespace OlcSideScrollingConsoleGame
 
         private void DisplayEnd(float elapsed)
         {
+            // Avgör hur det slutade!
+            typeOfEnding = Enum.TypeOfEnding.None;
+            if (EnergiIdLista.Count == 100 || devState == Enum.DevState.GoToEndingNearPrefect || devState == Enum.DevState.GoToEndingPertect)
+            {
+                if (Hero.Health == 100 || devState == Enum.DevState.GoToEndingPertect)
+                {
+                    typeOfEnding = Enum.TypeOfEnding.Perfect;
+
+                }
+                else
+                {
+                    typeOfEnding = Enum.TypeOfEnding.NerePerfect;
+                }
+            }
+            else
+            {
+                typeOfEnding = Enum.TypeOfEnding.Done;
+            }
+
 
             if (HasSwitchedState)
             {
-                //HasSwitchedState = false;
+                Core.Aggregate.Instance.Sound.stop();
+
+                HasSwitchedState = false;
                 if (Core.Aggregate.Instance.Sound != null)
                 {
 
@@ -972,22 +1009,41 @@ namespace OlcSideScrollingConsoleGame
                     }
 
                     if (!Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd))
-                        Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd);
+                    {
+
+                        if (typeOfEnding == Enum.TypeOfEnding.Perfect)
+                        {
+                            // TODO: kolla om detta är en bra idé att spela en speciell slinga då. (kommer den att pausas sen när spelet börjar om?)
+
+                            Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGPerfectEnd);
+                        }
+                        else if (typeOfEnding == Enum.TypeOfEnding.NerePerfect)
+                        {
+                            // Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd);
+                            Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGNearPerfectEnd);
+                        }
+                        else if (typeOfEnding == Enum.TypeOfEnding.Done)
+                        {
+                            Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd);
+                        }
+
+                    }
                 }
             }
 
 
             Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
 
-            Core.Aggregate.Instance.Sound.stop();
+
 
             if (HasSwitchedState)
             {
                 HasSwitchedState = false;
 
+                EndTotalTime = GameTotalTime;
+
                 if (RightToAccessPodium)
                 {
-                    EndTotalTime = GameTotalTime;
                     RightToAccessPodium = false;
 
                     if (Core.Aggregate.Instance.PlacesOnHighScore(EndTotalTime))
@@ -1049,53 +1105,7 @@ namespace OlcSideScrollingConsoleGame
 
 
             //TODO some kind of animation 
-
-            if (EnergiIdLista.Count == 100)
-            {
-                if (Hero.Health == 100)
-                {
-                    //100, 100
-                    //:TODO Gå in i igloo
-                    // Börja utanför bild
-                    // Gå in i bild
-                    // efter ett tag kommer igloo in i bild
-                    // stanna framför igloo
-                    // flaxa
-                    // fotsätt gå (gå in i igloo)
-                    typeOfEnding = Enum.TypeOfEnding.Perfect;
-                    AnimationEnd(elapsed);
-
-                }
-                else
-                {
-                    //100
-                    //:TODO visa att det finns en igloo, läna scarlet utanför bild.
-                    // Börja utanför bild
-                    // Gå in i bild
-                    // stanna en stund
-                    //( flaxa ) alt titta upp
-                    // fortsätt gå
-                    // Börja moonwalka.
-                    // Låt träd och buske komma i bild
-                    // Låt igloo komma i bild.
-                    // stanna
-                    typeOfEnding = Enum.TypeOfEnding.NerePerfect;
-                    AnimationEnd(elapsed);
-                }
-            }
-            else
-            {
-                //Klarade spelet
-                typeOfEnding = Enum.TypeOfEnding.Done;
-
-                //För test
-                //typeOfEnding = Enum.TypeOfEnding.Perfect;
-
-                AnimationEnd(elapsed);
-
-            }
-
-
+            AnimationEnd(elapsed);
 
 
             //Draw endtext
@@ -1387,7 +1397,7 @@ namespace OlcSideScrollingConsoleGame
 
                     if (timeTotalCounter < 1000)
                         timeTotalCounter++;
-                    
+
 
 
                     if (timeTotalCounter < 129)
@@ -1490,6 +1500,7 @@ namespace OlcSideScrollingConsoleGame
 
 
             }
+
         }
 
         #endregion
@@ -1501,47 +1512,92 @@ namespace OlcSideScrollingConsoleGame
         List<string> ListEndText { get; set; } = new List<string>();
         bool typingEndTextIsDone { get; set; } = false;
         bool skippTypingRow { get; set; } = false;
+        // engelska, japanska, isländska, latin, finska, engelska
         public void DrawEndTextList(float elapsed)
         {
-
             var ListEndTextMall = new List<string>();
             if (typeOfEnding == Enum.TypeOfEnding.Perfect)
             {
                 //100% av alla energier och 100% hälsa kvar
+                #region test text
+
+                //ListEndTextMall = new List<string>()
+                //    {
+                //      "\"Please bring strange things.",
+                //      "Please come bringing new things.",
+                //      "Let very old things come into",
+                //      " your hands.",
+                //      "Let what you do not know come",
+                //      " into your eyes.",
+                //      "Let desert sand harden your",
+                //      " feet.",
+                //      "Let the arch of your feet be",
+                //      " the mountains.",
+                //      "Let the paths of your",
+                //      " fingertips be your maps",
+                //      "And the ways you go be the",
+                //      " lines of your palms.",
+                //      "Let there be deep snow in your",
+                //      " inbreathing",
+                //      "And your outbreath be the",
+                //      " shining of ice.",
+                //      "May your mouth contain the",
+                //      " shapes of strange words.",
+                //      "May you smell food cooking",
+                //      " you have not eaten.",
+                //      "May the spring of a foreign",
+                //      " river be your navel.",
+                //      "May your soul be at home where",
+                //      " there are no houses.",
+                //      "Walk carefully, well-loved one,",
+                //      "Walk mindfully, well-loved one,",
+                //      "Walk fearlessly, well-loved one.",
+                //      "Return with us, return to us,",
+                //      "Be always coming home.\"",
+                //      "-Ursula K. Le Guin",
+                //      //"Time "+EndTotalTime.ToString("hh':'mm':'ss"),
+                //      "Press any button -to exit"
+                //    };
+                #endregion
+
                 ListEndTextMall = new List<string>()
                     {
-                      "\"Please bring strange things.",
-                      "Please come bringing new things.",
-                      "Let very old things come into",
-                      " your hands.",
-                      "Let what you do not know come",
-                      " into your eyes.",
-                      "Let desert sand harden your",
-                      " feet.",
-                      "Let the arch of your feet be",
-                      " the mountains.",
-                      "Let the paths of your",
-                      " fingertips be your maps",
-                      "And the ways you go be the",
-                      " lines of your palms.",
-                      "Let there be deep snow in your",
-                      " inbreathing",
-                      "And your outbreath be the",
-                      " shining of ice.",
-                      "May your mouth contain the",
-                      " shapes of strange words.",
-                      "May you smell food cooking",
-                      " you have not eaten.",
-                      "May the spring of a foreign",
-                      " river be your navel.",
-                      "May your soul be at home where",
-                      " there are no houses.",
-                      "Walk carefully, well-loved one,",
-                      "Walk mindfully, well-loved one,",
-                      "Walk fearlessly, well-loved one.",
-                      "Return with us, return to us,",
-                      "Be always coming home.\"",
-                      "-Ursula K. Le Guin",
+                       "So I came with weirdos.",
+                        "Bring a new one.",
+                        "Let's put the old one",
+                        "Your hand.",
+                        "You don't know what" ,
+                        " he's going to do",
+                        "In your eyes.",
+                        "Oakwood desert sand",
+                        "pcs",
+                        "Legs curved",
+                        "Mountains.",
+                        "Give your way",
+                        "A card with your " ,
+                        "fingertips and then",
+                        "And when you go",
+                        "Line on the palm.",	  
+                        "Let's take you deep" ,
+                        " into the snow",
+                        "breathe",
+                        "And your spirit",
+                        "To enlarge the ice.",
+                        "In your mouth",
+                        "New shape.",
+                        "I eat?",
+                        "You don't eat",
+                        "Spring aliens",
+                        "The river is your navel.",
+                        "Life at home;",
+                        "There is no house.",
+                        "Walk carefully, dear;",
+                         "With all my heart I am;",
+                         "And fear not thy beloved, " ,
+                         "thy God, ",
+                         "and walk not in the way.",
+                        "Back behind us;",
+                        "Please always go home.",
                       "Press any button -to exit"
                     };
 
@@ -1549,47 +1605,98 @@ namespace OlcSideScrollingConsoleGame
             else if (typeOfEnding == Enum.TypeOfEnding.NerePerfect)
             {
                 // 100% av alla energier, fast tog skada
+                #region test text
+
+                //ListEndTextMall = new List<string>()
+                //    {
+                //     "\"When I take you to the Valley," ,
+                //     "you'll see the blue hills on" ,
+                //     "the left and the blue hills on" ,
+                //     "the right, the rainbow and the" ,
+                //     "vineyards under the rainbow" ,
+                //     "late in the rainy season," ,
+                //     "and maybe you'll say," ,
+                //     "'There it is, that's it!'" ,
+                //     "But I'll say." ,
+                //     "'A little farther.'" ,
+                //     "We'll go on, I hope," ,
+                //     "and you'll see the roofs of" ,
+                //     "the little towns and the" ,
+                //     "hillsides yellow with wild" ,
+                //     "oats, a buzzard soaring" ,
+                //     "and a woman singing by the" ,
+                //     "shadows of a creek in the dry" ,
+                //     "season, and maybe you'll say," ,
+                //     "'Let's stop here, this is it!'" ,
+                //     " But I'll say," ,
+                //     "'A little farther yet.'" ,
+                //     "We'll go on, and you'll hear" ,
+                //     "the quail calling on the" ,
+                //     "mountain by the springs" ,
+                //     "of the river," ,
+                //     "and looking back you'll see" ,
+                //     "the river running downward" ,
+                //     "through the wild hills behind," ,
+                //     "below, and you'll say," ,
+                //     "'Isn't that the Valley?'" ,
+                //     "And all I will be able",
+                //     "to say is" ,
+                //     "'Drink this water of the spring," ,
+                //     "rest here awhile," ,
+                //     "we have a long way yet to go" ,
+                //     "and I can't go without you.'\"",
+                //     "-Ursula K. Le Guin",
+                //     //"Time "+EndTotalTime.ToString("hh':'mm':'ss"),
+                //     "Press any button -to exit"
+                //    };
+
+                #endregion
+
+
                 ListEndTextMall = new List<string>()
                     {
-                     "\"When I take you to the Valley," ,
-                     "you'll see the blue hills on" ,
-                     "the left and the blue hills on" ,
-                     "the right, the rainbow and the" ,
-                     "vineyards under the rainbow" ,
-                     "late in the rainy season," ,
-                     "and maybe you'll say," ,
-                     "'There it is, that's it!'" ,
-                     "But I'll say." ,
-                     "'A little farther.'" ,
-                     "We'll go on, I hope," ,
-                     "and you'll see the roofs of" ,
-                     "the little towns and the" ,
-                     "hillsides yellow with wild" ,
-                     "oats, a buzzard soaring" ,
-                     "and a woman singing by the" ,
-                     "shadows of a creek in the dry" ,
-                     "season, and maybe you'll say," ,
-                     "'Let's stop here, this is it!'" ,
-                     " But I'll say," ,
-                     "'A little farther yet.'" ,
-                     "We'll go on, and you'll hear" ,
-                     "the quail calling on the" ,
-                     "mountain by the springs" ,
-                     "of the river," ,
-                     "and looking back you'll see" ,
-                     "the river running downward" ,
-                     "through the wild hills behind," ,
-                     "below, and you'll say," ,
-                     "'Isn't that the Valley?'" ,
-                     "And all I will be able",
-                     "to say is" ,
-                     "'Drink this water of the spring," ,
-                     "rest here awhile," ,
-                     "we have a long way yet to go" ,
-                     "and I can't go without you.'\"",
-                     "-Ursula K. Le Guin",
+                     "In the valley",
+                    "You see the blue of the hill,",
+                    "And the blue area on the left",
+                    "Right and rainbow",
+                    "The spring becomes a",
+                    "After the rain",
+                    "And maybe say",
+                    "\"That's the way it is,\"",
+                    "But tell me.",
+                    "\"A little more.\"",
+                    "I hope you go",
+                    "You see the roof",
+                    "In a small town",
+                    "The mountain is wild and yellow",
+                    "oatmeal",
+                    "Nosuri is floating",
+                    "The woman is singing",
+                    "The shade dries",
+                    "Time and maybe say",
+                    "\"Stop, this is it!\"",
+                    "However, he said:",
+                    "\"A little more.\"",
+                    "continue consultation",
+                    "Uzura",
+                    "Next to the fountain;",
+                    "Valley,",
+                    "after thinking",
+                    "The bottom of the river",
+                    "Natural mountains behind",
+                    "Below we tell you",
+                    "\"Isn't that a dollar!\"",
+                    "And I can't do all the things",
+                    "that",
+                    "Drink this spring water",
+                    "Please rest for a moment\"",
+                    "However, this is a long way to",
+                    "go,",
+                    "And I can't be sure he is." ,
                      "Press any button -to exit"
                     };
+
+
             }
             else if (typeOfEnding == Enum.TypeOfEnding.Done)
             {
@@ -1598,7 +1705,7 @@ namespace OlcSideScrollingConsoleGame
                       "Congratulations!",
                       "You beat the game.",
                       "Thank you so much for",
-                      "trying to help Scarlet",
+                      "trying to help Scarlett",
                       "find her way back home and",
                       "playing Penguin After All.",
                       "This game was built on the",
@@ -1616,6 +1723,7 @@ namespace OlcSideScrollingConsoleGame
                       "Much in common after all.",
                       "Thank you for plaing",
                       "Penguin After All",
+                      //"Time "+EndTotalTime.ToString("hh':'mm':'ss"),
                       "Press any button -to exit"
                 };
 
@@ -1679,13 +1787,22 @@ namespace OlcSideScrollingConsoleGame
 
                 }
 
-                //En koll för att se om vi är klara med texten
-                if (ListEndText.Count == ListEndTextMall.Count)
+                try
                 {
-                    if (ListEndText[ListEndText.Count - 1].Length == ListEndTextMall[ListEndTextMall.Count - 1].Length)
+                    //En koll för att se om vi är klara med texten
+                    if (ListEndText.Count == ListEndTextMall.Count && ListEndText.Count > 0)
                     {
-                        typingEndTextIsDone = true;
+                        if (ListEndText[ListEndText.Count - 1].Length == ListEndTextMall[ListEndTextMall.Count - 1].Length)
+                        {
+                            typingEndTextIsDone = true;
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    // TODO: har inte sökt så noga på vad det är som göra att man kommer hit om man avslutar. men testa med olika mode och se och sen lös.
+
+                    var errro = ex.ToString();
                 }
 
                 //if (ListEndText.Count >= 11)
@@ -2479,7 +2596,7 @@ namespace OlcSideScrollingConsoleGame
                             ButtonsHasGoneIdle = false;
                             return;
                         }
-                        else if (devState == Enum.DevState.GoToEnding)
+                        else if (devState == Enum.DevState.GoToEnding || devState == Enum.DevState.GoToEndingNearPrefect || devState == Enum.DevState.GoToEndingPertect || devState == Enum.DevState.GoToEndingDone)
                         {
                             // sim ending 
                             hasAccumulatedAllSpeed = false;

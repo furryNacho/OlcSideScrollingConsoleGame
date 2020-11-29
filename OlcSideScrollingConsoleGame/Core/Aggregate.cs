@@ -16,7 +16,10 @@ namespace OlcSideScrollingConsoleGame.Core
     {
         private static readonly object padlock = new object();
         private static Aggregate instance = null;
-
+        /// <summary>
+        /// Toggle error logging on or off
+        /// </summary>
+        private bool EnableWriteToLog { get; set; } = false;
         Aggregate()
         {
         }
@@ -56,7 +59,7 @@ namespace OlcSideScrollingConsoleGame.Core
         internal void Load(Program game)
         {
             ThisGame = game;
-            ReadWrite = new ReadWrite();
+            ReadWrite = new ReadWrite(EnableWriteToLog);
             LoadSprites();
             LoadAllMapData();
             LoadMaps();
@@ -103,6 +106,14 @@ namespace OlcSideScrollingConsoleGame.Core
                 Sound.loadSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd);
                 Sound.loopSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundEnd);
 
+                Sound.loadSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGNearPerfectEnd);
+                Sound.loopSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGNearPerfectEnd); 
+
+                Sound.loadSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGPerfectEnd);
+                Sound.loopSound(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGPerfectEnd);
+                // pefect end?
+                // just done?
+
 
                 if (Settings != null)
                     if (Settings.AudioOn)
@@ -122,11 +133,7 @@ namespace OlcSideScrollingConsoleGame.Core
             }
         }
 
-        //används direkt på Sound ifrån program..
-        //private void UnLoadSound()
-        //{
-        //    Sound.cleanUp();
-        //}
+
 
         private void LoadSprites()
         {

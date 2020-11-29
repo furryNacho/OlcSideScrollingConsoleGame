@@ -13,10 +13,26 @@ namespace OlcSideScrollingConsoleGame.Core
         private string Root { get; set; }
         public string GetRoot { get { return Root; } }
 
-        public ReadWrite()
+        private bool EnableWriteToLog { get; set; }
+
+
+        public ReadWrite(bool enableWriteToLog = false)
         {
-            Root = System.IO.Path.Combine(Environment.CurrentDirectory);
+            EnableWriteToLog = enableWriteToLog;
+            Root = GetCorrectPath();
         }
+
+        private string GetCorrectPath()
+        {
+            //Fuckar up och ger tillbaka min path på andras maskiner.. wtf
+            Root = System.IO.Path.Combine(Environment.CurrentDirectory);
+            
+            //
+            var BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+           
+            return BaseDirectory;
+        }
+
 
         public T ReadJson<T>(string FilePath, string FileName, string FileExtension, bool CreateFile = true)
         {
@@ -62,17 +78,20 @@ namespace OlcSideScrollingConsoleGame.Core
 
         public void WriteToLog(string Msg)
         {
-            var fullDirectory = CreateIfNotExists("\\Log", "\\log", ".txt");
-            string[] lines = {
-                "--------------------------------"+DateTime.Now+"--------------------------------",
-                Msg,
-                "END"
-            };
-
-            using (StreamWriter writer = new StreamWriter(fullDirectory, true))
+            if (EnableWriteToLog)
             {
-                foreach (var line in lines)
-                    writer.WriteLine(line);
+                var fullDirectory = CreateIfNotExists("\\Log", "\\log", ".txt");
+                string[] lines = {
+                    "--------------------------------"+DateTime.Now+"--------------------------------",
+                    Msg,
+                    "END"
+                };
+
+                using (StreamWriter writer = new StreamWriter(fullDirectory, true))
+                {
+                    foreach (var line in lines)
+                        writer.WriteLine(line);
+                }
             }
         }
 
