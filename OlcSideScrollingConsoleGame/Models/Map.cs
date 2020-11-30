@@ -2035,6 +2035,8 @@ namespace OlcSideScrollingConsoleGame.Models
 
                     // Flag this is final stage
                     //Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd = true;
+                    Core.Aggregate.Instance.HasSwitchedState = true;
+
                 }
                 Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 8;
                 Script.AddCommand(new CommandChangeMap((target as Teleport).MapName, (target as Teleport).MapPosX, (target as Teleport).MapPosY));

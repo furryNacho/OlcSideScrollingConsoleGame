@@ -37,7 +37,7 @@ namespace OlcSideScrollingConsoleGame.Core
                 }
             }
         }
-
+        public bool HasSwitchedState { get; set; } = false;
         public Program ThisGame { get; set; }
         public ReadWrite ReadWrite { get; set; }
         private Dictionary<string, Sprite> MapSprites { get; set; } = new Dictionary<string, Sprite>();
@@ -133,8 +133,6 @@ namespace OlcSideScrollingConsoleGame.Core
             }
         }
 
-
-
         private void LoadSprites()
         {
             LoadSprite("tilesheetspring", PathSprites, @"\tilesheetspring", ".png");
@@ -144,8 +142,8 @@ namespace OlcSideScrollingConsoleGame.Core
 
 
             LoadSprite("tilesheetwm", PathSprites, @"\tilesheetwm", ".png"); // tile sheet
-            LoadSprite("tilesheetone", PathSprites, @"\tilesheetone", ".png"); // tile sheet
-            LoadSprite("tilesheettwo", PathSprites, @"\tilesheettwo", ".png"); // tile sheet
+            //LoadSprite("tilesheetone", PathSprites, @"\tilesheetone", ".png"); // tile sheet
+            //LoadSprite("tilesheettwo", PathSprites, @"\tilesheettwo", ".png"); // tile sheet
             LoadSprite("font", PathSprites, @"\font", ".png"); // font
             LoadSprite("hero", PathSprites, @"\hero", ".png"); // hero
             /*LoadSprite("energi", PathSprites, @"\energi", ".png");*/ // energi
@@ -158,7 +156,7 @@ namespace OlcSideScrollingConsoleGame.Core
             LoadSprite("enemythree", PathSprites, @"\enemythree", ".png");
             LoadSprite("enemyboss", PathSprites, @"\enemyboss", ".png");
 
-            LoadSprite("cord", PathSprites, @"\cord", ".bmp"); // tile sheet that is coordinates
+            //LoadSprite("cord", PathSprites, @"\cord", ".bmp"); // tile sheet that is coordinates
 
 
             LoadSprite("splashstart", PathSprites, @"\splashstart", ".png");

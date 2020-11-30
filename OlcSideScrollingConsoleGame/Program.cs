@@ -1519,46 +1519,7 @@ namespace OlcSideScrollingConsoleGame
             if (typeOfEnding == Enum.TypeOfEnding.Perfect)
             {
                 //100% av alla energier och 100% hälsa kvar
-                #region test text
-
-                //ListEndTextMall = new List<string>()
-                //    {
-                //      "\"Please bring strange things.",
-                //      "Please come bringing new things.",
-                //      "Let very old things come into",
-                //      " your hands.",
-                //      "Let what you do not know come",
-                //      " into your eyes.",
-                //      "Let desert sand harden your",
-                //      " feet.",
-                //      "Let the arch of your feet be",
-                //      " the mountains.",
-                //      "Let the paths of your",
-                //      " fingertips be your maps",
-                //      "And the ways you go be the",
-                //      " lines of your palms.",
-                //      "Let there be deep snow in your",
-                //      " inbreathing",
-                //      "And your outbreath be the",
-                //      " shining of ice.",
-                //      "May your mouth contain the",
-                //      " shapes of strange words.",
-                //      "May you smell food cooking",
-                //      " you have not eaten.",
-                //      "May the spring of a foreign",
-                //      " river be your navel.",
-                //      "May your soul be at home where",
-                //      " there are no houses.",
-                //      "Walk carefully, well-loved one,",
-                //      "Walk mindfully, well-loved one,",
-                //      "Walk fearlessly, well-loved one.",
-                //      "Return with us, return to us,",
-                //      "Be always coming home.\"",
-                //      "-Ursula K. Le Guin",
-                //      //"Time "+EndTotalTime.ToString("hh':'mm':'ss"),
-                //      "Press any button -to exit"
-                //    };
-                #endregion
+               
 
                 ListEndTextMall = new List<string>()
                     {
@@ -1605,52 +1566,7 @@ namespace OlcSideScrollingConsoleGame
             else if (typeOfEnding == Enum.TypeOfEnding.NerePerfect)
             {
                 // 100% av alla energier, fast tog skada
-                #region test text
-
-                //ListEndTextMall = new List<string>()
-                //    {
-                //     "\"When I take you to the Valley," ,
-                //     "you'll see the blue hills on" ,
-                //     "the left and the blue hills on" ,
-                //     "the right, the rainbow and the" ,
-                //     "vineyards under the rainbow" ,
-                //     "late in the rainy season," ,
-                //     "and maybe you'll say," ,
-                //     "'There it is, that's it!'" ,
-                //     "But I'll say." ,
-                //     "'A little farther.'" ,
-                //     "We'll go on, I hope," ,
-                //     "and you'll see the roofs of" ,
-                //     "the little towns and the" ,
-                //     "hillsides yellow with wild" ,
-                //     "oats, a buzzard soaring" ,
-                //     "and a woman singing by the" ,
-                //     "shadows of a creek in the dry" ,
-                //     "season, and maybe you'll say," ,
-                //     "'Let's stop here, this is it!'" ,
-                //     " But I'll say," ,
-                //     "'A little farther yet.'" ,
-                //     "We'll go on, and you'll hear" ,
-                //     "the quail calling on the" ,
-                //     "mountain by the springs" ,
-                //     "of the river," ,
-                //     "and looking back you'll see" ,
-                //     "the river running downward" ,
-                //     "through the wild hills behind," ,
-                //     "below, and you'll say," ,
-                //     "'Isn't that the Valley?'" ,
-                //     "And all I will be able",
-                //     "to say is" ,
-                //     "'Drink this water of the spring," ,
-                //     "rest here awhile," ,
-                //     "we have a long way yet to go" ,
-                //     "and I can't go without you.'\"",
-                //     "-Ursula K. Le Guin",
-                //     //"Time "+EndTotalTime.ToString("hh':'mm':'ss"),
-                //     "Press any button -to exit"
-                //    };
-
-                #endregion
+              
 
 
                 ListEndTextMall = new List<string>()
@@ -1714,7 +1630,7 @@ namespace OlcSideScrollingConsoleGame
                       "and then ported to C# by",
                       "DevChrome.",
                       "The music was created by",
-                      "Fisk i fickorna.",
+                      "Fiskifickorna.",
                       "And the guy who put it",
                       "all together goes by",
                       "the name",
@@ -2173,7 +2089,7 @@ namespace OlcSideScrollingConsoleGame
                     "Game Engine Port:",
                     "DevChrome",
                     "Music and Sound:",
-                    "Fisk i fickorna",
+                    "Fiskifickorna",
                     "",
                     "Back"
                  };
@@ -3504,9 +3420,10 @@ namespace OlcSideScrollingConsoleGame
 
             Audio.Library.Sound playSounds = null;
 
-            if (HasSwitchedState)
+            if (HasSwitchedState || Core.Aggregate.Instance.HasSwitchedState)
             {
                 HasSwitchedState = false;
+                Core.Aggregate.Instance.HasSwitchedState = false;
 
                 // gå igenom listDynamics kolla picups. finns id i EnergiIdLista ta bort från listDynamics
                 listDynamics.RemoveAll(x => EnergiIdLista.Any(y => y == x.CoinId));
@@ -3530,6 +3447,11 @@ namespace OlcSideScrollingConsoleGame
                     }
                     else
                     {
+                        if (Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundGame))
+                        {
+                            Core.Aggregate.Instance.Sound.stop(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundGame);
+                        }
+
                         if (!Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundFinalStage))
                         {
                             Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
