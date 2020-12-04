@@ -60,16 +60,19 @@ namespace OlcSideScrollingConsoleGame.Core
         {
             ThisGame = game;
             ReadWrite = new ReadWrite(EnableWriteToLog);
+            LoadSettings();
+
             LoadSprites();
             LoadAllMapData();
             LoadMaps();
             LoadItems();
             Script = new ScriptProcessor();
 
-            LoadSettings(); 
+
             LoadHighScore();
 
-            LoadSound();
+            if (Settings != null && !Settings.Mute)
+                LoadSound();
 
         }
 
@@ -129,7 +132,8 @@ namespace OlcSideScrollingConsoleGame.Core
             catch (Exception ex)
             {
 
-                throw;
+                ReadWrite.WriteToLog(String.Format("LoadSound - Could not load sound. {0}", ex.ToString()));
+                Sound = null;
             }
         }
 
@@ -261,6 +265,16 @@ namespace OlcSideScrollingConsoleGame.Core
         private void LoadSettings()
         {
             Settings = ReadWrite.ReadJson<SettingsObj>(PathSettings, @"\settings", ".json");
+
+            if (Settings != null)
+            {
+                EnableWriteToLog = Settings.Log;
+                if (Settings.Log)
+                {
+                    ReadWrite = new ReadWrite(EnableWriteToLog);
+                }
+               
+            }
         }
 
         public bool SaveSettings()

@@ -124,7 +124,7 @@ namespace OlcSideScrollingConsoleGame
             }
             catch (Exception ex)
             {
-                Core.Aggregate.Instance.ReadWrite.WriteToLog(ex.ToString());
+                Core.Aggregate.Instance.ReadWrite.WriteToLog("main "+ex.ToString());
             }
         }
 
@@ -434,12 +434,14 @@ namespace OlcSideScrollingConsoleGame
                         if (SelectedOption.Display == "Turn Sound On")
                         {
                             Core.Aggregate.Instance.Settings.AudioOn = true;
-                            Core.Aggregate.Instance.Sound.unMute();
+                            if(Core.Aggregate.Instance.Sound != null)
+                                 Core.Aggregate.Instance.Sound.unMute();
                         }
                         else if (SelectedOption.Display == "Turn Sound Off")
                         {
                             Core.Aggregate.Instance.Settings.AudioOn = false;
-                            Core.Aggregate.Instance.Sound.mute();
+                            if (Core.Aggregate.Instance.Sound != null)
+                                Core.Aggregate.Instance.Sound.mute();
                         }
 
                         Core.Aggregate.Instance.SaveSettings();
@@ -847,7 +849,7 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 // OK
-                if (ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || IIP.Button0))
+                if (ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || GetKey(Key.X).Pressed || IIP.Button0))
                 {
                     ButtonsHasGoneIdle = false;
                     if (Select == 3) //nollindex, select är på sista valet
@@ -987,9 +989,10 @@ namespace OlcSideScrollingConsoleGame
 
             if (HasSwitchedState)
             {
-                Core.Aggregate.Instance.Sound.stop();
+                if (Core.Aggregate.Instance.Sound != null)
+                    Core.Aggregate.Instance.Sound.stop();
 
-                HasSwitchedState = false;
+                //HasSwitchedState = false;
                 if (Core.Aggregate.Instance.Sound != null)
                 {
 
@@ -1521,6 +1524,7 @@ namespace OlcSideScrollingConsoleGame
                 //100% av alla energier och 100% hälsa kvar
                
 
+
                 ListEndTextMall = new List<string>()
                     {
                        "So I came with weirdos.",
@@ -1718,7 +1722,7 @@ namespace OlcSideScrollingConsoleGame
                 {
                     // TODO: har inte sökt så noga på vad det är som göra att man kommer hit om man avslutar. men testa med olika mode och se och sen lös.
 
-                    var errro = ex.ToString();
+                    Core.Aggregate.Instance.ReadWrite.WriteToLog("DrawEndTextList " + ex.ToString());
                 }
 
                 //if (ListEndText.Count >= 11)
@@ -2027,7 +2031,8 @@ namespace OlcSideScrollingConsoleGame
                 return;
             }
 
-            Core.Aggregate.Instance.Sound.pause();
+            if (Core.Aggregate.Instance.Sound != null)
+                Core.Aggregate.Instance.Sound.pause();
 
             this.Clear((Pixel)Pixel.Presets.Black);
 
@@ -2486,7 +2491,7 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 // A ("jump button")
-                if (ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || IIP.Button0))
+                if (ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || GetKey(Key.X).Pressed || IIP.Button0))
                 {
                     // TODO : hantera vilken värld man ska till
                     if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 1)
@@ -3418,7 +3423,7 @@ namespace OlcSideScrollingConsoleGame
         {
             Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
 
-            Audio.Library.Sound playSounds = null;
+            //Audio.Library.Sound playSounds = null;
 
             if (HasSwitchedState || Core.Aggregate.Instance.HasSwitchedState)
             {
@@ -3428,8 +3433,9 @@ namespace OlcSideScrollingConsoleGame
                 // gå igenom listDynamics kolla picups. finns id i EnergiIdLista ta bort från listDynamics
                 listDynamics.RemoveAll(x => EnergiIdLista.Any(y => y == x.CoinId));
 
-                playSounds = Core.Aggregate.Instance.Sound;
-                if (playSounds != null)
+                // playSounds = Core.Aggregate.Instance.Sound;
+                // if (playSounds != null)
+                if (Core.Aggregate.Instance.Sound != null)
                 {
                     if (Core.Aggregate.Instance.Sound.isPlaying(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.BGSoundWorld))
                     {
@@ -3480,7 +3486,9 @@ namespace OlcSideScrollingConsoleGame
 
             if (listDynamics == null || listDynamics.Count <= 0)
             {
+                Core.Aggregate.Instance.ReadWrite.WriteToLog("listDynamics");
                 throw new Exception();
+
             }
 
 
@@ -3493,7 +3501,7 @@ namespace OlcSideScrollingConsoleGame
             if (Focus)
             {
                 //B
-                if (IIP.Button1 || IIP.Button2 || GetKey(Key.B).Down)
+                if (IIP.Button1 || IIP.Button2 || GetKey(Key.B).Down || GetKey(Key.Z).Down)
                 {
                     BPower = true;
                 }
@@ -3531,7 +3539,7 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 //Jump 
-                if (GetKey(Key.Space).Down || IIP.Button0 || IIP.Button3)
+                if (GetKey(Key.Space).Down || GetKey(Key.X).Down || IIP.Button0 || IIP.Button3)
                 {
                     if (JumpButtonDownReleaseOnce) // hoppknapp måste ha släppts, hjälten måste vara airborn
                         jumpMemory = 5;
@@ -3592,7 +3600,7 @@ namespace OlcSideScrollingConsoleGame
 
                     JumpButtonDownReleaseOnce = false;
                 }
-                else if (!GetKey(Key.Space).Pressed || !IIP.Button0)
+                else if (!GetKey(Key.Space).Pressed || GetKey(Key.X).Pressed || !IIP.Button0)
                 {
                     JumpButtonDownReleaseOnce = true;
 
@@ -4596,15 +4604,15 @@ namespace OlcSideScrollingConsoleGame
                                         //
                                         //Plocka upp energi
                                         //
-                                        if (playSounds != null)
-                                        {
-                                            //TODO: ljud plocka upp energi
-                                            //if (!Core.Aggregate.Instance.Sound.isPlaying("puttekong.wav"))
-                                            //{
-                                            //    Core.Aggregate.Instance.Sound.play("puttekong.wav");
-                                            //}
+                                        //if (playSounds != null)
+                                        //{
+                                        //    //TODO: ljud plocka upp energi
+                                        //    //if (!Core.Aggregate.Instance.Sound.isPlaying("puttekong.wav"))
+                                        //    //{
+                                        //    //    Core.Aggregate.Instance.Sound.play("puttekong.wav");
+                                        //    //}
 
-                                        }
+                                        //}
                                         if (Core.Aggregate.Instance.Sound != null)
                                             if (Hero.IsAttackable)
                                                 Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.PickUp);  // TODO: ljud för att plocka upp
@@ -4831,7 +4839,7 @@ namespace OlcSideScrollingConsoleGame
 
                 //this.Machine.Switch(Enum.State.GameMap);
 
-                if (GetKey(Key.Space).Pressed || IIP.Button0)
+                if (GetKey(Key.Space).Pressed || GetKey(Key.X).Pressed || IIP.Button0)
                 {
                     Reset();
                     //this.Machine.Switch(Enum.State.WorldMap);

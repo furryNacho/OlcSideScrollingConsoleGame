@@ -41,6 +41,8 @@ namespace OlcSideScrollingConsoleGame.Models
         public SaveSlotMainObj SaveSlotsObjs { get; set; } = new SaveSlotMainObj();
 
         //public bool ShowEnd { get; set; }
+        public bool Log { get; set; } = false;
+        public bool Mute { get; set; } = false;
     }
 
     public class SaveSlotMainObj

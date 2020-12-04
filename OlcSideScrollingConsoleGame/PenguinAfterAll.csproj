@@ -64,7 +64,8 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Audio.Library">
+    <Reference Include="Audio.Library, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Audio.Library.dll</HintPath>
     </Reference>
     <Reference Include="Gamepad.Library">
