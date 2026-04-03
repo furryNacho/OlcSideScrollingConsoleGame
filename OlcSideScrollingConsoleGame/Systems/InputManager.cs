@@ -24,11 +24,11 @@ namespace OlcSideScrollingConsoleGame.Systems
         /// 0 = spelaren har släppt hoppknapp.
         /// 1–3 = antal frames spelaren hållt nere hoppknappen.
         /// </summary>
-        public int JumpButtonState { get; private set; }
-        public bool JumpButtonPressRelease { get; private set; }
-        public bool JumpButtonDownRelease { get; set; }        // set: jump-systemet nollställer
+        public int  JumpButtonState           { get; set; }   // set: Program.cs justerar per frame
+        public bool JumpButtonPressRelease    { get; set; }   // set: jump-systemet nollställer
+        public bool JumpButtonDownRelease     { get; set; }   // set: jump-systemet nollställer
         public bool JumpButtonDownReleaseOnce { get; set; }   // set: jump-systemet nollställer
-        public int JumpButtonCounter { get; private set; }
+        public int  JumpButtonCounter         { get; set; }   // set: jump-systemet nollställer
 
         // ─────────────────────────────────────────────
         // Idle-tillstånd (menyer väntar på att knapparna gått i vila)
@@ -118,6 +118,7 @@ namespace OlcSideScrollingConsoleGame.Systems
         public bool IsPausePressed   => _game.GetKey(Key.Escape).Pressed || _iip.Button7;
 
         public bool IsRunDown        => _game.GetKey(Key.Z).Down    || _iip.Button1;
+        public bool IsSelectDown     => _iip.Button6;   // gamepad Select-knapp
         public bool IsRunPressed     => _game.GetKey(Key.Z).Pressed || _iip.Button1;
 
         public bool IsAnyKeyPressed  => _game.GetKey(Key.Any).Pressed;

@@ -40,15 +40,17 @@ namespace OlcSideScrollingConsoleGame.Systems
         bool IsCancelPressed  { get; }
         bool IsPausePressed   { get; }
         bool IsRunDown        { get; }
+        bool IsSelectDown     { get; }
         bool IsAnyKeyPressed  { get; }
 
         // ─────────────────────────────────────────────
         // Hoppknappens tillstånd (komplex logik)
         // ─────────────────────────────────────────────
-        int  JumpButtonState           { get; }
+        int  JumpButtonState           { get; set; }   // Program.cs hanterar dessa tillsammans med InputManager
+        bool JumpButtonPressRelease    { get; set; }
         bool JumpButtonDownRelease     { get; set; }
         bool JumpButtonDownReleaseOnce { get; set; }
-        int  JumpButtonCounter         { get; }
+        int  JumpButtonCounter         { get; set; }
 
         // ─────────────────────────────────────────────
         // Idle-tillstånd

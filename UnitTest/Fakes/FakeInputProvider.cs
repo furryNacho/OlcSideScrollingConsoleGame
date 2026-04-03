@@ -24,17 +24,19 @@ namespace UnitTest.Fakes
         public bool IsDownReleased  { get; set; }
 
         // Actionknappar
-        public bool IsJumpDown      { get; set; }
-        public bool IsJumpPressed   { get; set; }
-        public bool IsJumpReleased  { get; set; }
+        public bool IsJumpDown       { get; set; }
+        public bool IsJumpPressed    { get; set; }
+        public bool IsJumpReleased   { get; set; }
         public bool IsConfirmPressed { get; set; }
         public bool IsCancelPressed  { get; set; }
         public bool IsPausePressed   { get; set; }
         public bool IsRunDown        { get; set; }
+        public bool IsSelectDown     { get; set; }
         public bool IsAnyKeyPressed  { get; set; }
 
         // Hoppknappens tillstånd
         public int  JumpButtonState           { get; set; }
+        public bool JumpButtonPressRelease    { get; set; }
         public bool JumpButtonDownRelease     { get; set; }
         public bool JumpButtonDownReleaseOnce { get; set; }
         public int  JumpButtonCounter         { get; set; }
