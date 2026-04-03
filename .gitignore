@@ -338,3 +338,25 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+# -------------------------------------------------------
+# Game assets – lokala filer, checkas inte in i git
+# Läggs till manuellt lokalt för att kunna köra spelet
+# -------------------------------------------------------
+
+# Sprites
+Resources/Assets/Sprites/*.png
+Resources/Assets/Sprites/*.bmp
+Resources/Assets/Sprites/*.jpg
+
+# Kartor (genereras av FurryNachoLevelEditor)
+Resources/Assets/MapData/*.json
+
+# Ljud och musik
+Resources/Assets/Sound/*.wav
+Resources/Assets/Sound/*.mp3
+Resources/Assets/Sound/*.ogg
+
+# Inställningar och highscore (genereras vid körning)
+Resources/Settings/settings.json
+Resources/Settings/highscore.json

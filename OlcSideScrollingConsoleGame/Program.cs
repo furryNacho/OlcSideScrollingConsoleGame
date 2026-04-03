@@ -27,6 +27,7 @@ using OlcSideScrollingConsoleGame.Models.Objects;
 using OlcSideScrollingConsoleGame.Models.Items;
 using OlcSideScrollingConsoleGame.Commands;
 using OlcSideScrollingConsoleGame.Models;
+using OlcSideScrollingConsoleGame.Global;
 using System.Threading;
 
 namespace OlcSideScrollingConsoleGame
@@ -96,14 +97,12 @@ namespace OlcSideScrollingConsoleGame
         private bool JumpButtonDownReleaseOnce { get; set; }
         private int JumpButtonCounter { get; set; }
 
-        const int ScreenW = 256;
-        //const int ScreenH = 240;
-        //const int ScreenW = 256;
-        //const int ScreenH = 192;
-        const int ScreenH = 224;
-        const int PixW = 4;//4
-        const int PixH = 4;//4
-        const int FrameR = -1;
+        // Skärm- och renderkonstanter delegerade till GameConstants
+        const int ScreenW  = GameConstants.ScreenWidth;
+        const int ScreenH  = GameConstants.ScreenHeight;
+        const int PixW     = GameConstants.PixelWidth;
+        const int PixH     = GameConstants.PixelHeight;
+        const int FrameR   = GameConstants.FrameRate;
 
         private TimeSpan ActualTotalTime { get; set; }
         private TimeSpan GameTotalTime { get; set; }
