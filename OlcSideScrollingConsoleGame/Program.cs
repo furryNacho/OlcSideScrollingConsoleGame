@@ -22,12 +22,12 @@ using System.Text;
 using System.Threading.Tasks;
 using PixelEngine;
 using PixelEngine.Utilities;
-using Gamepad.Library;
 using OlcSideScrollingConsoleGame.Models.Objects;
 using OlcSideScrollingConsoleGame.Models.Items;
 using OlcSideScrollingConsoleGame.Commands;
 using OlcSideScrollingConsoleGame.Models;
 using OlcSideScrollingConsoleGame.Global;
+using OlcSideScrollingConsoleGame.Systems;
 using System.Threading;
 
 namespace OlcSideScrollingConsoleGame
@@ -53,9 +53,7 @@ namespace OlcSideScrollingConsoleGame
 
         private StateMachine<Enum.State> Machine { get; set; }
         private Creature Hero { get; set; }
-        public SlimDXGamepad SlimDx { get; set; }
-        public IsItPressed IIP { get; set; }
-        private bool ButtonsHasGoneIdle { get; set; }
+        private IInputProvider _input;
 
         private bool HasSwitchedState { get; set; } = false;
 
@@ -88,14 +86,6 @@ namespace OlcSideScrollingConsoleGame
         /// 0 = Hjälten är inte på marken. Mellan 1 till 3 så länge har hjälten varit på marken. 
         /// </summary>
         private int HeroLandedState { get; set; }
-        /// <summary>
-        /// 0 = Spelare har släppt hoppknapp. Mellan 1 till 3 så länge har spelaren hållt nere hoppknappen
-        /// </summary>
-        private int JumpButtonState { get; set; }
-        private bool JumpButtonPressRelease { get; set; }
-        private bool JumpButtonDownRelease { get; set; }
-        private bool JumpButtonDownReleaseOnce { get; set; }
-        private int JumpButtonCounter { get; set; }
 
         // Skärm- och renderkonstanter delegerade till GameConstants
         const int ScreenW  = GameConstants.ScreenWidth;
@@ -147,11 +137,7 @@ namespace OlcSideScrollingConsoleGame
             //ChangeMap("mapone", 5, 5, Hero);
             ChangeMap("worldmap", 2, 3, Hero);
 
-
-            SlimDx = new SlimDXGamepad();
-            SlimDx.SetUp();
-            IIP = SlimDx.IIP;
-            SlimDx.timer_Tick();
+            _input = new InputManager(this);
 
             SpriteFont = Core.Aggregate.Instance.GetSprite("font");
             SpriteItems = Core.Aggregate.Instance.GetSprite("items");
@@ -205,8 +191,7 @@ namespace OlcSideScrollingConsoleGame
 
             this.Clear((Pixel)Pixel.Presets.Black);
 
-            SlimDx.timer_Tick();
-            IIP = SlimDx.IIP;
+            _input.Poll();
 
             //What to draw
             string header = "";
@@ -370,12 +355,12 @@ namespace OlcSideScrollingConsoleGame
             if (Focus)
             {
                 //Button spam lock  
-                if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
+                if (!_input.ButtonsHasGoneIdle && _input.IsIdle && !GetKey(Key.Any).Pressed)
                 {
-                    ButtonsHasGoneIdle = true;
+                    _input.ButtonsHasGoneIdle = true;
                 }
                 //Up
-                if (ButtonsHasGoneIdle && (GetKey(Key.Up).Pressed || IIP.up))
+                if (_input.ButtonsHasGoneIdle && (_input.IsUpPressed))
                 {
 
                     if (SettingsSelectIndex <= 1)
@@ -387,10 +372,10 @@ namespace OlcSideScrollingConsoleGame
                         SettingsSelectIndex--;
                     }
 
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                 }
                 //Down
-                if (ButtonsHasGoneIdle && (GetKey(Key.Down).Pressed || IIP.down))
+                if (_input.ButtonsHasGoneIdle && (_input.IsDownPressed))
                 {
 
                     if (SettingsSelectIndex >= options.Count)
@@ -402,19 +387,19 @@ namespace OlcSideScrollingConsoleGame
                         SettingsSelectIndex++;
                     }
 
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                 }
 
                 // Select
-                if (ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || IIP.Button7 || IIP.Button0))
+                if (_input.ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || _input.IsCancelPressed || _input.IsJumpDown))
                 {
                     var SelectedOption = options[SettingsSelectIndex - 1];
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
 
                     //Back to menu
                     if (SelectedOption.OptionIsBack)
                     {
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
                         HasSwitchedState = true;
 
                         if (MenuState == Enum.MenuState.Load)
@@ -428,7 +413,7 @@ namespace OlcSideScrollingConsoleGame
                     }
                     else if (MenuState == Enum.MenuState.Audio)
                     {
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
 
                         if (SelectedOption.Display == "Turn Sound On")
                         {
@@ -453,7 +438,7 @@ namespace OlcSideScrollingConsoleGame
                             Core.Aggregate.Instance.ResetHighScore();
 
                             MenuState = Enum.MenuState.SettingsMenu;
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             HasSwitchedState = true;
                             this.Machine.Switch(Enum.State.Menu);
 
@@ -461,7 +446,7 @@ namespace OlcSideScrollingConsoleGame
                         else if (SelectedOption.Display == "No")
                         {
                             MenuState = Enum.MenuState.SettingsMenu;
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             HasSwitchedState = true;
                             this.Machine.Switch(Enum.State.Menu);
                         }
@@ -469,7 +454,7 @@ namespace OlcSideScrollingConsoleGame
                     }
                     else if (MenuState == Enum.MenuState.ClearSavedGame)
                     {
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
 
                         if (SelectedOption.OptionIsSlotOne)
                         {
@@ -490,7 +475,7 @@ namespace OlcSideScrollingConsoleGame
                     }
                     else if (MenuState == Enum.MenuState.Load)
                     {
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
 
                         if (SelectedOption.SlotIsUsed)
                         {
@@ -509,14 +494,14 @@ namespace OlcSideScrollingConsoleGame
 
                             this.Machine.Switch(Enum.State.WorldMap);
                             HasSwitchedState = true;
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                         }
 
                     }
                     else if (MenuState == Enum.MenuState.Save)
                     {
                         //Spara spelet (indikera att spelet är sparat)
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
 
                         if (SelectedOption.OptionIsSlotOne)
                         {
@@ -579,8 +564,7 @@ namespace OlcSideScrollingConsoleGame
             Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
             this.Clear((Pixel)Pixel.Presets.Black);
 
-            SlimDx.timer_Tick();
-            IIP = SlimDx.IIP;
+            _input.Poll();
 
             List<HighScoreEnterName> ActionPlaceholder = new List<HighScoreEnterName>();
 
@@ -790,26 +774,26 @@ namespace OlcSideScrollingConsoleGame
             if (Focus)
             {
                 //Button spam lock  
-                if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
+                if (!_input.ButtonsHasGoneIdle && _input.IsIdle && !GetKey(Key.Any).Pressed)
                 {
-                    ButtonsHasGoneIdle = true;
+                    _input.ButtonsHasGoneIdle = true;
                 }
 
                 //Selecting part
-                if (ButtonsHasGoneIdle && (GetKey(Key.Left).Released || IIP.left))
+                if (_input.ButtonsHasGoneIdle && (_input.IsLeftReleased))
                 {
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                     HSSelectX--;
                 }
-                if (ButtonsHasGoneIdle && (GetKey(Key.Right).Released || IIP.right))
+                if (_input.ButtonsHasGoneIdle && (_input.IsRightReleased))
                 {
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                     HSSelectX++;
                 }
 
-                if (ButtonsHasGoneIdle && (GetKey(Key.Up).Released || IIP.up))
+                if (_input.ButtonsHasGoneIdle && (_input.IsUpReleased))
                 {
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                     if (Select < 3)
                     {
                         var newVal = NameInAscii[Select] + 1;
@@ -818,9 +802,9 @@ namespace OlcSideScrollingConsoleGame
                         NameInAscii[Select] = newVal;
                     }
                 }
-                if (ButtonsHasGoneIdle && (GetKey(Key.Down).Released || IIP.down))
+                if (_input.ButtonsHasGoneIdle && (_input.IsDownReleased))
                 {
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                     if (Select < 3)
                     {
                         var newVal = NameInAscii[Select] - 1;
@@ -836,11 +820,11 @@ namespace OlcSideScrollingConsoleGame
                 if (HSSelectY >= 4) HSSelectY = 0;
 
 
-                //if (ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !IIP.idle))
-                if (ButtonsHasGoneIdle && (GetKey(Key.Escape).Pressed || IIP.Button7))
+                //if (_input.ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !_input.IsIdle))
+                if (_input.ButtonsHasGoneIdle && (_input.IsCancelPressed))
                 {
 
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                     MenuState = Enum.MenuState.StartMenu;
                     this.Machine.Switch(Enum.State.Menu);
                     HasSwitchedState = true;
@@ -848,9 +832,9 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 // OK
-                if (ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || GetKey(Key.X).Pressed || IIP.Button0))
+                if (_input.ButtonsHasGoneIdle && (_input.IsConfirmPressed))
                 {
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                     if (Select == 3) //nollindex, select är på sista valet
                     {
                         var highScoreName = "";
@@ -872,7 +856,7 @@ namespace OlcSideScrollingConsoleGame
                         //Core.Aggregate.Instance.ResetHighScore();
 
 
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
                         this.Machine.Switch(Enum.State.HighScore);
                         HasSwitchedState = true;
 
@@ -905,23 +889,22 @@ namespace OlcSideScrollingConsoleGame
             Core.Aggregate.Instance.Script.ProcessCommands(elapsed);
             this.Clear((Pixel)Pixel.Presets.Black);
 
-            SlimDx.timer_Tick();
-            IIP = SlimDx.IIP;
+            _input.Poll();
 
             //GameTotalTime = Clock.Total + ActualTotalTime;//temp
 
             if (Focus)
             {
                 //Button spam lock  
-                if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
+                if (!_input.ButtonsHasGoneIdle && _input.IsIdle && !GetKey(Key.Any).Pressed)
                 {
-                    ButtonsHasGoneIdle = true;
+                    _input.ButtonsHasGoneIdle = true;
                 }
 
-                if (ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !IIP.idle))
-                //if (ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || IIP.Button7))
+                if (_input.ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !_input.IsIdle))
+                //if (_input.ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || _input.IsCancelPressed))
                 {
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                     HasSwitchedState = true;
 
                     if (returnToEndAfterHighScore)
@@ -1052,7 +1035,7 @@ namespace OlcSideScrollingConsoleGame
                     {
                         returnToEndAfterHighScore = true;
 
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
                         this.Machine.Switch(Enum.State.EnterHighScore);
                         HasSwitchedState = true;
 
@@ -1067,8 +1050,7 @@ namespace OlcSideScrollingConsoleGame
 
             this.Clear((Pixel)Pixel.Presets.Black);
 
-            SlimDx.timer_Tick();
-            IIP = SlimDx.IIP;
+            _input.Poll();
 
             Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd = false;
 
@@ -1077,17 +1059,17 @@ namespace OlcSideScrollingConsoleGame
             {
 
                 //Button spam lock  
-                if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
+                if (!_input.ButtonsHasGoneIdle && _input.IsIdle && !GetKey(Key.Any).Pressed)
                 {
-                    ButtonsHasGoneIdle = true;
+                    _input.ButtonsHasGoneIdle = true;
                 }
 
-                if (ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !IIP.idle))
+                if (_input.ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !_input.IsIdle))
                 {
                     // TODO: om klar med spelet... Menu och eller reset. Kanske skulle ha reset som ett gamestate, där allt nollas och sätts igång
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
 
-                    if (typingEndTextIsDone || (GetKey(Key.P).Pressed || IIP.Button7))
+                    if (typingEndTextIsDone || (GetKey(Key.P).Pressed || _input.IsCancelPressed))
                     {
                         this.Machine.Switch(Enum.State.Menu);
                         HasSwitchedState = true;
@@ -1692,7 +1674,7 @@ namespace OlcSideScrollingConsoleGame
                         ListEndText[wordRowIndex - 1] = textRow;
                         //ListEndText.Add("asdfasdf");
                         skippTypingRow = false;
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
                         //continue;
                         break;
                     }
@@ -1942,15 +1924,14 @@ namespace OlcSideScrollingConsoleGame
             //}
 
 
-            SlimDx.timer_Tick();
-            IIP = SlimDx.IIP;
+            _input.Poll();
 
             //Input
             if (Focus)
             {
-                if (GetKey(Key.Any).Pressed || !IIP.idle)
+                if (GetKey(Key.Any).Pressed || !_input.IsIdle)
                 {
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                     MenuState = Enum.MenuState.StartMenu;
                     this.Machine.Switch(Enum.State.Menu);
                     HasSwitchedState = true;
@@ -2038,8 +2019,7 @@ namespace OlcSideScrollingConsoleGame
             string Header = "Menu";
 
 
-            SlimDx.timer_Tick();
-            IIP = SlimDx.IIP;
+            _input.Poll();
 
 
             var menuList = new List<string>();
@@ -2139,32 +2119,32 @@ namespace OlcSideScrollingConsoleGame
             if (Focus)
             {
                 //Button spam lock  
-                if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
+                if (!_input.ButtonsHasGoneIdle && _input.IsIdle && !GetKey(Key.Any).Pressed)
                 {
-                    ButtonsHasGoneIdle = true;
+                    _input.ButtonsHasGoneIdle = true;
                 }
 
                 //Up
-                if (selectedMenuItem > 1 && (GetKey(Key.Up).Pressed || IIP.up) && ButtonsHasGoneIdle)
+                if (selectedMenuItem > 1 && (_input.IsUpPressed) && _input.ButtonsHasGoneIdle)
                 {
                     if (MenuState != Enum.MenuState.CreditsMenu)
                     {
                         selectedMenuItem--;
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
                     }
                 }
 
                 //Down
-                if (selectedMenuItem < menuList.Count && (GetKey(Key.Down).Pressed || IIP.down) && ButtonsHasGoneIdle)
+                if (selectedMenuItem < menuList.Count && (_input.IsDownPressed) && _input.ButtonsHasGoneIdle)
                 {
                     selectedMenuItem++;
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                 }
 
                 // Select
-                if (ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || IIP.Button7 || IIP.Button0))
+                if (_input.ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || _input.IsCancelPressed || _input.IsJumpDown))
                 {
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
 
                     string selectedMenuItemString = menuList[selectedMenuItem - 1];
                     switch (selectedMenuItemString)
@@ -2180,7 +2160,7 @@ namespace OlcSideScrollingConsoleGame
                             //Core.Aggregate.Instance.SaveSettings(tempSaveSettings);
 
                             HasSwitchedState = true;
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
 
                             this.Machine.Switch(Enum.State.WorldMap);
 
@@ -2189,13 +2169,13 @@ namespace OlcSideScrollingConsoleGame
                             selectedMenuItem = 1;
                             this.Machine.Switch(Enum.State.WorldMap);
                             HasSwitchedState = true;
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             break;
                         case "Save":
                             selectedMenuItem = 1;
 
 
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             MenuState = Enum.MenuState.Save;
                             HasSwitchedState = true;
                             this.Machine.Switch(Enum.State.Settings);
@@ -2205,7 +2185,7 @@ namespace OlcSideScrollingConsoleGame
                         case "Load Saved Game":
                             selectedMenuItem = 1; // Kanske ska sätta till 2..
 
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             MenuState = Enum.MenuState.Load;
                             HasSwitchedState = true;
                             this.Machine.Switch(Enum.State.Settings);
@@ -2216,29 +2196,29 @@ namespace OlcSideScrollingConsoleGame
                             //this.Machine.Switch(Enum.State.Settings);
                             //HasSwitchedState = true;
                             MenuState = Enum.MenuState.SettingsMenu;
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             break;
                         case "Audio":
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             MenuState = Enum.MenuState.Audio;
                             HasSwitchedState = true;
                             this.Machine.Switch(Enum.State.Settings);
                             break;
                         case "Clear High Score":
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             MenuState = Enum.MenuState.ClearHighScore;
                             HasSwitchedState = true;
                             this.Machine.Switch(Enum.State.Settings);
                             break;
                         case "Clear Saved Game":
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             MenuState = Enum.MenuState.ClearSavedGame;
                             HasSwitchedState = true;
                             this.Machine.Switch(Enum.State.Settings);
                             break;
                         case "Back":
                             selectedMenuItem = 1;
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
 
                             //if (MenuState == Enum.MenuState.StartMenu)
                             //{
@@ -2255,7 +2235,7 @@ namespace OlcSideScrollingConsoleGame
                             //TODO: go back to main menu
                             //Core.Aggregate.Instance.GetSettings().GameHasStarted = false;
                             MenuState = Enum.MenuState.StartMenu;
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
 
                             break;
                         case "Exit Game":
@@ -2267,19 +2247,19 @@ namespace OlcSideScrollingConsoleGame
                             Core.Aggregate.Instance.ThisGame.Finish();
                             break;
                         case "View High Score":
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             this.Machine.Switch(Enum.State.HighScore);
                             HasSwitchedState = true;
                             break;
                         case "Credits":
                             selectedMenuItem = 3;
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             MenuState = Enum.MenuState.CreditsMenu;
                             HasSwitchedState = true;
                             break;
 
                         //case "examp":
-                        //    ButtonsHasGoneIdle = false;
+                        //    _input.ButtonsHasGoneIdle = false;
                         //    MenuState = Enum.MenuState.StartMenu;
 
                         //    break;
@@ -2355,7 +2335,7 @@ namespace OlcSideScrollingConsoleGame
             if (Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd)
             {
                 this.Machine.Switch(Enum.State.End);
-                ButtonsHasGoneIdle = false;
+                _input.ButtonsHasGoneIdle = false;
                 HasSwitchedState = true;
                 return;
             }
@@ -2418,7 +2398,7 @@ namespace OlcSideScrollingConsoleGame
             {
                 //TODO: skicka in en placeholder och läsa settings för att avgöra vart på kartan ska placeras
                 ChangeMap("worldmap", corrWorldMapPosX, corrWorldMapPosY, Hero);
-                ButtonsHasGoneIdle = false;
+                _input.ButtonsHasGoneIdle = false;
 
             }
 
@@ -2435,8 +2415,7 @@ namespace OlcSideScrollingConsoleGame
                 }
             }
 
-            SlimDx.timer_Tick();
-            IIP = SlimDx.IIP;
+            _input.Poll();
 
 
 
@@ -2445,26 +2424,26 @@ namespace OlcSideScrollingConsoleGame
             if (Focus && Hero.vx == 0 && Hero.vy == 0)
             {
                 //Button spam lock  
-                if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
+                if (!_input.ButtonsHasGoneIdle && _input.IsIdle && !GetKey(Key.Any).Pressed)
                 {
-                    ButtonsHasGoneIdle = true;
+                    _input.ButtonsHasGoneIdle = true;
 
                 }
 
                 //Up
-                if (ButtonsHasGoneIdle && (GetKey(Key.Up).Down || IIP.up))
+                if (_input.ButtonsHasGoneIdle && (_input.IsUpDown))
                 {
                     Hero.vy = -3.0f;
                 }
 
                 //Down
-                if (ButtonsHasGoneIdle && (GetKey(Key.Down).Down || IIP.down))
+                if (_input.ButtonsHasGoneIdle && (_input.IsDownDown))
                 {
                     Hero.vy = 3.0f;
                 }
 
                 //Right
-                if (ButtonsHasGoneIdle && (GetKey(Key.Right).Down || IIP.right))
+                if (_input.ButtonsHasGoneIdle && (_input.IsRightDown))
                 {
                     //Förbjud gå höger
                     if (!unlockAllStages)
@@ -2482,7 +2461,7 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 //Left
-                if (ButtonsHasGoneIdle && (GetKey(Key.Left).Down || IIP.left))
+                if (_input.ButtonsHasGoneIdle && (_input.IsLeftDown))
                 {
 
                     //Ska man någonsin få gå vänster? (blivit nåt knas om man gör höger får man ändå inte gå vänster igen. Om man inte hått höger får man gå vänster..?)
@@ -2490,7 +2469,7 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 // A ("jump button")
-                if (ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || GetKey(Key.X).Pressed || IIP.Button0))
+                if (_input.ButtonsHasGoneIdle && (_input.IsConfirmPressed))
                 {
                     // TODO : hantera vilken värld man ska till
                     if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 1)
@@ -2503,7 +2482,7 @@ namespace OlcSideScrollingConsoleGame
                             ChangeMap("mapone", 2, 23, Hero);
                             this.Machine.Switch(Enum.State.GameMap);
                             HasSwitchedState = true;
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             return;
                         }
                         else if (devState == Enum.DevState.GoToLastStage)
@@ -2513,7 +2492,7 @@ namespace OlcSideScrollingConsoleGame
                             ChangeMap("mapnine", 1, 4, Hero);
                             this.Machine.Switch(Enum.State.GameMap);
                             HasSwitchedState = true;
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             return;
                         }
                         else if (devState == Enum.DevState.GoToEnding || devState == Enum.DevState.GoToEndingNearPrefect || devState == Enum.DevState.GoToEndingPertect || devState == Enum.DevState.GoToEndingDone)
@@ -2521,7 +2500,7 @@ namespace OlcSideScrollingConsoleGame
                             // sim ending 
                             hasAccumulatedAllSpeed = false;
                             HasSwitchedState = true;
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             returnToEndAfterHighScore = false;
                             this.Machine.Switch(Enum.State.End);
                             return;
@@ -2539,7 +2518,7 @@ namespace OlcSideScrollingConsoleGame
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
 
                         return;
                     }
@@ -2551,7 +2530,7 @@ namespace OlcSideScrollingConsoleGame
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
 
                         return;
                     }
@@ -2563,7 +2542,7 @@ namespace OlcSideScrollingConsoleGame
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
 
                         return;
                     }
@@ -2575,7 +2554,7 @@ namespace OlcSideScrollingConsoleGame
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
 
                         return;
                     }
@@ -2587,7 +2566,7 @@ namespace OlcSideScrollingConsoleGame
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
 
                         return;
                     }
@@ -2599,7 +2578,7 @@ namespace OlcSideScrollingConsoleGame
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
 
                         return;
                     }
@@ -2611,7 +2590,7 @@ namespace OlcSideScrollingConsoleGame
 
                         this.Machine.Switch(Enum.State.GameMap);
                         HasSwitchedState = true;
-                        ButtonsHasGoneIdle = false;
+                        _input.ButtonsHasGoneIdle = false;
 
                         return;
                     }
@@ -2620,14 +2599,14 @@ namespace OlcSideScrollingConsoleGame
                 }
 
 
-                if (ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || IIP.Button7))
+                if (_input.ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || _input.IsCancelPressed))
                 {
                     // Todo öppna meny
                     MenuState = Enum.MenuState.PauseMenu;
                     this.Machine.Switch(Enum.State.Menu);
                     HasSwitchedState = true;
                     //MenuStartHasBeenReleased = false;
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                 }
 
             }
@@ -3226,8 +3205,7 @@ namespace OlcSideScrollingConsoleGame
             //}
 
 
-            SlimDx.timer_Tick();
-            IIP = SlimDx.IIP;
+            _input.Poll();
 
             DrawHUD("pause");
 
@@ -3235,113 +3213,113 @@ namespace OlcSideScrollingConsoleGame
             if (Focus)
             {
                 //Button spam lock  
-                if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
+                if (!_input.ButtonsHasGoneIdle && _input.IsIdle && !GetKey(Key.Any).Pressed)
                 {
-                    ButtonsHasGoneIdle = true;
+                    _input.ButtonsHasGoneIdle = true;
                 }
 
                 // Press select - Change to worldmap
-                if (GetKey(Key.S).Pressed || IIP.Button6)
+                if (GetKey(Key.S).Pressed || _input.IsPausePressed)
                 {
                     // TODO: only if stage is done
                     //if (Core.Aggregate.Instance.Settings.StageCompleted >= Core.Aggregate.Instance.Settings.SpawnAtWorldMap)
                     //{
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                     this.Machine.Switch(Enum.State.WorldMap);
                     HasSwitchedState = true;
                     //}
                 }
 
                 // Press start
-                if (ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || IIP.Button7))
+                if (_input.ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || _input.IsCancelPressed))
                 {
                     // GameStartHasBeenReleased = false;
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                     this.Machine.Switch(Enum.State.GameMap);
                     HasSwitchedState = true;
                 }
 
                 #region Konami
-                if (ButtonsHasGoneIdle && !IIP.idle)
+                if (_input.ButtonsHasGoneIdle && !_input.IsIdle)
                 {
-                    if (IIP.up || Konami.up)
+                    if (_input.IsUpDown || Konami.up)
                     {
                         if (!Konami.up)
                         {
                             Konami.up = true;
-                            ButtonsHasGoneIdle = false;
+                            _input.ButtonsHasGoneIdle = false;
                             return;
                         }
-                        if (IIP.up || Konami.upUp)
+                        if (_input.IsUpDown || Konami.upUp)
                         {
                             if (!Konami.upUp)
                             {
                                 Konami.upUp = true;
-                                ButtonsHasGoneIdle = false;
+                                _input.ButtonsHasGoneIdle = false;
                                 return;
                             }
-                            if (IIP.down || Konami.down)
+                            if (_input.IsDownDown || Konami.down)
                             {
                                 if (!Konami.down)
                                 {
                                     Konami.down = true;
-                                    ButtonsHasGoneIdle = false;
+                                    _input.ButtonsHasGoneIdle = false;
                                     return;
                                 }
-                                if (IIP.down || Konami.downDown)
+                                if (_input.IsDownDown || Konami.downDown)
                                 {
                                     if (!Konami.downDown)
                                     {
                                         Konami.downDown = true;
-                                        ButtonsHasGoneIdle = false;
+                                        _input.ButtonsHasGoneIdle = false;
                                         return;
                                     }
-                                    if (IIP.left || Konami.left)
+                                    if (_input.IsLeftDown || Konami.left)
                                     {
                                         if (!Konami.left)
                                         {
                                             Konami.left = true;
-                                            ButtonsHasGoneIdle = false;
+                                            _input.ButtonsHasGoneIdle = false;
                                             return;
                                         }
-                                        if (IIP.right || Konami.right)
+                                        if (_input.IsRightDown || Konami.right)
                                         {
                                             if (!Konami.right)
                                             {
                                                 Konami.right = true;
-                                                ButtonsHasGoneIdle = false;
+                                                _input.ButtonsHasGoneIdle = false;
                                                 return;
                                             }
-                                            if (IIP.left || Konami.leftLeft)
+                                            if (_input.IsLeftDown || Konami.leftLeft)
                                             {
                                                 if (!Konami.leftLeft)
                                                 {
                                                     Konami.leftLeft = true;
-                                                    ButtonsHasGoneIdle = false;
+                                                    _input.ButtonsHasGoneIdle = false;
                                                     return;
                                                 }
-                                                if (IIP.right || Konami.rightRight)
+                                                if (_input.IsRightDown || Konami.rightRight)
                                                 {
                                                     if (!Konami.rightRight)
                                                     {
                                                         Konami.rightRight = true;
-                                                        ButtonsHasGoneIdle = false;
+                                                        _input.ButtonsHasGoneIdle = false;
                                                         return;
                                                     }
-                                                    if (IIP.Button1 || Konami.B)
+                                                    if (_input.IsRunDown || Konami.B)
                                                     {
                                                         // TODO a sen b, inte ab
 
                                                         if (!Konami.B)
                                                         {
                                                             Konami.B = true;
-                                                            ButtonsHasGoneIdle = false;
+                                                            _input.ButtonsHasGoneIdle = false;
                                                             return;
                                                         }
-                                                        if (IIP.Button0 || Konami.A)
+                                                        if (_input.IsJumpDown || Konami.A)
                                                         {
                                                             Konami.A = true;
-                                                            ButtonsHasGoneIdle = false;
+                                                            _input.ButtonsHasGoneIdle = false;
 
                                                             this.Machine.Switch(Enum.State.WorldMap);
                                                             HasSwitchedState = true;
@@ -3477,7 +3455,7 @@ namespace OlcSideScrollingConsoleGame
             {
                 this.Machine.Switch(Enum.State.GameOver);
                 HasSwitchedState = true;
-                ButtonsHasGoneIdle = false;
+                _input.ButtonsHasGoneIdle = false;
             }
 
             //listDynamics = listDynamics.Where(x => x.Redundant == false).ToList(); // Kanske ska dumpa denna för att kunna göra en poff på fiende om jump damage
@@ -3491,8 +3469,7 @@ namespace OlcSideScrollingConsoleGame
             }
 
 
-            SlimDx.timer_Tick();
-            IIP = SlimDx.IIP;
+            _input.Poll();
 
             detHarBallatUrLog = false;
 
@@ -3500,11 +3477,11 @@ namespace OlcSideScrollingConsoleGame
             if (Focus)
             {
                 //B
-                if (IIP.Button1 || IIP.Button2 || GetKey(Key.B).Down || GetKey(Key.Z).Down)
+                if (_input.IsRunDown || _input.IsSelectDown || GetKey(Key.B).Down || GetKey(Key.Z).Down)
                 {
                     BPower = true;
                 }
-                else if (!IIP.Button1)
+                else if (!_input.IsRunDown)
                 {
                     BPower = false;
                 }
@@ -3512,7 +3489,7 @@ namespace OlcSideScrollingConsoleGame
                 var tempHeroObj = (DynamicCreatureHero)Hero;
 
                 //Up
-                if (GetKey(Key.Up).Down || IIP.up)
+                if (_input.IsUpDown)
                 {
                     //Hero.vy = -6.0f;
                     //var tempHeroObj = (DynamicCreatureHero)Hero;
@@ -3525,7 +3502,7 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 //Down
-                if (GetKey(Key.Down).Down || IIP.down)
+                if (_input.IsDownDown)
                 {
                     //Hero.vy = 6.0f;
                     //var tempHeroObj = (DynamicCreatureHero)Hero;
@@ -3538,18 +3515,18 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 //Jump 
-                if (GetKey(Key.Space).Down || GetKey(Key.X).Down || IIP.Button0 || IIP.Button3)
+                if (GetKey(Key.Space).Down || GetKey(Key.X).Down || _input.IsJumpDown || _input.IsConfirmPressed)
                 {
-                    if (JumpButtonDownReleaseOnce) // hoppknapp måste ha släppts, hjälten måste vara airborn
+                    if (_input.JumpButtonDownReleaseOnce) // hoppknapp måste ha släppts, hjälten måste vara airborn
                         jumpMemory = 5;
 
-                    if (JumpButtonState < 3)
-                        JumpButtonState++;
+                    if (_input.JumpButtonState < 3)
+                        _input.JumpButtonState++;
 
                     //coyoteTime allowCoyoteTime
 
                     #region ogrinalhopp
-                    if ((Hero.vy == 0 && JumpButtonDownRelease) || (allowCoyoteTime && JumpButtonDownReleaseOnce) || enemyJump > -1)
+                    if ((Hero.vy == 0 && _input.JumpButtonDownRelease) || (allowCoyoteTime && _input.JumpButtonDownReleaseOnce) || enemyJump > -1)
                     {
 
                         if (Hero.vy != 0 && allowCoyoteTime)
@@ -3559,57 +3536,57 @@ namespace OlcSideScrollingConsoleGame
                             Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Jump); // TODO: hoppljud
 
                         Hero.vy = GameConstants.JumpVelocity;
-                        JumpButtonDownRelease = false;
+                        _input.JumpButtonDownRelease = false;
                         jumpMemory = -1;
                         enemyJump = -1;
                     }
                     #endregion
 
                     #region dutthopp
-                    //if (HeroAirBornState == 0 && HeroLandedState > 0 && JumpButtonState == 1) // HeroAirBornState
+                    //if (HeroAirBornState == 0 && HeroLandedState > 0 && _input.JumpButtonState == 1) // HeroAirBornState
                     //{
                     //    Hero.vy -= 4.65f;
                     //}
-                    //else if (HeroAirBornState == 3 && HeroLandedState == 0 && JumpButtonState > 1 && JumpButtonDownRelease)
+                    //else if (HeroAirBornState == 3 && HeroLandedState == 0 && _input.JumpButtonState > 1 && _input.JumpButtonDownRelease)
                     //{
 
                     //    Hero.vy -= 4.65f;
-                    //    JumpButtonDownRelease = false;
+                    //    _input.JumpButtonDownRelease = false;
                     //}
                     #endregion
 
                     #region dubbelhopp
 
-                    //if (HeroAirBornState == 0 && HeroLandedState > 0 && JumpButtonState == 1 && JumpButtonCounter == 0) // HeroAirBornState
+                    //if (HeroAirBornState == 0 && HeroLandedState > 0 && _input.JumpButtonState == 1 && _input.JumpButtonCounter == 0) // HeroAirBornState
                     //{
                     //    Hero.vy -= 7.0f;
-                    //    // JumpButtonDownRelease = false; //#1 för att "flyga"
-                    //    JumpButtonCounter++;
+                    //    // _input.JumpButtonDownRelease = false; //#1 för att "flyga"
+                    //    _input.JumpButtonCounter++;
                     //    Core.Aggregate.Instance.Sound.play("Click.wav");
                     //}
-                    ////else if (HeroAirBornState > 0 && HeroLandedState == 0 && JumpButtonState == 1 && !JumpButtonDownRelease) // dubbel så länge hjälte är på väg upp
-                    //// else if (HeroLandedState == 0 && JumpButtonState == 1 && !JumpButtonDownRelease) // #2 för att "flyga"
-                    //else if (HeroLandedState == 0 && JumpButtonState == 1 && JumpButtonCounter == 1)
+                    ////else if (HeroAirBornState > 0 && HeroLandedState == 0 && _input.JumpButtonState == 1 && !_input.JumpButtonDownRelease) // dubbel så länge hjälte är på väg upp
+                    //// else if (HeroLandedState == 0 && _input.JumpButtonState == 1 && !_input.JumpButtonDownRelease) // #2 för att "flyga"
+                    //else if (HeroLandedState == 0 && _input.JumpButtonState == 1 && _input.JumpButtonCounter == 1)
                     //{
                     //    Core.Aggregate.Instance.Sound.play("Click.wav");
                     //    Hero.vy -= 5.0f; // Riktigt vajsing.. Ger olika höjd om man börjar testa på precis nivå
-                    //    JumpButtonCounter++; // för att inte kunna flyga 
+                    //    _input.JumpButtonCounter++; // för att inte kunna flyga 
                     //}
                     #endregion
 
-                    JumpButtonDownReleaseOnce = false;
+                    _input.JumpButtonDownReleaseOnce = false;
                 }
-                else if (!GetKey(Key.Space).Pressed || GetKey(Key.X).Pressed || !IIP.Button0)
+                else if (!GetKey(Key.Space).Pressed || GetKey(Key.X).Pressed || !_input.IsJumpDown)
                 {
-                    JumpButtonDownReleaseOnce = true;
+                    _input.JumpButtonDownReleaseOnce = true;
 
-                    JumpButtonState = 0;
-                    JumpButtonPressRelease = true;
+                    _input.JumpButtonState = 0;
+                    _input.JumpButtonPressRelease = true;
 
                     if (HeroLandedState != 0)
                     {
-                        JumpButtonDownRelease = true;
-                        JumpButtonCounter = 0;
+                        _input.JumpButtonDownRelease = true;
+                        _input.JumpButtonCounter = 0;
                     }
                 }
 
@@ -3619,12 +3596,12 @@ namespace OlcSideScrollingConsoleGame
                     //               Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Jump); 
 
                     Hero.vy = GameConstants.JumpVelocity;
-                    JumpButtonDownRelease = false;
+                    _input.JumpButtonDownRelease = false;
                     jumpMemory = -1;
                 }
 
                 //Right
-                if (GetKey(Key.Right).Down || IIP.right)
+                if (_input.IsRightDown)
                 {
                     var newSpeed = (Hero.Grounded ? GameConstants.MoveAccelerationGround : GameConstants.MoveAccelerationAir) * elapsed;
                     Hero.vx += newSpeed;
@@ -3647,7 +3624,7 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 //Left
-                if (GetKey(Key.Left).Down || IIP.left)
+                if (_input.IsLeftDown)
                 {
                     var newSpeed = (-1f * (Hero.Grounded ? GameConstants.MoveAccelerationGround : GameConstants.MoveAccelerationAir)) * elapsed;
                     Hero.vx += newSpeed;
@@ -3670,27 +3647,27 @@ namespace OlcSideScrollingConsoleGame
                     //}
                 }
 
-                //if (GetKey(Key.R).Released || IIP.Button1 || IIP.Button3)
+                //if (GetKey(Key.R).Released || _input.IsRunDown || _input.IsConfirmPressed)
                 //{
                 //    this.Reset();
                 //}
 
                 // Pause
                 //Button spam lock  
-                if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
+                if (!_input.ButtonsHasGoneIdle && _input.IsIdle && !GetKey(Key.Any).Pressed)
                 {
-                    ButtonsHasGoneIdle = true;
+                    _input.ButtonsHasGoneIdle = true;
                 }
-                if (ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || IIP.Button7))
+                if (_input.ButtonsHasGoneIdle && (GetKey(Key.P).Pressed || _input.IsCancelPressed))
                 {
                     //PauseStartHasBeenReleased = false;
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                     this.Machine.Switch(Enum.State.Pause);
                     HasSwitchedState = true;
                 }
 
 
-                if (IIP.idle && !GetKey(Key.Any).Pressed)
+                if (_input.IsIdle && !GetKey(Key.Any).Pressed)
                 {
                     IdleCounter++;
                     if (IdleCounter > GameConstants.IdleTimeout)
@@ -3829,7 +3806,7 @@ namespace OlcSideScrollingConsoleGame
 
 
 
-                        var anyDirectionAtAll = GetKey(Key.Left).Down || GetKey(Key.Right).Down || IIP.left || IIP.right;
+                        var anyDirectionAtAll = GetKey(Key.Left).Down || GetKey(Key.Right).Down || _input.IsLeftDown || _input.IsRightDown;
                         if (!BPower)
                         {
                             myObject.vx += -3.0f * myObject.vx * elapsed;
@@ -4267,11 +4244,11 @@ namespace OlcSideScrollingConsoleGame
                             NewObjectPosY = (int)NewObjectPosY + 1;
                             myObject.vy = 0;
 
-                            //if (myObject.IsHero && IIP.Button1 && rememberJumpCollision < 0)
+                            //if (myObject.IsHero && _input.IsRunDown && rememberJumpCollision < 0)
                             //{
                             //    rememberJumpCollision = 5;
                             //}
-                            //if (myObject.IsHero && !IIP.Button1 && IIP.Button0 && rememberJumpCollision < 0)
+                            //if (myObject.IsHero && !_input.IsRunDown && _input.IsJumpDown && rememberJumpCollision < 0)
                             //{
                             //    rememberJumpCollision = 5;
                             //}
@@ -4749,7 +4726,7 @@ namespace OlcSideScrollingConsoleGame
             ////DisplayDialog(new List<string>() { msgx }, 20, 20);
 
 
-            //DisplayDialog(new List<string>() { "Air: " + HeroAirBornState + " Land: " + HeroLandedState + " Jump: " + JumpButtonState }, 10, 10);
+            //DisplayDialog(new List<string>() { "Air: " + HeroAirBornState + " Land: " + HeroLandedState + " Jump: " + _input.JumpButtonState }, 10, 10);
             //DisplayDialog(new List<string>() { "vx: " + Hero.vx + " vy: " + Hero.vy }, 10, 10);
 
 
@@ -4816,8 +4793,7 @@ namespace OlcSideScrollingConsoleGame
 
             this.Clear((Pixel)Pixel.Presets.Black);
 
-            SlimDx.timer_Tick();
-            IIP = SlimDx.IIP;
+            _input.Poll();
 
             // ge tillbaka lite liv
             if (Hero.Health < 1)
@@ -4826,29 +4802,29 @@ namespace OlcSideScrollingConsoleGame
             }
 
             //Button spam lock  
-            if (!ButtonsHasGoneIdle && IIP.idle && !GetKey(Key.Any).Pressed)
+            if (!_input.ButtonsHasGoneIdle && _input.IsIdle && !GetKey(Key.Any).Pressed)
             {
-                ButtonsHasGoneIdle = true;
+                _input.ButtonsHasGoneIdle = true;
             }
             // klicka ut ur animation
-            //if (ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || IIP.Button0))
-            if (ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !IIP.idle))
+            //if (_input.ButtonsHasGoneIdle && (GetKey(Key.Space).Pressed || _input.IsJumpDown))
+            if (_input.ButtonsHasGoneIdle && (GetKey(Key.Any).Pressed || !_input.IsIdle))
             {
 
 
                 //this.Machine.Switch(Enum.State.GameMap);
 
-                if (GetKey(Key.Space).Pressed || GetKey(Key.X).Pressed || IIP.Button0)
+                if (_input.IsConfirmPressed)
                 {
                     Reset();
                     //this.Machine.Switch(Enum.State.WorldMap);
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                     MenuState = Enum.MenuState.StartMenu;
                     this.Machine.Switch(Enum.State.Menu);
                 }
                 else
                 {
-                    ButtonsHasGoneIdle = false;
+                    _input.ButtonsHasGoneIdle = false;
                     MenuState = Enum.MenuState.StartMenu;
                     this.Machine.Switch(Enum.State.Menu);
                 }
