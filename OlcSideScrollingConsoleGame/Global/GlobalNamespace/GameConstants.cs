@@ -88,6 +88,31 @@ namespace OlcSideScrollingConsoleGame.Global
 
 
         // ─────────────────────────────────────────────
+        // Hastighetsbegränsning (velocity clamp)
+        // ─────────────────────────────────────────────
+        public const float MaxVelocityX         = 10.0f;  // Max horisontell hastighet
+        public const float MaxVelocityXCrash    = 11.0f;  // Crashgräns horisontellt (återställer till 0)
+        public const float MaxVelocityYUp       = 10.0f;  // Max uppåthastighet
+        public const float MaxVelocityYUpCrash  = 11.0f;  // Crashgräns uppåt (återställer till 0)
+
+
+        // ─────────────────────────────────────────────
+        // Luftmotstånd / bromsning (drag)
+        // ─────────────────────────────────────────────
+        public const float DragNormal           = 3.0f;   // Bromskoefficient normalt läge
+        public const float DragBPower           = 2.0f;   // Bromskoefficient BPower-läge
+
+        /// <summary>Tröskel under vilken vx sätts till exakt 0 (normal mark, normalt läge).</summary>
+        public const float SlipperinessNormal         = 3.0f;
+        /// <summary>Tröskel under vilken vx sätts till exakt 0 (normal mark, BPower).</summary>
+        public const float SlipperinessNormalBPower   = 0.09f;
+        /// <summary>Tröskel under vilken vx sätts till exakt 0 (isig mark, normalt läge).</summary>
+        public const float SlipperinessIce            = 0.1f;
+        /// <summary>Tröskel under vilken vx sätts till exakt 0 (isig mark, BPower).</summary>
+        public const float SlipperinessIceBPower      = 0.08f;
+
+
+        // ─────────────────────────────────────────────
         // Stridsvärden
         // ─────────────────────────────────────────────
         public const float KnockbackMultiplierX = 3.0f;

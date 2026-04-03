@@ -96,6 +96,7 @@
     <Compile Include="Global\GlobalNamespace\StaticRes.cs" />
     <Compile Include="Systems\IInputProvider.cs" />
     <Compile Include="Systems\InputManager.cs" />
+    <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Models\Items\DynamicItem.cs" />
     <Compile Include="Models\Items\Items.cs" />
     <Compile Include="Models\Map.cs" />

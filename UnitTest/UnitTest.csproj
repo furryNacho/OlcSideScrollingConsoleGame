@@ -52,6 +52,7 @@
     <Compile Include="Fakes\FakeInputProvider.cs" />
     <Compile Include="GameConstantsTests.cs" />
     <Compile Include="InputProviderTests.cs" />
+    <Compile Include="PhysicsSystemTests.cs" />
     <Compile Include="KassJson.cs" />
     <Compile Include="UnitTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

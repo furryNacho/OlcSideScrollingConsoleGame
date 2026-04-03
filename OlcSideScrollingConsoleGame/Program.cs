@@ -3752,152 +3752,29 @@ namespace OlcSideScrollingConsoleGame
 
 
 
-                    // Gravity
-                    //myObject.vy += GameConstants.GravityNormal * elapsed;
-                    if (myObject.IsHero)
-                    {
-                        if (rememberJumpCollision > -1)
-                        {
-                            rememberJumpCollision--;
-                        }
+                    // Gravity – delegerat till PhysicsSystem (SRP)
+                    PhysicsSystem.ApplyGravity(myObject, myObject.IsHero, BPower, ref rememberJumpCollision, elapsed);
 
-                        if (myObject.vy < 0)
-                        {
-                            if (BPower)
-                            {
-                                if (rememberJumpCollision < 0)
-                                    myObject.vy += GameConstants.GravityPowerJump * elapsed;
-                            }
-                            else
-                            {
-                                if (rememberJumpCollision < 0)
-                                    myObject.vy += GameConstants.GravityNormal * elapsed;
-                            }
-                        }
-                        else
-                        {
-                            myObject.vy += GameConstants.GravityHeavy * elapsed;
-                        }
-
-                    }
-                    else
-                    {
-                        myObject.vy += GameConstants.GravityNormal * elapsed;
-                    }
-
-
-                    // Drag
-                    if (myObject.IsHero && myObject.Grounded)
-                    {
-                        /* myObject.vx += -3.0f * myObject.vx * elapsed;
-                            if (Math.Abs(myObject.vx) < 0.01f)
-                                myObject.vx = 0.0f;
-                         */
-
-                        float slipperiness = 3.0f;
-                        float slipperinessBPower = 0.09f;
-
-                        //Make slippery if ice-lvl
-                        if (CurrentMap.Name == "mapseven" || CurrentMap.Name == "mapeight" || CurrentMap.Name == "mapnine")
-                        {
-                            slipperiness = 0.1f;
-                            slipperinessBPower = 0.08f;
-                        }
-
-
-
-                        var anyDirectionAtAll = GetKey(Key.Left).Down || GetKey(Key.Right).Down || _input.IsLeftDown || _input.IsRightDown;
-                        if (!BPower)
-                        {
-                            myObject.vx += -3.0f * myObject.vx * elapsed;
-                            if (!anyDirectionAtAll)
-                            {
-                                if (Math.Abs(myObject.vx) < slipperiness)
-                                    myObject.vx = 0.0f;
-                            }
-
-                        }
-                        else if (BPower)
-                        {
-                            myObject.vx += -2.0f * myObject.vx * elapsed;
-                            if (!anyDirectionAtAll)
-                            {
-                                if (Math.Abs(myObject.vx) < slipperinessBPower)
-                                    myObject.vx = 0.0f;
-                            }
-
-                        }
-                    }
+                    // Drag – delegerat till PhysicsSystem (SRP)
+                    bool isIcyMap = CurrentMap.Name == "mapseven"
+                                 || CurrentMap.Name == "mapeight"
+                                 || CurrentMap.Name == "mapnine";
+                    bool anyDirectionAtAll = _input.IsLeftDown || _input.IsRightDown;
+                    PhysicsSystem.ApplyDrag(myObject, BPower, isIcyMap, anyDirectionAtAll, elapsed);
 
                     //temp högsta hast:
                     if (myObject.IsHero)
                     {
-                        if (myObject.vx < maxL)
-                        {
-                            maxL = myObject.vx;
-                        }
-                        if (myObject.vx > maxR)
-                        {
-                            maxR = myObject.vx;
-                        }
+                        if (myObject.vx < maxL) maxL = myObject.vx;
+                        if (myObject.vx > maxR) maxR = myObject.vx;
                     }
                     //end temp
 
-                    // Clamp velocities
-                    if (myObject.vx > 10.0f) // höger
+                    // Clamp velocities – delegerat till PhysicsSystem (SRP)
+                    if (PhysicsSystem.ClampVelocities(myObject))
                     {
-                        if (myObject.vx > 11.0f)
-                        {
-                            myObject.detHarBallatUr = true;
-                            detHarBallatUrLog = true;
-                            myObject.vx = 0.0f;
-                        }
-                        else
-                        {
-                            myObject.vx = 10.0f;
-                        }
-                    }
-
-                    if (myObject.vx < -10.0f) // vänster
-                    {
-                        if (myObject.vx < -11.0f)
-                        {
-                            myObject.detHarBallatUr = true;
-                            detHarBallatUrLog = true;
-                            myObject.vx = 0.0f;
-                        }
-                        else
-                        {
-                            myObject.vx = -10.0f;
-                        }
-                    }
-
-                    if (myObject.vy > GameConstants.FallSpeedThreshold)//neråt
-                    {
-                        if (myObject.vy > GameConstants.FallSpeedMax)
-                        {
-                            myObject.detHarBallatUr = true;
-                            detHarBallatUrLog = true;
-                            myObject.vy = 0.0f;
-                        }
-                        else
-                        {
-                            myObject.vy = 20.0f;
-                        }
-                    }
-
-                    if (myObject.vy < -10.0f)//uppåt
-                    {
-                        if (myObject.vy < -11.0f)
-                        {
-                            myObject.detHarBallatUr = true;
-                            detHarBallatUrLog = true;
-                            myObject.vy = 0.0f;
-                        }
-                        else
-                        {
-                            myObject.vy = -10.0f;
-                        }
+                        myObject.detHarBallatUr = true;
+                        detHarBallatUrLog = true;
                     }
                     //End Clamp velocities
 
