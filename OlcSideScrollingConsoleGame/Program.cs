@@ -3753,7 +3753,10 @@ namespace OlcSideScrollingConsoleGame
 
 
                     // Gravity – delegerat till PhysicsSystem (SRP)
-                    PhysicsSystem.ApplyGravity(myObject, myObject.IsHero, BPower, ref rememberJumpCollision, elapsed);
+                    // C# tillåter inte ref på auto-property; lokal variabel används som mellanhand.
+                    int _rjc = rememberJumpCollision;
+                    PhysicsSystem.ApplyGravity(myObject, myObject.IsHero, BPower, ref _rjc, elapsed);
+                    rememberJumpCollision = _rjc;
 
                     // Drag – delegerat till PhysicsSystem (SRP)
                     bool isIcyMap = CurrentMap.Name == "mapseven"
