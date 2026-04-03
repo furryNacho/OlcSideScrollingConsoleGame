@@ -21,7 +21,15 @@ namespace OlcSideScrollingConsoleGame.Global
         // ─────────────────────────────────────────────
         // Fysik – gravitation och rörelse
         // ─────────────────────────────────────────────
-        public const float Gravity                  = 17.0f;
+
+        // Tre gravitationsstyrkor beroende på spelläge:
+        public const float GravityPowerJump         = 17.0f;   // Hjälten i BPower-läge med hoppminne
+        public const float GravityNormal            = 20.0f;   // Normal gravitation
+        public const float GravityHeavy             = 21.0f;   // Tyngre gravitation (ej BPower)
+
+        // Fall-hastighetsgränser:
+        public const float FallSpeedThreshold       = 20.0f;   // Gräns för "faller snabbt"-tillstånd
+        public const float FallSpeedMax             = 25.0f;   // Absolut fallhastighetstak (triggers detHarBallatUr)
 
         public const float JumpVelocity             = -9.3f;
         public const float JumpDamageRebound        = -8.5f;   // Studs uppåt vid hoppspark på fiende

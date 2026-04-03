@@ -2643,8 +2643,8 @@ namespace OlcSideScrollingConsoleGame
                 if (myObject.IsHero)
                 {
 
-                    //if ((!no1 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 0) && (myObject.px >= 3 && myObject.px <= 3.05f))
-                    if (!no1 && (myObject.px >= 3 && myObject.px <= 3.05f))
+                    //if ((!no1 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 0) && (myObject.px >= GameConstants.WorldMapStage1X && myObject.px <= GameConstants.WorldMapStage1X + GameConstants.WorldMapStageTolerance))
+                    if (!no1 && (myObject.px >= GameConstants.WorldMapStage1X && myObject.px <= GameConstants.WorldMapStage1X + GameConstants.WorldMapStageTolerance))
                     {
                         /*Om vx är possitiv - instruktion att gå höger.
                          *Om vx är negativ - instruktion att gå vänster
@@ -2673,7 +2673,7 @@ namespace OlcSideScrollingConsoleGame
                         currentStage = 1;
 
                     }
-                    else if ((!no2 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 1) && (myObject.px >= 6 && myObject.px <= 6.09f))
+                    else if ((!no2 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 1) && (myObject.px >= GameConstants.WorldMapStage2X && myObject.px <= GameConstants.WorldMapStage2X + GameConstants.WorldMapStageTolerance))
                     {
                         // förbjud att gå höger
                         //if (!unlockAllStages)
@@ -2699,7 +2699,7 @@ namespace OlcSideScrollingConsoleGame
                         currentStage = 2;
 
                     }
-                    else if ((!no3 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 2) && (myObject.px >= 9 && myObject.px <= 9.1f))
+                    else if ((!no3 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 2) && (myObject.px >= GameConstants.WorldMapStage3X && myObject.px <= GameConstants.WorldMapStage3X + GameConstants.WorldMapStageTolerance))
                     {
                         // förbjud att gå höger
                         //if (!unlockAllStages)
@@ -2726,7 +2726,7 @@ namespace OlcSideScrollingConsoleGame
 
                     }
                     //else if (!no4 && (myObject.px >= 11 && myObject.px <= 11.1f && myObject.py < 3.01))
-                    else if ((!no4 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 3) && (myObject.px >= 12 && myObject.px <= 12.1f))
+                    else if ((!no4 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 3) && (myObject.px >= GameConstants.WorldMapStage4X && myObject.px <= GameConstants.WorldMapStage4X + GameConstants.WorldMapStageTolerance))
                     {
                         // förbjud att gå höger
                         //if (!unlockAllStages)
@@ -2753,7 +2753,7 @@ namespace OlcSideScrollingConsoleGame
 
                     }
                     //else if (!no5 && (myObject.px >= 11 && myObject.py >= 5f && myObject.py <= 5.1f))
-                    else if ((!no5 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 4) && (myObject.px >= 15 && myObject.px <= 15.1f))
+                    else if ((!no5 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 4) && (myObject.px >= GameConstants.WorldMapStage5X && myObject.px <= GameConstants.WorldMapStage5X + GameConstants.WorldMapStageTolerance))
                     {
 
                         // förbjud att gå höger
@@ -2780,7 +2780,7 @@ namespace OlcSideScrollingConsoleGame
                         currentStage = 5;
                     }
                     //else if (!no6 && (myObject.px >= 11 && myObject.py >= 7f && myObject.py <= 7.01f))
-                    else if ((!no6 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 5) && (myObject.px >= 18 && myObject.px <= 18.1f))
+                    else if ((!no6 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 5) && (myObject.px >= GameConstants.WorldMapStage6X && myObject.px <= GameConstants.WorldMapStage6X + GameConstants.WorldMapStageTolerance))
                     {
 
                         // förbjud att gå höger
@@ -2807,7 +2807,7 @@ namespace OlcSideScrollingConsoleGame
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 6;
                         currentStage = 6;
                     }
-                    else if ((!no7 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 6) && (myObject.px >= 21 && myObject.px <= 21.1f))
+                    else if ((!no7 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 6) && (myObject.px >= GameConstants.WorldMapStage7X && myObject.px <= GameConstants.WorldMapStage7X + GameConstants.WorldMapStageTolerance))
                     {
                         // förbjud att gå höger
                         //if (!unlockAllStages)
@@ -2835,7 +2835,7 @@ namespace OlcSideScrollingConsoleGame
                         Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap = 7;
                         currentStage = 7;
                     }
-                    else if ((!no8 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 7) && (myObject.px >= 24 && myObject.px <= 24.1f))
+                    else if ((!no8 || Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted == 7) && (myObject.px >= GameConstants.WorldMapStage8X && myObject.px <= GameConstants.WorldMapStage8X + GameConstants.WorldMapStageTolerance))
                     {
                         //myObject.vx = 0;
                         //myObject.vy = 0;
@@ -2891,7 +2891,7 @@ namespace OlcSideScrollingConsoleGame
                 //
                 // Collision
                 //
-                float fBorder = 0.000000005f;// Hårdkoda hitbox (bevara för rpg!!)
+                float fBorder = GameConstants.CollisionBorderPrecision;// Hårdkoda hitbox (bevara för rpg!!)
 
                 if (myObject.vx <= 0) // Moving Left
                 {
@@ -3032,7 +3032,7 @@ namespace OlcSideScrollingConsoleGame
                                             if (!myObject.IsHero)
                                             {
                                                 //studsa hjälten lite
-                                                Hero.vy = -8.5f;
+                                                Hero.vy = GameConstants.JumpDamageRebound;
 
                                                 JumpDamage((Creature)Hero, (Creature)myObject);
                                             }
@@ -3052,7 +3052,7 @@ namespace OlcSideScrollingConsoleGame
                                         if (!otherObject.Friendly) // otherObject är fiende
                                         {
                                             //studsa hjälten lite
-                                            Hero.vy = -8.5f;
+                                            Hero.vy = GameConstants.JumpDamageRebound;
 
                                             JumpDamage((Creature)Hero, (Creature)otherObject);
                                         }
@@ -3558,7 +3558,7 @@ namespace OlcSideScrollingConsoleGame
                         if (Core.Aggregate.Instance.Sound != null)
                             Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Jump); // TODO: hoppljud
 
-                        Hero.vy = -9.3f;
+                        Hero.vy = GameConstants.JumpVelocity;
                         JumpButtonDownRelease = false;
                         jumpMemory = -1;
                         enemyJump = -1;
@@ -3618,7 +3618,7 @@ namespace OlcSideScrollingConsoleGame
                     tempMemoryJumpCounter++;
                     //               Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Jump); 
 
-                    Hero.vy = -9.3f;
+                    Hero.vy = GameConstants.JumpVelocity;
                     JumpButtonDownRelease = false;
                     jumpMemory = -1;
                 }
@@ -3626,20 +3626,20 @@ namespace OlcSideScrollingConsoleGame
                 //Right
                 if (GetKey(Key.Right).Down || IIP.right)
                 {
-                    var newSpeed = (Hero.Grounded ? 25.0f : 15.0f) * elapsed;
+                    var newSpeed = (Hero.Grounded ? GameConstants.MoveAccelerationGround : GameConstants.MoveAccelerationAir) * elapsed;
                     Hero.vx += newSpeed;
                     if (BPower)
                     {
-                        if (Hero.vx > 10)
+                        if (Hero.vx > GameConstants.MaxSpeedPower)
                         {
-                            Hero.vx = 10;
+                            Hero.vx = GameConstants.MaxSpeedPower;
                         }
                     }
                     else
                     {
-                        if (Hero.vx > 6)
+                        if (Hero.vx > GameConstants.MaxSpeedNormal)
                         {
-                            Hero.vx = 6;
+                            Hero.vx = GameConstants.MaxSpeedNormal;
                         }
                     }
 
@@ -3649,20 +3649,20 @@ namespace OlcSideScrollingConsoleGame
                 //Left
                 if (GetKey(Key.Left).Down || IIP.left)
                 {
-                    var newSpeed = (Hero.Grounded ? -25.0f : -15.0f) * elapsed;
+                    var newSpeed = (-1f * (Hero.Grounded ? GameConstants.MoveAccelerationGround : GameConstants.MoveAccelerationAir)) * elapsed;
                     Hero.vx += newSpeed;
                     if (BPower)
                     {
-                        if (Hero.vx < -10)
+                        if (Hero.vx < -GameConstants.MaxSpeedPower)
                         {
-                            Hero.vx = -10;
+                            Hero.vx = -GameConstants.MaxSpeedPower;
                         }
                     }
                     else
                     {
-                        if (Hero.vx < -6)
+                        if (Hero.vx < -GameConstants.MaxSpeedNormal)
                         {
-                            Hero.vx = -6;
+                            Hero.vx = -GameConstants.MaxSpeedNormal;
                         }
                     }
                     //if (!solidLeft)
@@ -3693,7 +3693,7 @@ namespace OlcSideScrollingConsoleGame
                 if (IIP.idle && !GetKey(Key.Any).Pressed)
                 {
                     IdleCounter++;
-                    if (IdleCounter > 200)
+                    if (IdleCounter > GameConstants.IdleTimeout)
                     {
                         Hero.IsIdle = true;
                         if (IdleCounter > 220 && IdleCounter < 245)
@@ -3776,7 +3776,7 @@ namespace OlcSideScrollingConsoleGame
 
 
                     // Gravity
-                    //myObject.vy += 20.0f * elapsed;
+                    //myObject.vy += GameConstants.GravityNormal * elapsed;
                     if (myObject.IsHero)
                     {
                         if (rememberJumpCollision > -1)
@@ -3789,23 +3789,23 @@ namespace OlcSideScrollingConsoleGame
                             if (BPower)
                             {
                                 if (rememberJumpCollision < 0)
-                                    myObject.vy += 17.0f * elapsed;
+                                    myObject.vy += GameConstants.GravityPowerJump * elapsed;
                             }
                             else
                             {
                                 if (rememberJumpCollision < 0)
-                                    myObject.vy += 20.0f * elapsed;
+                                    myObject.vy += GameConstants.GravityNormal * elapsed;
                             }
                         }
                         else
                         {
-                            myObject.vy += 21.0f * elapsed;
+                            myObject.vy += GameConstants.GravityHeavy * elapsed;
                         }
 
                     }
                     else
                     {
-                        myObject.vy += 20.0f * elapsed;
+                        myObject.vy += GameConstants.GravityNormal * elapsed;
                     }
 
 
@@ -3895,9 +3895,9 @@ namespace OlcSideScrollingConsoleGame
                         }
                     }
 
-                    if (myObject.vy > 20.0f)//neråt
+                    if (myObject.vy > GameConstants.FallSpeedThreshold)//neråt
                     {
-                        if (myObject.vy > 25.0f)
+                        if (myObject.vy > GameConstants.FallSpeedMax)
                         {
                             myObject.detHarBallatUr = true;
                             detHarBallatUrLog = true;
@@ -3941,7 +3941,7 @@ namespace OlcSideScrollingConsoleGame
                     //
                     // Collision
                     //
-                    float fBorder = 0.000000005f;// Hårdkoda hitbox (bevara för rpg!!)
+                    float fBorder = GameConstants.CollisionBorderPrecision;// Hårdkoda hitbox (bevara för rpg!!)
 
                     // Moving Left
                     if (myObject.vx <= 0)
@@ -4028,7 +4028,7 @@ namespace OlcSideScrollingConsoleGame
 
                                 if (objIsSolid && !frostCreature.HasJumped)
                                 {
-                                    myObject.vy = -7.7f;
+                                    myObject.vy = GameConstants.EnemyJumpVelocity;
                                     frostCreature.HasJumped = true;
                                 }
                                 else if (objIsSolid && frostCreature.HasJumped)
@@ -4171,7 +4171,7 @@ namespace OlcSideScrollingConsoleGame
 
                                 if (objIsSolid && !frostCreature.HasJumped)
                                 {
-                                    myObject.vy = -7.7f;
+                                    myObject.vy = GameConstants.EnemyJumpVelocity;
                                     frostCreature.HasJumped = true;
                                 }
                                 else if (objIsSolid && frostCreature.HasJumped)
@@ -4535,7 +4535,7 @@ namespace OlcSideScrollingConsoleGame
                                                 if (!myObject.IsHero)
                                                 {
                                                     //studsa hjälten lite
-                                                    //Hero.vy = -8.5f;
+                                                    //Hero.vy = GameConstants.JumpDamageRebound;
                                                     Hero.vy = -5.5f;
                                                     Hero.Grounded = true;
                                                     JumpDamage((Creature)Hero, (Creature)myObject);
