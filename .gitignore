@@ -342,21 +342,23 @@ healthchecksdb
 # -------------------------------------------------------
 # Game assets – lokala filer, checkas inte in i git
 # Läggs till manuellt lokalt för att kunna köra spelet
+# ** prefix matchar sökvägen oavsett projektundermapp
 # -------------------------------------------------------
 
 # Sprites
-Resources/Assets/Sprites/*.png
-Resources/Assets/Sprites/*.bmp
-Resources/Assets/Sprites/*.jpg
+**/Resources/Assets/Sprites/*.png
+**/Resources/Assets/Sprites/*.bmp
+**/Resources/Assets/Sprites/*.jpg
+**/Resources/Assets/Sprites/*.ico
 
 # Kartor (genereras av FurryNachoLevelEditor)
-Resources/Assets/MapData/*.json
+**/Resources/Assets/MapData/*.json
 
 # Ljud och musik
-Resources/Assets/Sound/*.wav
-Resources/Assets/Sound/*.mp3
-Resources/Assets/Sound/*.ogg
+**/Resources/Assets/Sound/*.wav
+**/Resources/Assets/Sound/*.mp3
+**/Resources/Assets/Sound/*.ogg
 
 # Inställningar och highscore (genereras vid körning)
-Resources/Settings/settings.json
-Resources/Settings/highscore.json
+**/Resources/Settings/settings.json
+**/Resources/Settings/highscore.json
