@@ -8,8 +8,9 @@ namespace OlcSideScrollingConsoleGame.Systems
     /// Kapslar in all input-hantering (tangentbord + gamepad).
     /// Exponerar semantiska spelåtgärder istället för råa knapptillstånd.
     /// Ansvarar för uppdatering av gamepad-tillstånd varje frame.
+    /// Implementerar IInputProvider för testbarhet (DIP).
     /// </summary>
-    public class InputManager
+    public class InputManager : IInputProvider
     {
         private readonly Game _game;
         private readonly SlimDXGamepad _gamepad;

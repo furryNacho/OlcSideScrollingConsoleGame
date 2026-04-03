@@ -92,7 +92,10 @@
     <Compile Include="Core\Aggregate.cs" />
     <Compile Include="Core\ReadWrite.cs" />
     <Compile Include="Global\GlobalNamespace\Enum.cs" />
+    <Compile Include="Global\GlobalNamespace\GameConstants.cs" />
     <Compile Include="Global\GlobalNamespace\StaticRes.cs" />
+    <Compile Include="Systems\IInputProvider.cs" />
+    <Compile Include="Systems\InputManager.cs" />
     <Compile Include="Models\Items\DynamicItem.cs" />
     <Compile Include="Models\Items\Items.cs" />
     <Compile Include="Models\Map.cs" />
