@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using OlcSideScrollingConsoleGame.Models;
 

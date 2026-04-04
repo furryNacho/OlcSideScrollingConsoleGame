@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -58,7 +59,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         /// <summary>
         /// Namnet på dynamiskt objekt
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public int Id { get; set; }
 
         public int CoinId { get; set; }
@@ -112,7 +113,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
         public int RemoveCount { get; set; }
 
-        public static Program Engine { get; set; }
+        public static Program? Engine { get; set; }
 
         /// <summary>
         /// Ansvarar själv för hur den ser ut på skärmen.  Tar en instans av olcGameEnigne
@@ -125,14 +126,14 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         public virtual bool IsIndestructible => false;
 
         public virtual void DrawSelf(Program graphics, float ox, float oy) { }
-       
+
         /// <summary>
         /// Elapsed time
         /// </summary>
         /// <param name="el"></param>
-        public virtual void Update(float elapsedTime, DynamicGameObject player = null) { }
+        public virtual void Update(float elapsedTime, DynamicGameObject? player = null) { }
 
-        public virtual void OnInteract(DynamicGameObject player = null) { }
+        public virtual void OnInteract(DynamicGameObject? player = null) { }
 
     }
 }

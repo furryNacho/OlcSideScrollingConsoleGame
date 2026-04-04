@@ -1,5 +1,6 @@
+#nullable enable
 using OlcSideScrollingConsoleGame.Core;
-﻿using PixelEngine;
+using PixelEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             DamageGiven = 4;
         }
 
-        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null)
+        public override void Behaviour(float fElapsedTime, DynamicGameObject? player = null)
         {
             if (Health <= 0)
             {
@@ -107,7 +108,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             DamageGiven = 4;
         }
 
-        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null)
+        public override void Behaviour(float fElapsedTime, DynamicGameObject? player = null)
         {
             if (Health <= 0)
             {
@@ -165,7 +166,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
         }
 
-        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null)
+        public override void Behaviour(float fElapsedTime, DynamicGameObject? player = null)
         {
             if (Health <= 0)
             {
@@ -228,7 +229,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
         public Enum.LastStage State { get; set; }
 
-        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null)
+        public override void Behaviour(float fElapsedTime, DynamicGameObject? player = null)
         {
             if (Health <= 0)
             {
@@ -334,7 +335,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         public override void DrawSelf(Program gfx, float ox, float oy)
         {
             var screen = new PixelEngine.Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
-            gfx.DrawPartialSprite(screen, Sprite, new PixelEngine.Point(4 * 16, 1 * 16), 16, 16);
+            gfx.DrawPartialSprite(screen, Sprite!, new PixelEngine.Point(4 * 16, 1 * 16), 16, 16);
         }
     }
 
@@ -358,7 +359,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         public Enum.LastStage State { get; set; }
 
 
-        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null)
+        public override void Behaviour(float fElapsedTime, DynamicGameObject? player = null)
         {
             if (Health <= 0)
             {
@@ -708,7 +709,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         //    var secondMagicalPlayerParam = new Point(SheetOffsetX, SheetOffsetY); // Vilken tile i spritesheeten som ska ritas.
 
         //    // 16 är för närvarande en full enhet 
-        //    gfx.DrawPartialSprite(firstMagicalPlayerParam, Sprite, secondMagicalPlayerParam, spriteSize, spriteSize);
+        //    gfx.DrawPartialSprite(firstMagicalPlayerParam, Sprite!, secondMagicalPlayerParam, spriteSize, spriteSize);
 
         //}
         #endregion
@@ -750,7 +751,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             // State == MovingDown: sheetOffset (0,0) — bevarar ursprungsbeteendet
 
             var screen = new PixelEngine.Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
-            gfx.DrawPartialSprite(screen, Sprite, new PixelEngine.Point(sheetOffsetX, sheetOffsetY), 16, 16);
+            gfx.DrawPartialSprite(screen, Sprite!, new PixelEngine.Point(sheetOffsetX, sheetOffsetY), 16, 16);
         }
     }
 
@@ -810,12 +811,12 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             // SheetOffsetX och SheetOffsetY ger top left in en sprite
             var secondMagicalPlayerParam = new Point(SheetOffsetX, SheetOffsetY); // Vilken tile i spritesheeten som ska ritas.
 
-            gfx.DrawPartialSprite(firstMagicalPlayerParam, Sprite, secondMagicalPlayerParam, 16, 32);
+            gfx.DrawPartialSprite(firstMagicalPlayerParam, Sprite!, secondMagicalPlayerParam, 16, 32);
 
         }
 
         // Passivt overlagobjekt — inget autonomt beteende.
-        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null) { }
+        public override void Behaviour(float fElapsedTime, DynamicGameObject? player = null) { }
     }
 
     public class DynamicCreatureOverlay : Creature
@@ -832,12 +833,12 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         }
 
         // Passivt overlagobjekt — inget autonomt beteende.
-        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null) { }
+        public override void Behaviour(float fElapsedTime, DynamicGameObject? player = null) { }
 
         public override void DrawSelf(Program gfx, float ox, float oy)
         {
             var screen = new PixelEngine.Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
-            gfx.DrawPartialSprite(screen, Sprite, new PixelEngine.Point(4 * 16, 3 * 16), 16, 16);
+            gfx.DrawPartialSprite(screen, Sprite!, new PixelEngine.Point(4 * 16, 3 * 16), 16, 16);
         }
     }
 
@@ -858,12 +859,12 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         }
 
         // Passivt overlagobjekt — inget autonomt beteende.
-        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null) { }
+        public override void Behaviour(float fElapsedTime, DynamicGameObject? player = null) { }
 
         public override void DrawSelf(Program gfx, float ox, float oy)
         {
             var screen = new PixelEngine.Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
-            gfx.DrawPartialSprite(screen, Sprite, new PixelEngine.Point(3 * 16, 3 * 16), 16, 16);
+            gfx.DrawPartialSprite(screen, Sprite!, new PixelEngine.Point(3 * 16, 3 * 16), 16, 16);
         }
     }
 
@@ -880,7 +881,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             DamageGiven = 0;
         }
 
-        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null)
+        public override void Behaviour(float fElapsedTime, DynamicGameObject? player = null)
         {
             if (Health <= 0)
             {

@@ -1,4 +1,5 @@
-﻿using PixelEngine;
+﻿#nullable enable
+using PixelEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,7 +60,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
        
 
-        public override void Update(float elapsedTime, DynamicGameObject player = null)
+        public override void Update(float elapsedTime, DynamicGameObject? player = null)
         {
             //does nothing
         }

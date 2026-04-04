@@ -1,4 +1,5 @@
-﻿using PixelEngine;
+﻿#nullable enable
+using PixelEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 {
     public abstract class Creature : DynamicGameObject
     {
-        public Creature(string name, Sprite sprite)
+        public Creature(string name, Sprite? sprite)
             : base(name)
 
         {
@@ -28,7 +29,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         protected Enum.GraphicsState sprGraphicsState { get; set; }
         protected int GraphicCounter { get; set; }
         private float Timer { get; set; }
-        protected Sprite Sprite { get; set; }
+        protected Sprite? Sprite { get; set; }
         public int Health { get; set; }
         public int MaxHealth { get; set; }
         public int DamageGiven { get; set; } = 0;
@@ -40,7 +41,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
        
 
-        public override void Update(float elapsedTime, DynamicGameObject player)
+        public override void Update(float elapsedTime, DynamicGameObject? player = null)
         {
             if (KnockBackTimer > 0.0f)
             {
@@ -228,7 +229,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
                         if (IsHero) // IsHero
                         {
-                            var asdf = this as DynamicCreatureHero;
+                            var asdf = (this as DynamicCreatureHero)!; // guarded av IsHero
                             if (asdf.LookDown)
                             {
                                 // rad tre för höger
@@ -318,7 +319,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             var secondMagicalPlayerParam = new Point(SheetOffsetX, SheetOffsetY); // Vilken tile i spritesheeten som ska ritas.
 
             // 16 är för närvarande en full enhet 
-            gfx.DrawPartialSprite(firstMagicalPlayerParam, Sprite, secondMagicalPlayerParam, 16, 16);
+            gfx.DrawPartialSprite(firstMagicalPlayerParam, Sprite!, secondMagicalPlayerParam, 16, 16);
 
         }
 
@@ -327,7 +328,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         /// Varje konkret subklass måste implementera detta — tom implementation
         /// är tillåten för passiva objekt (overlay, hero-styrning via Program.cs).
         /// </summary>
-        public abstract void Behaviour(float fElapsedTime, DynamicGameObject player = null);
+        public abstract void Behaviour(float fElapsedTime, DynamicGameObject? player = null);
 
         public virtual void PerformAttack() { }
 

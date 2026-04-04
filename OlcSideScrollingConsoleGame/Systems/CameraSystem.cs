@@ -1,3 +1,4 @@
+#nullable enable
 using OlcSideScrollingConsoleGame.Global;
 
 namespace OlcSideScrollingConsoleGame.Systems

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using Gamepad.Library;
 using OlcSideScrollingConsoleGame.Global;
@@ -14,7 +15,7 @@ namespace OlcSideScrollingConsoleGame.Systems
     public class InputManager : IInputProvider
     {
         private readonly Game _game;
-        private readonly SlimDXGamepad _gamepad;
+        private readonly SlimDXGamepad? _gamepad;
         private IsItPressed _iip;
 
         // ─────────────────────────────────────────────

@@ -1,4 +1,5 @@
-﻿using OlcSideScrollingConsoleGame.Core;
+﻿#nullable enable
+using OlcSideScrollingConsoleGame.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,6 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         /// <summary>
         /// Hjältens beteende styrs av Program.cs via IInputProvider — inget autonomt AI-beteende.
         /// </summary>
-        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null) { }
+        public override void Behaviour(float fElapsedTime, DynamicGameObject? player = null) { }
     }
 }
