@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraSystemTests.cs" />
+    <Compile Include="CollisionSystemTests.cs" />
     <Compile Include="EnemyTypeTests.cs" />
     <Compile Include="TileMapRendererTests.cs" />
     <Compile Include="Fakes\FakeInputProvider.cs" />

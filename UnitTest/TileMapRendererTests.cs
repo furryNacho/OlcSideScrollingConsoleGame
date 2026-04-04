@@ -140,6 +140,7 @@ namespace UnitTest
             }
 
             public int GetIndex(int x, int y) => _fixedIndex;
+            public bool GetSolid(int x, int y) => false;
         }
     }
 }

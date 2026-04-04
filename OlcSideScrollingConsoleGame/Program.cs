@@ -3672,46 +3672,23 @@ namespace OlcSideScrollingConsoleGame
                     }
 
                     //
-                    // Collision
+                    // Collision — horisontell och vertikal detektering delegerad till CollisionSystem (SRP)
                     //
                     float fBorder = GameConstants.CollisionBorderPrecision;// Hårdkoda hitbox (bevara för rpg!!)
 
                     // Moving Left
                     if (myObject.vx <= 0)
                     {
+                        var (adjXLeft, hitWallLeft) = CollisionSystem.ResolveHorizontal(
+                            myObject.py, NewObjectPosX, myObject.vx, fBorder, CurrentMap);
                         var turnPatrol = false;
-                        //if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.9f)))
-                        if (CurrentMap.GetSolid((int)(NewObjectPosX + 0), (int)(myObject.py + 0.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(myObject.py + 0.9f)))
+                        if (hitWallLeft)
                         {
-                            //if (myObject.IsHero)
-                            //{
-                            //  //  solidLeft = true;
-                            //}
-                            //NewObjectPosX = (int)NewObjectPosX + 1;
-                            //NewObjectPosX = (int)NewObjectPosX + 0.9f;
-
+                            NewObjectPosX = adjXLeft;
                             if (myObject.Name != "frost")
-                            {
                                 myObject.vx = 0;
-                            }
-                            else
-                            {
-
-                            }
-
-                            NewObjectPosX = (int)(NewObjectPosX + 0.9f);
-
-
-
                             turnPatrol = true;
                         }
-                        //else
-                        //{
-                        //    if (myObject.IsHero)
-                        //    {
-                        //        solidLeft = false;
-                        //    }
-                        //}
 
 
                         if (myObject is DynamicCreatureEnemyWalrus)
@@ -3831,29 +3808,16 @@ namespace OlcSideScrollingConsoleGame
                     }
                     else // Moving Right
                     {
-
-
+                        var (adjXRight, hitWallRight) = CollisionSystem.ResolveHorizontal(
+                            myObject.py, NewObjectPosX, myObject.vx, fBorder, CurrentMap);
                         var turnPatrol = false;
-                        if (CurrentMap.GetSolid((int)(NewObjectPosX + (1.0f - fBorder)), (int)(myObject.py + fBorder + 0.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + (1.0f - fBorder)), (int)(myObject.py + (1.0f - fBorder))))
+                        if (hitWallRight)
                         {
                             if (myObject.Name != "frost")
                             {
-
-                                NewObjectPosX = (int)NewObjectPosX;
-
+                                NewObjectPosX = adjXRight;
                                 myObject.vx = 0;
                             }
-                            else
-                            {
-                                // blir vacko om det är frost och frost hoppar. specialare för att det inte ska se ut som den har hicka
-                                //NewObjectPosX = (int)NewObjectPosX+0.5f;
-                                //myObject.vx = 4;
-                                //myObject.vx = 8;
-
-
-                            }
-
-
                             turnPatrol = true;
                         }
 
@@ -3995,23 +3959,14 @@ namespace OlcSideScrollingConsoleGame
                             }
                         }
 
-                        if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)NewObjectPosY) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.9f), (int)NewObjectPosY))
+                        var (adjYUp, hitCeiling, _) = CollisionSystem.ResolveVertical(
+                            NewObjectPosX, NewObjectPosY, myObject.vy, CurrentMap);
+                        if (hitCeiling)
                         {
-                            NewObjectPosY = (int)NewObjectPosY + 1;
+                            NewObjectPosY = adjYUp;
                             myObject.vy = 0;
-
-                            //if (myObject.IsHero && _input.IsRunDown && rememberJumpCollision < 0)
-                            //{
-                            //    rememberJumpCollision = 5;
-                            //}
-                            //if (myObject.IsHero && !_input.IsRunDown && _input.IsJumpDown && rememberJumpCollision < 0)
-                            //{
-                            //    rememberJumpCollision = 5;
-                            //}
                             if (myObject.IsHero && rememberJumpCollision < 0)
-                            {
                                 rememberJumpCollision = 5;
-                            }
                         }
 
                         //Hjälten landat - reset 
@@ -4030,12 +3985,14 @@ namespace OlcSideScrollingConsoleGame
                         //    coyoteTime--;
 
                         if (myObject.Name != "boss" && myObject.Name != "ice")
-                            if (CurrentMap.GetSolid((int)(NewObjectPosX + 0.0f), (int)(NewObjectPosY + 1.0f)) || CurrentMap.GetSolid((int)(NewObjectPosX + 0.9f), (int)(NewObjectPosY + 1.0f)))
+                        {
+                            var (adjYDown, _, grounded) = CollisionSystem.ResolveVertical(
+                                NewObjectPosX, NewObjectPosY, myObject.vy, CurrentMap);
+                            if (grounded)
                             {
-                                NewObjectPosY = (int)NewObjectPosY;
+                                NewObjectPosY = adjYDown;
                                 myObject.vy = 0;
                                 myObject.Grounded = true;
-
 
                                 //Hjälten landat
                                 if (myObject.IsHero)
@@ -4044,20 +4001,16 @@ namespace OlcSideScrollingConsoleGame
                                     allowCoyoteTime = true;
 
                                     if (HeroLandedState < 3)
-                                    {
                                         HeroLandedState++;
-                                    }
-
 
                                     if (HeroLandedState <= 1)
                                     {
                                         if (Core.Aggregate.Instance.Sound != null)
-                                            Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Land); // spelaren landar
+                                            Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Land);
                                     }
                                 }
-
-
                             }
+                        }
 
                         //Hjälten airborn - reset 
                         if (myObject.IsHero)
