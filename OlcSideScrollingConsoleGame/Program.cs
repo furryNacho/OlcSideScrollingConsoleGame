@@ -231,22 +231,7 @@ namespace OlcSideScrollingConsoleGame
 
                     header = "Select Slot To Save Your Game";
 
-                    bread = "Selected Slot ";
-                    switch (SettingsSelectIndex)
-                    {
-                        case 1:
-                            bread += " One";
-                            break;
-                        case 2:
-                            bread += " Two";
-                            break;
-                        case 3:
-                            bread += " Three";
-                            break;
-                        default:
-                            bread = "";
-                            break;
-                    }
+                    bread = SettingsSelectIndex switch { 1 => "Selected Slot  One", 2 => "Selected Slot  Two", 3 => "Selected Slot  Three", _ => "" };
 
                     options = DefaultListSave();
 
@@ -255,22 +240,7 @@ namespace OlcSideScrollingConsoleGame
 
                     header = "Select Game To Load";
 
-                    bread = "Selected Slot ";
-                    switch (SettingsSelectIndex)
-                    {
-                        case 1:
-                            bread += " One";
-                            break;
-                        case 2:
-                            bread += " Two";
-                            break;
-                        case 3:
-                            bread += " Three";
-                            break;
-                        default:
-                            bread = "";
-                            break;
-                    }
+                    bread = SettingsSelectIndex switch { 1 => "Selected Slot  One", 2 => "Selected Slot  Two", 3 => "Selected Slot  Three", _ => "" };
 
                     options = DefaultListSave();
 
@@ -280,23 +250,7 @@ namespace OlcSideScrollingConsoleGame
                     //Nolla vald sparat spel
                     header = "Clear Saved Game";
 
-                    bread = "Clear Slot";
-                    switch (SettingsSelectIndex)
-                    {
-                        case 1:
-                            bread += " One";
-                            break;
-                        case 2:
-                            bread += " Two";
-                            break;
-                        case 3:
-                            bread += " Three";
-                            break;
-                        default:
-                            bread = "";
-                            break;
-                    }
-
+                    bread = SettingsSelectIndex switch { 1 => "Clear Slot One", 2 => "Clear Slot Two", 3 => "Clear Slot Three", _ => "" };
 
                     options = DefaultListSave();
 
@@ -404,122 +358,109 @@ namespace OlcSideScrollingConsoleGame
                         _input.ButtonsHasGoneIdle = false;
                         HasSwitchedState = true;
 
-                        if (MenuState == Enum.MenuState.Load)
-                            MenuState = Enum.MenuState.StartMenu;
-                        else if (MenuState == Enum.MenuState.Save)
-                            MenuState = Enum.MenuState.PauseMenu;
-                        else
-                            MenuState = Enum.MenuState.SettingsMenu;
+                        MenuState = MenuState switch
+                        {
+                            Enum.MenuState.Load => Enum.MenuState.StartMenu,
+                            Enum.MenuState.Save => Enum.MenuState.PauseMenu,
+                            _                  => Enum.MenuState.SettingsMenu
+                        };
 
                         this.Machine.Switch(Enum.State.Menu);
                     }
-                    else if (MenuState == Enum.MenuState.Audio)
+                    else
                     {
-                        _input.ButtonsHasGoneIdle = false;
-
-                        if (SelectedOption.Display == "Turn Sound On")
+                        switch (MenuState)
                         {
-                            Core.Aggregate.Instance.Settings.AudioOn = true;
-                            if(Core.Aggregate.Instance.Sound != null)
-                                 Core.Aggregate.Instance.Sound.unMute();
+                            case Enum.MenuState.Audio:
+                                _input.ButtonsHasGoneIdle = false;
+
+                                if (SelectedOption.Display == "Turn Sound On")
+                                {
+                                    Core.Aggregate.Instance.Settings.AudioOn = true;
+                                    if (Core.Aggregate.Instance.Sound != null)
+                                        Core.Aggregate.Instance.Sound.unMute();
+                                }
+                                else if (SelectedOption.Display == "Turn Sound Off")
+                                {
+                                    Core.Aggregate.Instance.Settings.AudioOn = false;
+                                    if (Core.Aggregate.Instance.Sound != null)
+                                        Core.Aggregate.Instance.Sound.mute();
+                                }
+
+                                Core.Aggregate.Instance.SaveSettings();
+                                break;
+
+                            case Enum.MenuState.ClearHighScore:
+                                if (SelectedOption.Display == "Yes")
+                                {
+                                    Core.Aggregate.Instance.ResetHighScore();
+
+                                    MenuState = Enum.MenuState.SettingsMenu;
+                                    _input.ButtonsHasGoneIdle = false;
+                                    HasSwitchedState = true;
+                                    this.Machine.Switch(Enum.State.Menu);
+                                }
+                                else if (SelectedOption.Display == "No")
+                                {
+                                    MenuState = Enum.MenuState.SettingsMenu;
+                                    _input.ButtonsHasGoneIdle = false;
+                                    HasSwitchedState = true;
+                                    this.Machine.Switch(Enum.State.Menu);
+                                }
+                                break;
+
+                            case Enum.MenuState.ClearSavedGame:
+                                _input.ButtonsHasGoneIdle = false;
+
+                                if (SelectedOption.OptionIsSlotOne)
+                                {
+                                    //Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne = new SaveSlot() { Name = "Slot One" };
+                                    Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne = new SaveSlot();
+                                }
+                                else if (SelectedOption.OptionIsSlotTwo)
+                                {
+                                    Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo = new SaveSlot();
+                                }
+                                else if (SelectedOption.OptionIsSlotThree)
+                                {
+                                    Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree = new SaveSlot();
+                                }
+
+                                Core.Aggregate.Instance.SaveSettings();
+                                break;
+
+                            case Enum.MenuState.Load:
+                                _input.ButtonsHasGoneIdle = false;
+
+                                if (SelectedOption.SlotIsUsed)
+                                {
+                                    if (SelectedOption.OptionIsSlotOne)
+                                        Load(1);
+                                    else if (SelectedOption.OptionIsSlotTwo)
+                                        Load(2);
+                                    else if (SelectedOption.OptionIsSlotThree)
+                                        Load(3);
+
+                                    this.Machine.Switch(Enum.State.WorldMap);
+                                    HasSwitchedState = true;
+                                    _input.ButtonsHasGoneIdle = false;
+                                }
+                                break;
+
+                            case Enum.MenuState.Save:
+                                //Spara spelet (indikera att spelet är sparat)
+                                _input.ButtonsHasGoneIdle = false;
+
+                                if (SelectedOption.OptionIsSlotOne)
+                                    Save(1);
+                                else if (SelectedOption.OptionIsSlotTwo)
+                                    Save(2);
+                                else if (SelectedOption.OptionIsSlotThree)
+                                    Save(3);
+
+                                Core.Aggregate.Instance.SaveSettings();
+                                break;
                         }
-                        else if (SelectedOption.Display == "Turn Sound Off")
-                        {
-                            Core.Aggregate.Instance.Settings.AudioOn = false;
-                            if (Core.Aggregate.Instance.Sound != null)
-                                Core.Aggregate.Instance.Sound.mute();
-                        }
-
-                        Core.Aggregate.Instance.SaveSettings();
-
-                    }
-                    else if (MenuState == Enum.MenuState.ClearHighScore)
-                    {
-                        if (SelectedOption.Display == "Yes")
-                        {
-                            Core.Aggregate.Instance.ResetHighScore();
-
-                            MenuState = Enum.MenuState.SettingsMenu;
-                            _input.ButtonsHasGoneIdle = false;
-                            HasSwitchedState = true;
-                            this.Machine.Switch(Enum.State.Menu);
-
-                        }
-                        else if (SelectedOption.Display == "No")
-                        {
-                            MenuState = Enum.MenuState.SettingsMenu;
-                            _input.ButtonsHasGoneIdle = false;
-                            HasSwitchedState = true;
-                            this.Machine.Switch(Enum.State.Menu);
-                        }
-
-                    }
-                    else if (MenuState == Enum.MenuState.ClearSavedGame)
-                    {
-                        _input.ButtonsHasGoneIdle = false;
-
-                        if (SelectedOption.OptionIsSlotOne)
-                        {
-                            //Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne = new SaveSlot() { Name = "Slot One" };
-                            Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne = new SaveSlot();
-                        }
-                        else if (SelectedOption.OptionIsSlotTwo)
-                        {
-                            Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo = new SaveSlot();
-                        }
-                        else if (SelectedOption.OptionIsSlotThree)
-                        {
-                            Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree = new SaveSlot();
-                        }
-
-                        Core.Aggregate.Instance.SaveSettings();
-
-                    }
-                    else if (MenuState == Enum.MenuState.Load)
-                    {
-                        _input.ButtonsHasGoneIdle = false;
-
-                        if (SelectedOption.SlotIsUsed)
-                        {
-                            if (SelectedOption.OptionIsSlotOne)
-                            {
-                                Load(1);
-                            }
-                            else if (SelectedOption.OptionIsSlotTwo)
-                            {
-                                Load(2);
-                            }
-                            else if (SelectedOption.OptionIsSlotThree)
-                            {
-                                Load(3);
-                            }
-
-                            this.Machine.Switch(Enum.State.WorldMap);
-                            HasSwitchedState = true;
-                            _input.ButtonsHasGoneIdle = false;
-                        }
-
-                    }
-                    else if (MenuState == Enum.MenuState.Save)
-                    {
-                        //Spara spelet (indikera att spelet är sparat)
-                        _input.ButtonsHasGoneIdle = false;
-
-                        if (SelectedOption.OptionIsSlotOne)
-                        {
-                            Save(1);
-                        }
-                        else if (SelectedOption.OptionIsSlotTwo)
-                        {
-                            Save(2);
-                        }
-                        else if (SelectedOption.OptionIsSlotThree)
-                        {
-                            Save(3);
-                        }
-
-                        Core.Aggregate.Instance.SaveSettings();
-
                     }
                 }
             }
@@ -2029,69 +1970,55 @@ namespace OlcSideScrollingConsoleGame
 
 
             //Pause on world map or start menu
-            if (MenuState == Enum.MenuState.StartMenu)
+            switch (MenuState)
             {
-                menuList = new List<string>()
-                {
-                    "Start New Game",
-                    "Load Saved Game",
-                    "View High Score",
-                    "Settings",
-                    "Credits",
-                    "Exit Game"
-                };
+                case Enum.MenuState.StartMenu:
+                    menuList = new List<string>()
+                    {
+                        "Start New Game",
+                        "Load Saved Game",
+                        "View High Score",
+                        "Settings",
+                        "Credits",
+                        "Exit Game"
+                    };
+                    break;
+                case Enum.MenuState.PauseMenu:
+                    menuList = new List<string>()
+                    {
+                        "Resume",
+                        "Save",
+                        "Quit"
+                    };
+                    break;
+                case Enum.MenuState.SettingsMenu:
+                    Header = "Menu - Settings";
+                    menuList = new List<string>()
+                    {
+                        "Audio",
+                        "Clear High Score",
+                        "Clear Saved Game",
+                        "Back"
+                    };
+                    break;
+                case Enum.MenuState.CreditsMenu:
+                    Header = "Credits";
+                    menuList = new List<string>()
+                    {
+                        "Developer:",
+                        "FurryNacho",
+                        "olcPixelGameEngine:",
+                        "Javidx9",
+                        "Game Engine Port:",
+                        "DevChrome",
+                        "Music and Sound:",
+                        "Fiskifickorna",
+                        "",
+                        "Back"
+                    };
+                    selectedMenuItem = menuList.Count;
+                    break;
             }
-            else if (MenuState == Enum.MenuState.PauseMenu)
-            {
-                menuList = new List<string>()
-                {
-                    "Resume",
-                    "Save",
-                    "Quit"
-                 };
-            }
-            else if (MenuState == Enum.MenuState.SettingsMenu)
-            {
-                Header = "Menu - Settings";
-
-                menuList = new List<string>()
-                {
-                    "Audio",
-                    "Clear High Score",
-                    "Clear Saved Game",
-                    "Back"
-                 };
-            }
-            else if (MenuState == Enum.MenuState.CreditsMenu)
-            {
-                Header = "Credits";
-
-                menuList = new List<string>()
-                {
-                    "Developer:",
-                    "FurryNacho",
-                    "olcPixelGameEngine:",
-                    "Javidx9",
-                    "Game Engine Port:",
-                    "DevChrome",
-                    "Music and Sound:",
-                    "Fiskifickorna",
-                    "",
-                    "Back"
-                 };
-
-                selectedMenuItem = menuList.Count;
-            }
-            //else if (MenuState == Enum.MenuState.Audio)
-            //{
-            //    menuList = new List<string>()
-            //    {
-            //        "Audio",
-            //        "Clear High Score",
-            //        "Clear Saved Game",
-            //        "Back"
-            //     };
-            //}
 
             // Draw
             int HeaderX = (ScreenW / 2) - ((Header.Length * 8) / 2);
@@ -2477,35 +2404,32 @@ namespace OlcSideScrollingConsoleGame
                     if (Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap == 1)
                     {
                         //First stage is used as alternet develop stage
-                        if (devState == Enum.DevState.None)
+                        switch (devState)
                         {
-                            // original
-                            hasAccumulatedAllSpeed = false;
-                            ChangeMap("mapone", 2, 23, Hero);
-                            this.Machine.Switch(Enum.State.GameMap);
-                            HasSwitchedState = true;
-                            _input.ButtonsHasGoneIdle = false;
-                            return;
-                        }
-                        else if (devState == Enum.DevState.GoToLastStage)
-                        {
-                            // sim last stage
-                            hasAccumulatedAllSpeed = false;
-                            ChangeMap("mapnine", 1, 4, Hero);
-                            this.Machine.Switch(Enum.State.GameMap);
-                            HasSwitchedState = true;
-                            _input.ButtonsHasGoneIdle = false;
-                            return;
-                        }
-                        else if (devState == Enum.DevState.GoToEnding || devState == Enum.DevState.GoToEndingNearPrefect || devState == Enum.DevState.GoToEndingPertect || devState == Enum.DevState.GoToEndingDone)
-                        {
-                            // sim ending 
-                            hasAccumulatedAllSpeed = false;
-                            HasSwitchedState = true;
-                            _input.ButtonsHasGoneIdle = false;
-                            returnToEndAfterHighScore = false;
-                            this.Machine.Switch(Enum.State.End);
-                            return;
+                            case Enum.DevState.None:
+                                // original
+                                hasAccumulatedAllSpeed = false;
+                                ChangeMap("mapone", 2, 23, Hero);
+                                this.Machine.Switch(Enum.State.GameMap);
+                                HasSwitchedState = true;
+                                _input.ButtonsHasGoneIdle = false;
+                                return;
+                            case Enum.DevState.GoToLastStage:
+                                // sim last stage
+                                hasAccumulatedAllSpeed = false;
+                                ChangeMap("mapnine", 1, 4, Hero);
+                                this.Machine.Switch(Enum.State.GameMap);
+                                HasSwitchedState = true;
+                                _input.ButtonsHasGoneIdle = false;
+                                return;
+                            case Enum.DevState.GoToEnding or Enum.DevState.GoToEndingNearPrefect or Enum.DevState.GoToEndingPertect or Enum.DevState.GoToEndingDone:
+                                // sim ending
+                                hasAccumulatedAllSpeed = false;
+                                HasSwitchedState = true;
+                                _input.ButtonsHasGoneIdle = false;
+                                returnToEndAfterHighScore = false;
+                                this.Machine.Switch(Enum.State.End);
+                                return;
                         }
 
 
