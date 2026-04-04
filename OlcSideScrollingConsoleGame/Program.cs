@@ -2006,7 +2006,7 @@ namespace OlcSideScrollingConsoleGame
                     menuList = new List<string>()
                     {
                         "Developer:",
-                        "FurryNacho",
+                        "FuryNacho",
                         "olcPixelGameEngine:",
                         "Javidx9",
                         "Game Engine Port:",
@@ -5068,7 +5068,13 @@ namespace OlcSideScrollingConsoleGame
         {
             listDynamics.Clear();
             listDynamics.Add(hero);
-            CurrentMap = Core.Aggregate.Instance.GetMap(MapName);
+            var map = Core.Aggregate.Instance.GetMap(MapName);
+            if (map == null)
+            {
+                Core.Aggregate.Instance.ReadWrite.WriteToLog($"ChangeMap: kartan '{MapName}' finns inte.");
+                throw new ArgumentException($"Kartan '{MapName}' är inte laddad.", nameof(MapName));
+            }
+            CurrentMap = map;
 
             hero.px = x;
             hero.py = y;

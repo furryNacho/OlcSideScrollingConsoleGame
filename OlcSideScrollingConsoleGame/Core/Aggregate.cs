@@ -1,10 +1,9 @@
-﻿using PixelEngine;
+﻿#nullable enable
+using PixelEngine;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OlcSideScrollingConsoleGame.Models;
 using OlcSideScrollingConsoleGame.Models.Items;
 using OlcSideScrollingConsoleGame.Commands;
@@ -15,7 +14,7 @@ namespace OlcSideScrollingConsoleGame.Core
     public class Aggregate : IAssets
     {
         private static readonly object padlock = new object();
-        private static Aggregate instance = null;
+        private static Aggregate? instance = null;
         /// <summary>
         /// Toggle error logging on or off
         /// </summary>
@@ -38,23 +37,28 @@ namespace OlcSideScrollingConsoleGame.Core
             }
         }
         public bool HasSwitchedState { get; set; } = false;
-        public Program ThisGame { get; set; }
-        public ReadWrite ReadWrite { get; set; }
+        /// <summary>Sätts i Load() — null före dess.</summary>
+        public Program? ThisGame { get; set; }
+        /// <summary>Sätts i Load() — null! före dess (garanterat initierat via Load).</summary>
+        public ReadWrite ReadWrite { get; set; } = null!;
         private Dictionary<string, Sprite> MapSprites { get; set; } = new Dictionary<string, Sprite>();
         private Dictionary<string, Map> MapMaps { get; set; } = new Dictionary<string, Map>();
         private Dictionary<string, Item> MapItems { get; set; } = new Dictionary<string, Item>();
         private Dictionary<string, LevelObj> MapData { get; set; } = new Dictionary<string, LevelObj>();
-        private string PathSprites { get { return @"\Resources\Assets\Sprites"; } }
-        private string PathMapData { get { return @"\Resources\Assets\MapData"; } }
-        private string PathSettings { get { return @"\Resources\Settings"; } }
-        private string PathSound { get { return @"\Resources\Assets\Sound"; } }
-        public ScriptProcessor Script { get; set; }
+        private string PathSprites => @"\Resources\Assets\Sprites";
+        private string PathMapData => @"\Resources\Assets\MapData";
+        private string PathSettings => @"\Resources\Settings";
+        private string PathSound  => @"\Resources\Assets\Sound";
+        /// <summary>Sätts i Load() — null! före dess (garanterat initierat via Load).</summary>
+        public ScriptProcessor Script { get; set; } = null!;
         private Random Random { get; set; } = new Random();
 
-        public SettingsObj Settings { get; set; } = new SettingsObj();
-        private List<HighScoreObj> HighScoreList { get; set; }
+        /// <summary>null om inställningsfilen saknas vid start — kontrollera före användning.</summary>
+        public SettingsObj? Settings { get; set; } = new SettingsObj();
+        private List<HighScoreObj> HighScoreList { get; set; } = null!;
 
-        public Audio.Library.Sound Sound { get; private set; }
+        /// <summary>null om ljudsystemet inte kunde laddas — alla anropare kontrollerar redan null.</summary>
+        public Audio.Library.Sound? Sound { get; private set; }
 
         internal void Load(Program game)
         {
@@ -279,7 +283,8 @@ namespace OlcSideScrollingConsoleGame.Core
 
         public bool SaveSettings()
         {
-             return ReadWrite.WriteJson<SettingsObj>(PathSettings, @"\settings", ".json", Settings);
+            if (Settings == null) return false;
+            return ReadWrite.WriteJson<SettingsObj>(PathSettings, @"\settings", ".json", Settings);
         }
 
 
@@ -341,62 +346,19 @@ namespace OlcSideScrollingConsoleGame.Core
         }
         #endregion
 
-        public LevelObj GetMapData(string name)
-        {
-            LevelObj mapData;
-            if (MapData.TryGetValue(name, out mapData))
-            {
-                return mapData;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        public LevelObj? GetMapData(string name) =>
+            MapData.TryGetValue(name, out var mapData) ? mapData : null;
 
-        public Sprite GetSprite(string name)
-        {
-            Sprite sprite;
-            if (MapSprites.TryGetValue(name, out sprite))
-            {
-                return sprite;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        public Sprite? GetSprite(string name) =>
+            MapSprites.TryGetValue(name, out var sprite) ? sprite : null;
 
-        public Item GetItem(string name)
-        {
-            Item item;
-            if (MapItems.TryGetValue(name, out item))
-            {
-                return item;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        public Item? GetItem(string name) =>
+            MapItems.TryGetValue(name, out var item) ? item : null;
 
-        public Map GetMap(string name)
-        {
-            Map map;
-            if (MapMaps.TryGetValue(name, out map))
-            {
-                return map;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        public Map? GetMap(string name) =>
+            MapMaps.TryGetValue(name, out var map) ? map : null;
 
-        public SettingsObj GetSettings()
-        {
-            return Settings;
-        }
+        public SettingsObj? GetSettings() => Settings;
 
         public bool SaveSettings(SettingsObj settingsObj)
         {
