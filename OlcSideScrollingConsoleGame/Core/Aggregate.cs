@@ -268,16 +268,13 @@ namespace OlcSideScrollingConsoleGame.Core
 
         private void LoadSettings()
         {
-            Settings = ReadWrite.ReadJson<SettingsObj>(PathSettings, @"\settings", ".json");
+            Settings = ReadWrite.ReadJson<SettingsObj>(PathSettings, @"\settings", ".json")
+                       ?? new SettingsObj();
 
-            if (Settings != null)
+            EnableWriteToLog = Settings.Log;
+            if (Settings.Log)
             {
-                EnableWriteToLog = Settings.Log;
-                if (Settings.Log)
-                {
-                    ReadWrite = new ReadWrite(EnableWriteToLog);
-                }
-               
+                ReadWrite = new ReadWrite(EnableWriteToLog);
             }
         }
 
