@@ -118,7 +118,13 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         /// Ansvarar själv för hur den ser ut på skärmen.  Tar en instans av olcGameEnigne
         /// ox oy offset som typ betyder kamera
         /// </summary>
-        public virtual void DrawSelf(Program graphics, float ox, float oy) { } 
+        /// <summary>
+        /// Sant om objektet inte kan förstöras av hoppspark.
+        /// Åsidosätts i subklasser som DynamicCreatureEnemyIcicle.
+        /// </summary>
+        public virtual bool IsIndestructible => false;
+
+        public virtual void DrawSelf(Program graphics, float ox, float oy) { }
        
         /// <summary>
         /// Elapsed time

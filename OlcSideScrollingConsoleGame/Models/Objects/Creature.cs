@@ -188,82 +188,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             int SheetOffsetX = 0; //Uppe till vänster är sheet offset 0. (noll index)
             int SheetOffsetY = 0;// Om y är 1 så är det en rad ner (noll index)
 
-            if (Name == "ice")
-            {
-                SheetOffsetY = 1 * 16;
-                SheetOffsetX = 4 * 16;
-            }
-            else if (Name == "boss")
-            {
-
-                if (!IsAttackable)
-                {
-                    SheetOffsetY = 1 * 16;
-                    SheetOffsetX = 0 * 16; 
-                }
-                else
-                {
-                    if (this is DynamicCreatureEnemyBoss)
-                    {
-                        var bossman = this as DynamicCreatureEnemyBoss;
-                        if (bossman.State == Enum.LastStage.MovingUp)
-                        {
-
-                            if (py <= 12)
-                            {
-                                //"idle", vrid på huvudet
-                                if (TurnedTo == Enum.PlayerOrientation.Left)
-                                {
-                                    SheetOffsetY = 0 * 16;
-                                    SheetOffsetX = 4 * 16;
-                                }
-                                else if (TurnedTo == Enum.PlayerOrientation.Right)
-                                {
-                                    SheetOffsetY = 0 * 16;
-                                    SheetOffsetX = 3 * 16;
-                                }
-
-
-                            }
-                            else
-                            {
-                                //flaxa lite på vägen upp
-                                GraphicCounter = GraphicCounter - 1;
-
-                                SheetOffsetY = 0 * 16;
-                                SheetOffsetX = GraphicCounter * 16;
-                            }
-
-                            
-                        }
-                    }
-                    else
-                    {
-                        //fall ner
-                        SheetOffsetY = 1 * 16;
-                        SheetOffsetX = 4 * 16;
-
-                    }
-                }
-            }
-            else if (Name == "overlay")
-            {
-                SheetOffsetY = 3 * 16;
-                SheetOffsetX = 4 * 16;
-            }
-            else if (Name == "overlayice")
-            {
-                SheetOffsetY = 3 * 16;
-                SheetOffsetX = 3 * 16;
-            }
-            //else if (Name == "overlayworldmap")
-            //{
-            //    SheetOffsetY = 0 * 16;
-            //    SheetOffsetX = 0 * 16;
-            //}
-            else
-            {
-                switch (sprGraphicsState)
+            switch (sprGraphicsState)
                 {
                     /*
                      * längst ner i högra hörnet (5x5)
@@ -368,12 +293,8 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
                         SheetOffsetX = 16 * 4;
 
                         break;
-                }
             }
 
-           
-
-           
             //Sen är det dags att rita ut spriten
             // dynamiska objektet finns i world space, men måste rita den i screen space. 1 - 1 translation eftersom alla enheter är en / en enheter.
             //Vi måste bara ta reda på vart kameran titar i world space.

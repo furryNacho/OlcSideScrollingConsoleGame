@@ -1,3 +1,4 @@
+using System;
 using Gamepad.Library;
 using OlcSideScrollingConsoleGame.Global;
 using PixelEngine;
@@ -38,10 +39,20 @@ namespace OlcSideScrollingConsoleGame.Systems
         public InputManager(Game game)
         {
             _game = game;
-            _gamepad = new SlimDXGamepad();
-            _gamepad.SetUp();
-            _iip = _gamepad.IIP;
-            _gamepad.timer_Tick();
+            try
+            {
+                _gamepad = new SlimDXGamepad();
+                _gamepad.SetUp();
+                _iip = _gamepad.IIP;
+                _gamepad.timer_Tick();
+            }
+            catch (Exception)
+            {
+                // Gamepad-biblioteket (SlimDX) ej tillgängligt – kör med tangentbord.
+                // Kräver VC++ 2010 x86 runtime (vcredist_x86.exe) för gamepad-stöd.
+                _gamepad = null;
+                _iip = new IsItPressed();
+            }
         }
 
         // ─────────────────────────────────────────────
@@ -53,8 +64,11 @@ namespace OlcSideScrollingConsoleGame.Systems
         /// </summary>
         public void Poll()
         {
-            _gamepad.timer_Tick();
-            _iip = _gamepad.IIP;
+            if (_gamepad != null)
+            {
+                _gamepad.timer_Tick();
+                _iip = _gamepad.IIP;
+            }
             UpdateJumpButtonState();
         }
 

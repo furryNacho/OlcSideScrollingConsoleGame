@@ -54,6 +54,8 @@ namespace OlcSideScrollingConsoleGame
         private StateMachine<Enum.State> Machine { get; set; }
         private Creature Hero { get; set; }
         private IInputProvider _input;
+        private ICameraSystem _camera;
+        private ITileMapRenderer _tileRenderer;
 
         private bool HasSwitchedState { get; set; } = false;
 
@@ -65,9 +67,7 @@ namespace OlcSideScrollingConsoleGame
         private Sprite SpriteFont { get; set; }
         private Sprite SpriteItems { get; set; }
 
-        // Camera properties
-        float CameraPosX { get; set; } = 0.0f;
-        float CameraPosY { get; set; } = 0.0f;
+
         public int IdleCounter { get; set; } = 0;
 
         private List<string> ListDialogToShow { get; set; }
@@ -137,7 +137,9 @@ namespace OlcSideScrollingConsoleGame
             //ChangeMap("mapone", 5, 5, Hero);
             ChangeMap("worldmap", 2, 3, Hero);
 
-            _input = new InputManager(this);
+            _input        = new InputManager(this);
+            _camera       = new CameraSystem();
+            _tileRenderer = new TileMapRenderer();
 
             SpriteFont = Core.Aggregate.Instance.GetSprite("font");
             SpriteItems = Core.Aggregate.Instance.GetSprite("items");
@@ -2846,7 +2848,7 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 //Sätta värder för att rätt overlay ska visas
-                if (myObject.Name == "overlayworldmap")
+                if (myObject is DynamicCreatureOverlayWorldMap)
                 {
                     // StageCompleted ska vara blå. Alla under ska sättas till passed. Alla över not passed 
                     var CurrentStageThatIsCompleted = Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted;
@@ -3084,74 +3086,24 @@ namespace OlcSideScrollingConsoleGame
 
             #region Draw lvl
 
-            //Om kamera inte ska följa spelare:
-            //CameraPosX = 0;
-            //CameraPosY = 0;
-            //Låt kamera följa spelare:
-            CameraPosX = Hero.px;
-            CameraPosY = Hero.py;
+            var cam = _camera.Calculate(Hero.px, Hero.py, CurrentMap.Width, CurrentMap.Height, ScreenWidth, ScreenHeight);
+            foreach (var call in _tileRenderer.GetDrawCalls(cam, CurrentMap))
+                DrawPartialSprite(new Point(call.ScreenX, call.ScreenY), CurrentMap.Sprite, new Point(call.SpriteX, call.SpriteY), call.TileWidth, call.TileHeight);
 
-            // Draw Levels
-            int nTileWidth = 16;
-            int nTileHeight = 16;
-            int nVisibleTilesX = ScreenWidth / nTileWidth;
-            int nVisibleTilesY = ScreenHeight / nTileHeight;
-
-            // Calculate Top-Leftmost visible tile
-            float fOffsetX = CameraPosX - (float)nVisibleTilesX / 2.0f;
-            float fOffsetY = CameraPosY - (float)nVisibleTilesY / 2.0f;
-
-            // Clamp camera to game boundaries
-            if (fOffsetX < 0) fOffsetX = 0;
-            if (fOffsetY < 0) fOffsetY = 0;
-
-            if (fOffsetX > CurrentMap.Width - nVisibleTilesX) fOffsetX = CurrentMap.Width - nVisibleTilesX;
-            if (fOffsetY > CurrentMap.Height - nVisibleTilesY) fOffsetY = CurrentMap.Height - nVisibleTilesY;
-
-
-            // Get offsets for smooth movement
-            float fTileOffsetX = (fOffsetX - (int)fOffsetX) * nTileWidth;
-            float fTileOffsetY = (fOffsetY - (int)fOffsetY) * nTileHeight;
-
-            // Draw visible tile map
-            for (int x = -1; x < nVisibleTilesX + 1; x++)
-            {
-                for (int y = -1; y < nVisibleTilesY + 1; y++)
-                {
-
-                    PixelEngine.Point firstMagicalParam = new Point();
-                    PixelEngine.Point secondMagicalParam = new Point();
-
-                    int idx = CurrentMap.GetIndex((int)(x + fOffsetX), (int)(y + fOffsetY));
-
-                    int sx = idx % 5; //column that the sprite is on  // TODO: hårt nummer && tror det 'r antal tiles som finns i spriten
-                    int sy = idx / 5; // row that the tile is on  // TODO: hårt nummer 
-
-                    var firstMagicalPlayerParamNew = new Point((int)(x * nTileWidth - fTileOffsetX), (int)(y * nTileHeight - fTileOffsetY));
-                    var secondMagicalPlayerParamNew = new Point((int)(sx * nTileWidth), (int)(sy * nTileWidth));
-                    DrawPartialSprite(firstMagicalPlayerParamNew, CurrentMap.Sprite, secondMagicalPlayerParamNew, nTileWidth, nTileHeight);
-
-
-
-
-
-                }
-            }
-            //
             #endregion
 
             #region Draw obj's
             // Draw all objekts
             foreach (var myObject in listDynamics)
             {
-                myObject.DrawSelf(this, fOffsetX, fOffsetY);
+                myObject.DrawSelf(this, cam.OffsetX, cam.OffsetY);
             }
 
             //Hack, rita alltid hjälten sist..
             var dynamicHeroObj = listDynamics.FirstOrDefault(x => x.IsHero);
             if (dynamicHeroObj != null)
             {
-                dynamicHeroObj.DrawSelf(this, fOffsetX, fOffsetY);
+                dynamicHeroObj.DrawSelf(this, cam.OffsetX, cam.OffsetY);
             }
             //
 
@@ -3717,7 +3669,7 @@ namespace OlcSideScrollingConsoleGame
                 if (CurrentMap.Name == "mapnine")
                 {
 
-                    if (!listDynamics.Any(x => x.Name == "boss"))
+                    if (!listDynamics.Any(x => x is DynamicCreatureEnemyBoss))
                     {
 
                         if (myObject is Teleport)
@@ -3729,7 +3681,7 @@ namespace OlcSideScrollingConsoleGame
                     else
                     {
 
-                        if (myObject.Name == "boss")
+                        if (myObject is DynamicCreatureEnemyBoss)
                         {
                             Core.Aggregate.Instance.CheckSwitchX();
                         }
@@ -3838,7 +3790,7 @@ namespace OlcSideScrollingConsoleGame
                         //}
 
 
-                        if (myObject.Name == "walrus")
+                        if (myObject is DynamicCreatureEnemyWalrus)
                         {
                             var x1 = (int)(NewObjectPosX + 0.0f);
                             var y1 = (int)(myObject.py + 0.0f) + 1; // +1 ner ett 
@@ -3867,7 +3819,7 @@ namespace OlcSideScrollingConsoleGame
 
 
                         //frost hoppa vänster
-                        if (myObject.Name == "frost")
+                        if (myObject is DynamicCreatureEnemyFrost)
                         {
 
 
@@ -3981,7 +3933,7 @@ namespace OlcSideScrollingConsoleGame
                             turnPatrol = true;
                         }
 
-                        if (myObject.Name == "walrus")
+                        if (myObject is DynamicCreatureEnemyWalrus)
                         {
                             var x1 = (int)(NewObjectPosX + (1.0f - fBorder));
                             var y1 = (int)(myObject.py + fBorder + 0.0f) + 1; // +1 ner ett 
@@ -4009,7 +3961,7 @@ namespace OlcSideScrollingConsoleGame
 
 
                         //frost hoppa höger
-                        if (myObject.Name == "frost")
+                        if (myObject is DynamicCreatureEnemyFrost)
                         {
 
 
@@ -4201,7 +4153,7 @@ namespace OlcSideScrollingConsoleGame
 
                     //
                     //
-                    if (myObject.Name == "frost")
+                    if (myObject is DynamicCreatureEnemyFrost)
                     {
 
                         // om pos inte diffar mer än .3 per stickprov, troligen fast..
@@ -4342,8 +4294,8 @@ namespace OlcSideScrollingConsoleGame
 
                                     }
 
-                                    //if (otherObject.Name == "walrus" || myObject.Name == "walrus")
-                                    if ((myObject.Name == "walrus" || myObject.Name == "frost") && !otherObject.Friendly)
+                                    //if (otherObject.Name == "walrus" || myObject is DynamicCreatureEnemyWalrus)
+                                    if ((myObject is DynamicCreatureEnemyWalrus || myObject is DynamicCreatureEnemyFrost) && !otherObject.Friendly)
                                     {
 
                                         if (myObject.Patrol == Enum.Actions.Right)
@@ -4415,7 +4367,7 @@ namespace OlcSideScrollingConsoleGame
                                             if (!otherObject.Friendly) // otherObject är fiende
                                             {
 
-                                                if (otherObject.Name == "ice")
+                                                if (otherObject is DynamicCreatureEnemyIcicle)
                                                 {
                                                     DamageHero((Creature)otherObject, (Creature)Hero, "1");
                                                 }
@@ -4535,62 +4487,15 @@ namespace OlcSideScrollingConsoleGame
             }
 
 
-            //// Link camera to player position
-            CameraPosX = Hero.px; // Ganska bra om det finns direkt tillgång till spelar obj, även om det kommer finnas massa olika obj, för kameran vill alltid följa spelaren.
-            CameraPosY = Hero.py;
-            //end link camera
+            var cam = _camera.Calculate(Hero.px, Hero.py, CurrentMap.Width, CurrentMap.Height, ScreenWidth, ScreenHeight);
 
-            // Draw Levels
-            int nTileWidth = 16;
-            int nTileHeight = 16;
-
-
-            int nVisibleTilesX = ScreenWidth / nTileWidth;
-            int nVisibleTilesY = ScreenHeight / nTileHeight;
-
-            // Calculate Top-Leftmost visible tile
-            float fOffsetX = CameraPosX - (float)nVisibleTilesX / 2.0f;
-            float fOffsetY = CameraPosY - (float)nVisibleTilesY / 2.0f;
-
-            // Clamp camera to game boundaries
-            if (fOffsetX < 0) fOffsetX = 0;
-            if (fOffsetY < 0) fOffsetY = 0;
-
-            if (fOffsetX > CurrentMap.Width - nVisibleTilesX) fOffsetX = CurrentMap.Width - nVisibleTilesX;
-            if (fOffsetY > CurrentMap.Height - nVisibleTilesY) fOffsetY = CurrentMap.Height - nVisibleTilesY;
-
-
-
-            // Get offsets for smooth movement
-            float fTileOffsetX = (fOffsetX - (int)fOffsetX) * nTileWidth;
-            float fTileOffsetY = (fOffsetY - (int)fOffsetY) * nTileHeight;
-
-            // Draw visible tile map
-            for (int x = -1; x < nVisibleTilesX + 1; x++)
-            {
-                for (int y = -1; y < nVisibleTilesY + 1; y++)
-                {
-
-                    PixelEngine.Point firstMagicalParam = new Point();
-                    PixelEngine.Point secondMagicalParam = new Point();
-
-                    int idx = CurrentMap.GetIndex((int)(x + fOffsetX), (int)(y + fOffsetY));
-
-                    int sx = idx % 5; //column that the sprite is on  // TODO: hårt nummer && tror det 'r antal tiles som finns i spriten
-                    int sy = idx / 5; // row that the tile is on  // TODO: hårt nummer 
-
-                    var firstMagicalPlayerParamNew = new Point((int)(x * nTileWidth - fTileOffsetX), (int)(y * nTileHeight - fTileOffsetY));
-                    var secondMagicalPlayerParamNew = new Point((int)(sx * nTileWidth), (int)(sy * nTileWidth));
-                    DrawPartialSprite(firstMagicalPlayerParamNew, CurrentMap.Sprite, secondMagicalPlayerParamNew, nTileWidth, nTileHeight);
-
-                }
-            }
-
+            foreach (var call in _tileRenderer.GetDrawCalls(cam, CurrentMap))
+                DrawPartialSprite(new Point(call.ScreenX, call.ScreenY), CurrentMap.Sprite, new Point(call.SpriteX, call.SpriteY), call.TileWidth, call.TileHeight);
 
             // Draw all objekts
             foreach (var myObject in listDynamics)
             {
-                myObject.DrawSelf(this, fOffsetX, fOffsetY);
+                myObject.DrawSelf(this, cam.OffsetX, cam.OffsetY);
             }
 
 
@@ -5232,7 +5137,7 @@ namespace OlcSideScrollingConsoleGame
             if (Core.Aggregate.Instance.Sound != null)
                 Core.Aggregate.Instance.Sound.play(OlcSideScrollingConsoleGame.Global.GlobalNamespace.SoundRef.Damage);
 
-            if (victim.Name == "boss")
+            if (victim is DynamicCreatureEnemyBoss)
             {
                 if (victim.IsAttackable)
                 {
@@ -5248,7 +5153,7 @@ namespace OlcSideScrollingConsoleGame
                     }
                 }
             }
-            else if (victim.Name == "ice")
+            else if (victim.IsIndestructible)
             {
                 //indestructible?
             }

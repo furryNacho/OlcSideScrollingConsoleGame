@@ -30,7 +30,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -40,7 +40,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -94,11 +94,18 @@
     <Compile Include="Global\GlobalNamespace\Enum.cs" />
     <Compile Include="Global\GlobalNamespace\GameConstants.cs" />
     <Compile Include="Global\GlobalNamespace\StaticRes.cs" />
+    <Compile Include="Systems\CameraSystem.cs" />
+    <Compile Include="Systems\CameraView.cs" />
+    <Compile Include="Systems\ICameraSystem.cs" />
     <Compile Include="Systems\IInputProvider.cs" />
     <Compile Include="Systems\InputManager.cs" />
+    <Compile Include="Systems\ITileMapRenderer.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
+    <Compile Include="Systems\TileDrawCall.cs" />
+    <Compile Include="Systems\TileMapRenderer.cs" />
     <Compile Include="Models\Items\DynamicItem.cs" />
     <Compile Include="Models\Items\Items.cs" />
+    <Compile Include="Models\IMapData.cs" />
     <Compile Include="Models\Map.cs" />
     <Compile Include="Models\Models.cs" />
     <Compile Include="Models\Objects\Creature.cs" />
@@ -116,9 +123,13 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Log\" />
-    <Folder Include="Resources\Assets\MapData\" />
-    <Folder Include="Resources\Assets\Sound\" />
-    <Folder Include="Resources\Assets\Sprites\" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Assets – kopieras till bin vid bygge, checkas inte in i git (se .gitignore) -->
+    <Content Include="Resources\Assets\Sprites\*"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
+    <Content Include="Resources\Assets\Sound\*"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
+    <Content Include="Resources\Assets\MapData\*"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
+    <!-- Settings-mapp – skapas automatiskt av spelet vid körning -->
     <Folder Include="Resources\Settings\" />
   </ItemGroup>
   <ItemGroup>

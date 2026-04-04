@@ -210,6 +210,10 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
     public class DynamicCreatureEnemyIcicle : Creature
     {
+        /// <summary>
+        /// Isbossen kan inte förstöras av hoppspark — alltid oförstörbar.
+        /// </summary>
+        public override bool IsIndestructible => true;
 
         public DynamicCreatureEnemyIcicle() : base("enemyzero", Core.Aggregate.Instance.GetSprite("enemyzero"))
         {
@@ -324,6 +328,12 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             }
             //end temp
 
+        }
+
+        public override void DrawSelf(Program gfx, float ox, float oy)
+        {
+            var screen = new PixelEngine.Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
+            gfx.DrawPartialSprite(screen, Sprite, new PixelEngine.Point(4 * 16, 1 * 16), 16, 16);
         }
     }
 
@@ -701,6 +711,46 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
         //}
         #endregion
+
+        public override void DrawSelf(Program gfx, float ox, float oy)
+        {
+            int sheetOffsetX = 0;
+            int sheetOffsetY = 0;
+
+            if (!IsAttackable)
+            {
+                sheetOffsetY = 1 * 16;
+                sheetOffsetX = 0 * 16;
+            }
+            else if (State == Enum.LastStage.MovingUp)
+            {
+                if (py <= 12)
+                {
+                    // "idle" — vrid på huvudet
+                    if (TurnedTo == Enum.PlayerOrientation.Left)
+                    {
+                        sheetOffsetY = 0 * 16;
+                        sheetOffsetX = 4 * 16;
+                    }
+                    else // Right
+                    {
+                        sheetOffsetY = 0 * 16;
+                        sheetOffsetX = 3 * 16;
+                    }
+                }
+                else
+                {
+                    // Flaxa lite på vägen upp
+                    GraphicCounter--;
+                    sheetOffsetY = 0 * 16;
+                    sheetOffsetX = GraphicCounter * 16;
+                }
+            }
+            // State == MovingDown: sheetOffset (0,0) — bevarar ursprungsbeteendet
+
+            var screen = new PixelEngine.Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
+            gfx.DrawPartialSprite(screen, Sprite, new PixelEngine.Point(sheetOffsetX, sheetOffsetY), 16, 16);
+        }
     }
 
     public class DynamicCreatureOverlayWorldMap : Creature
@@ -792,7 +842,34 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             DamageGiven = 0;
         }
 
-       
+        public override void DrawSelf(Program gfx, float ox, float oy)
+        {
+            var screen = new PixelEngine.Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
+            gfx.DrawPartialSprite(screen, Sprite, new PixelEngine.Point(4 * 16, 3 * 16), 16, 16);
+        }
+    }
+
+    /// <summary>
+    /// Isöverläggsgrafikens egna typ — separerad från DynamicCreatureOverlay
+    /// så att typbaserad dispatch ersätter namnbaserad (OCP).
+    /// </summary>
+    public class DynamicCreatureOverlayIce : Creature
+    {
+        public DynamicCreatureOverlayIce() : base("overlayice", Core.Aggregate.Instance.GetSprite("enemyboss"))
+        {
+            Friendly = true;
+            Health = 100;
+            MaxHealth = 100;
+            SolidVsDynamic = false;
+            SolidVsMap = true;
+            DamageGiven = 0;
+        }
+
+        public override void DrawSelf(Program gfx, float ox, float oy)
+        {
+            var screen = new PixelEngine.Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
+            gfx.DrawPartialSprite(screen, Sprite, new PixelEngine.Point(3 * 16, 3 * 16), 16, 16);
+        }
     }
 
     public class DynamicCreatureEnemyWind : Creature

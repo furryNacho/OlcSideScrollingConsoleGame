@@ -16,6 +16,7 @@ namespace OlcSideScrollingConsoleGame.Global
         public const int FrameRate         = -1;   // -1 = okappat
 
         public const int TileSize          = 16;   // Tile-storlek i pixlar
+        public const int TileSheetColumns  = 5;    // Antal kolumner i tile-spritesheet
 
 
         // ─────────────────────────────────────────────
