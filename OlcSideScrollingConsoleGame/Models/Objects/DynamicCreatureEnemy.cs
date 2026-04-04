@@ -1,3 +1,4 @@
+using OlcSideScrollingConsoleGame.Core;
 ﻿using PixelEngine;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     public class DynamicCreatureEnemyPenguin : Creature
     {
 
-        public DynamicCreatureEnemyPenguin() : base("enemyone", Core.Aggregate.Instance.GetSprite("enemyone"))
+        public DynamicCreatureEnemyPenguin(IAssets assets) : base("enemyone", assets.GetSprite("enemyone"))
         {
             Friendly = false;
             Health = 2;
@@ -96,7 +97,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     public class DynamicCreatureEnemyWalrus : Creature
     {
 
-        public DynamicCreatureEnemyWalrus() : base("enemytwo", Core.Aggregate.Instance.GetSprite("enemytwo"))
+        public DynamicCreatureEnemyWalrus(IAssets assets) : base("enemytwo", assets.GetSprite("enemytwo"))
         {
             Friendly = false;
             Health = 2;
@@ -151,7 +152,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     public class DynamicCreatureEnemyFrost : Creature
     {
 
-        public DynamicCreatureEnemyFrost() : base("enemythree", Core.Aggregate.Instance.GetSprite("enemythree"))
+        public DynamicCreatureEnemyFrost(IAssets assets) : base("enemythree", assets.GetSprite("enemythree"))
         {
             Friendly = false;
             Health = 2;
@@ -215,7 +216,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         /// </summary>
         public override bool IsIndestructible => true;
 
-        public DynamicCreatureEnemyIcicle() : base("enemyzero", Core.Aggregate.Instance.GetSprite("enemyzero"))
+        public DynamicCreatureEnemyIcicle(IAssets assets) : base("enemyzero", assets.GetSprite("enemyzero"))
         {
             Friendly = false;
             Health = 20;
@@ -343,7 +344,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     public class DynamicCreatureEnemyBoss : Creature
     {
 
-        public DynamicCreatureEnemyBoss() : base("enemyboss", Core.Aggregate.Instance.GetSprite("enemyboss"))
+        public DynamicCreatureEnemyBoss(IAssets assets) : base("enemyboss", assets.GetSprite("enemyboss"))
         //public DynamicCreatureEnemyBoss() : base("enemyboss", Core.Aggregate.Instance.GetSprite("enemyzero"))
         {
             Friendly = false;
@@ -757,7 +758,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     {
 
         //public DynamicCreatureOverlayWorldMap() : base("overlayworldmap", Core.Aggregate.Instance.GetSprite("worldmap"))
-        public DynamicCreatureOverlayWorldMap() : base("overlayworldmap", Core.Aggregate.Instance.GetSprite("tilesheetwm"))
+        public DynamicCreatureOverlayWorldMap(IAssets assets) : base("overlayworldmap", assets.GetSprite("tilesheetwm"))
         {
             Friendly = true;
             Health = 100;
@@ -832,7 +833,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     public class DynamicCreatureOverlay : Creature
     {
 
-        public DynamicCreatureOverlay() : base("overlay", Core.Aggregate.Instance.GetSprite("enemyboss"))
+        public DynamicCreatureOverlay(IAssets assets) : base("overlay", assets.GetSprite("enemyboss"))
         {
             Friendly = true;
             Health = 100;
@@ -855,7 +856,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     /// </summary>
     public class DynamicCreatureOverlayIce : Creature
     {
-        public DynamicCreatureOverlayIce() : base("overlayice", Core.Aggregate.Instance.GetSprite("enemyboss"))
+        public DynamicCreatureOverlayIce(IAssets assets) : base("overlayice", assets.GetSprite("enemyboss"))
         {
             Friendly = true;
             Health = 100;
@@ -875,7 +876,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     public class DynamicCreatureEnemyWind : Creature
     {
 
-        public DynamicCreatureEnemyWind() : base("enemywind", Core.Aggregate.Instance.GetSprite("enemywind"))
+        public DynamicCreatureEnemyWind(IAssets assets) : base("enemywind", assets.GetSprite("enemywind"))
         {
             Friendly = true;
             Health = 50;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OlcSideScrollingConsoleGame.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     {
         public bool LookUp { get; set; }
         public bool LookDown { get; set; }
-        public DynamicCreatureHero() : base("hero", Core.Aggregate.Instance.GetSprite("hero"))
+        public DynamicCreatureHero(IAssets assets) : base("hero", assets.GetSprite("hero"))
         {
             Friendly = true;
             Health = 9;

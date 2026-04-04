@@ -106,6 +106,7 @@
     <Compile Include="Models\Items\DynamicItem.cs" />
     <Compile Include="Models\Items\Items.cs" />
     <Compile Include="Models\IMapData.cs" />
+    <Compile Include="Core\IAssets.cs" />
     <Compile Include="Models\Map.cs" />
     <Compile Include="Models\Models.cs" />
     <Compile Include="Models\Objects\Creature.cs" />

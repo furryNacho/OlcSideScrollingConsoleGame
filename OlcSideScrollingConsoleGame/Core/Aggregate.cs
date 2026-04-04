@@ -12,7 +12,7 @@ using Audio.Library;
 
 namespace OlcSideScrollingConsoleGame.Core
 {
-    public class Aggregate
+    public class Aggregate : IAssets
     {
         private static readonly object padlock = new object();
         private static Aggregate instance = null;
@@ -231,27 +231,27 @@ namespace OlcSideScrollingConsoleGame.Core
 
         private void LoadMaps()
         {
-            var wm = new WorldMap();
+            var wm = new WorldMap(this);
             MapMaps.Add("worldmap", wm);
 
-            var lvl1 = new MapOne();
+            var lvl1 = new MapOne(this);
             MapMaps.Add("mapone", lvl1);
-            var lvl2 = new MapTwo();
+            var lvl2 = new MapTwo(this);
             MapMaps.Add("maptwo", lvl2);
-            var lvl3 = new MapThree();
+            var lvl3 = new MapThree(this);
             MapMaps.Add("mapthree", lvl3);
-            var lvl4 = new MapFour();
+            var lvl4 = new MapFour(this);
             MapMaps.Add("mapfour", lvl4);
-            var lvl5 = new MapFive();
+            var lvl5 = new MapFive(this);
             MapMaps.Add("mapfive", lvl5);
-            var lvl6 = new MapSix();
+            var lvl6 = new MapSix(this);
             MapMaps.Add("mapsix", lvl6);
-            var lvl7 = new MapSeven();
+            var lvl7 = new MapSeven(this);
             MapMaps.Add("mapseven", lvl7);
-            var lvl8 = new MapEight();
+            var lvl8 = new MapEight(this);
             MapMaps.Add("mapeight", lvl8);
 
-            var lvl9 = new MapNine();
+            var lvl9 = new MapNine(this);
             MapMaps.Add("mapnine", lvl9);
 
         }
@@ -341,7 +341,7 @@ namespace OlcSideScrollingConsoleGame.Core
         }
         #endregion
 
-        internal LevelObj GetMapData(string name)
+        public LevelObj GetMapData(string name)
         {
             LevelObj mapData;
             if (MapData.TryGetValue(name, out mapData))
@@ -354,7 +354,7 @@ namespace OlcSideScrollingConsoleGame.Core
             }
         }
 
-        internal Sprite GetSprite(string name)
+        public Sprite GetSprite(string name)
         {
             Sprite sprite;
             if (MapSprites.TryGetValue(name, out sprite))

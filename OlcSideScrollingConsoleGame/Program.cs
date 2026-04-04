@@ -133,7 +133,7 @@ namespace OlcSideScrollingConsoleGame
             //ActualTotalTime = new TimeSpan(0, 0, 7, 0, 0);
             ActualTotalTime = new TimeSpan();
 
-            Hero = new DynamicCreatureHero();
+            Hero = new DynamicCreatureHero(Core.Aggregate.Instance);
             //ChangeMap("mapone", 5, 5, Hero);
             ChangeMap("worldmap", 2, 3, Hero);
 

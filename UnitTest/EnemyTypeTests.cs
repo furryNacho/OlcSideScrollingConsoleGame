@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OlcSideScrollingConsoleGame.Models.Objects;
-using System.Runtime.Serialization;
+using UnitTest.Fakes;
 
 namespace UnitTest
 {
@@ -8,18 +8,13 @@ namespace UnitTest
     /// Enhetstester för fiendehierarkin — verifierar att typbaserad dispatch
     /// och IsIndestructible fungerar korrekt utan spelmotor eller hårdvara.
     ///
-    /// Objekt skapas med FormatterServices.GetUninitializedObject så att
-    /// konstruktorer (och därmed Core.Aggregate.Instance / x86-DLL-beroenden)
-    /// aldrig anropas. Expression-body-properties (=>) har ingen backing field
-    /// och fungerar korrekt utan konstruktor; auto-properties med initialiserare
-    /// ({ get; } = value) skulle kräva konstruktor och ska undvikas i dessa klasser.
+    /// Objekt skapas via DI-konstruktorer med FakeAssets (returnerar null för
+    /// alla sprites/items) — inga Aggregate.Instance-anrop, inga x86-DLL-laddningar.
     /// </summary>
     [TestClass]
     public class EnemyTypeTests
     {
-        // Hjälpmetod: skapar en instans utan att anropa konstruktorn.
-        private static T Uninit<T>() where T : class
-            => (T)FormatterServices.GetUninitializedObject(typeof(T));
+        private static readonly FakeAssets Fake = new FakeAssets();
 
         // ─────────────────────────────────────────────
         // IsIndestructible — oförstörbarhetsflagga
@@ -28,7 +23,7 @@ namespace UnitTest
         [TestMethod]
         public void DynamicCreatureEnemyIcicle_IsIndestructible_IsTrue()
         {
-            var icicle = Uninit<DynamicCreatureEnemyIcicle>();
+            var icicle = new DynamicCreatureEnemyIcicle(Fake);
             Assert.IsTrue(icicle.IsIndestructible,
                 "Icicle-fienden ska vara oförstörbar — hoppspark ska inte döda den.");
         }
@@ -36,7 +31,7 @@ namespace UnitTest
         [TestMethod]
         public void DynamicCreatureEnemyBoss_IsIndestructible_IsFalse()
         {
-            var boss = Uninit<DynamicCreatureEnemyBoss>();
+            var boss = new DynamicCreatureEnemyBoss(Fake);
             Assert.IsFalse(boss.IsIndestructible,
                 "Bossen är inte oförstörbar — den ska kunna ta hoppsparks-skada.");
         }
@@ -44,21 +39,21 @@ namespace UnitTest
         [TestMethod]
         public void DynamicCreatureEnemyWalrus_IsIndestructible_IsFalse()
         {
-            var walrus = Uninit<DynamicCreatureEnemyWalrus>();
+            var walrus = new DynamicCreatureEnemyWalrus(Fake);
             Assert.IsFalse(walrus.IsIndestructible);
         }
 
         [TestMethod]
         public void DynamicCreatureEnemyFrost_IsIndestructible_IsFalse()
         {
-            var frost = Uninit<DynamicCreatureEnemyFrost>();
+            var frost = new DynamicCreatureEnemyFrost(Fake);
             Assert.IsFalse(frost.IsIndestructible);
         }
 
         [TestMethod]
         public void DynamicCreatureEnemyPenguin_IsIndestructible_IsFalse()
         {
-            var penguin = Uninit<DynamicCreatureEnemyPenguin>();
+            var penguin = new DynamicCreatureEnemyPenguin(Fake);
             Assert.IsFalse(penguin.IsIndestructible);
         }
 
@@ -69,35 +64,35 @@ namespace UnitTest
         [TestMethod]
         public void DynamicCreatureEnemyWalrus_IsCreature()
         {
-            var walrus = Uninit<DynamicCreatureEnemyWalrus>();
+            var walrus = new DynamicCreatureEnemyWalrus(Fake);
             Assert.IsInstanceOfType(walrus, typeof(Creature));
         }
 
         [TestMethod]
         public void DynamicCreatureEnemyFrost_IsCreature()
         {
-            var frost = Uninit<DynamicCreatureEnemyFrost>();
+            var frost = new DynamicCreatureEnemyFrost(Fake);
             Assert.IsInstanceOfType(frost, typeof(Creature));
         }
 
         [TestMethod]
         public void DynamicCreatureEnemyIcicle_IsCreature()
         {
-            var icicle = Uninit<DynamicCreatureEnemyIcicle>();
+            var icicle = new DynamicCreatureEnemyIcicle(Fake);
             Assert.IsInstanceOfType(icicle, typeof(Creature));
         }
 
         [TestMethod]
         public void DynamicCreatureEnemyBoss_IsCreature()
         {
-            var boss = Uninit<DynamicCreatureEnemyBoss>();
+            var boss = new DynamicCreatureEnemyBoss(Fake);
             Assert.IsInstanceOfType(boss, typeof(Creature));
         }
 
         [TestMethod]
         public void DynamicCreatureOverlayIce_IsCreature()
         {
-            var overlay = Uninit<DynamicCreatureOverlayIce>();
+            var overlay = new DynamicCreatureOverlayIce(Fake);
             Assert.IsInstanceOfType(overlay, typeof(Creature));
         }
 
@@ -106,7 +101,7 @@ namespace UnitTest
         {
             // OverlayIce och Overlay är separata typer — garanterar att
             // typbaserad dispatch skiljer dem åt korrekt.
-            var ice = Uninit<DynamicCreatureOverlayIce>();
+            var ice = new DynamicCreatureOverlayIce(Fake);
             Assert.IsNotInstanceOfType(ice, typeof(DynamicCreatureOverlay),
                 "DynamicCreatureOverlayIce ska inte ärva från DynamicCreatureOverlay.");
         }
