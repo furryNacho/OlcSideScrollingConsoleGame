@@ -2,10 +2,6 @@
 using OlcSideScrollingConsoleGame.Core;
 using PixelEngine;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OlcSideScrollingConsoleGame.Models.Objects
 {

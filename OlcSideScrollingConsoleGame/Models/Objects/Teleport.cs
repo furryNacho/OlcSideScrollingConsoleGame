@@ -1,10 +1,5 @@
 ﻿#nullable enable
 using PixelEngine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OlcSideScrollingConsoleGame.Models.Objects
 {
@@ -45,17 +40,9 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
         private Point Flicker(Point c)
         {
-            
-
-            int randomPX = Core.Aggregate.Instance.RNG((int)c.X - 5, (int)c.X + 5);
-            int randomPY = Core.Aggregate.Instance.RNG((int)c.Y - 5, (int)c.Y + 5);
-
-            var r = new Point(randomPX, randomPY);
-
-            return r;
-
-
-
+            int rx = Core.Aggregate.Instance.RNG((int)c.X - 5, (int)c.X + 5);
+            int ry = Core.Aggregate.Instance.RNG((int)c.Y - 5, (int)c.Y + 5);
+            return new Point(rx, ry);
         }
 
        

@@ -1,10 +1,6 @@
 ﻿#nullable enable
 using PixelEngine;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OlcSideScrollingConsoleGame.Models.Objects
 {
@@ -352,10 +348,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             IsAttackable = true;
         }
 
-        public int GetFacingDirection()
-        {
-            return (int)FacingDirection;
-        }
+        public int GetFacingDirection() => (int)FacingDirection;
 
         public float StateTick { get; set; }
 

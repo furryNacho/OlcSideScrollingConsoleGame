@@ -362,3 +362,6 @@ healthchecksdb
 # Inställningar och highscore (genereras vid körning)
 **/Resources/Settings/settings.json
 **/Resources/Settings/highscore.json
+
+# Claude-specifika filer (lokala AI-instruktioner, ska ej pushas)
+CLAUDE.md
