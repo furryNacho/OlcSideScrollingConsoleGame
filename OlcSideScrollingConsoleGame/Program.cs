@@ -347,7 +347,7 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 // Select
-                if (_input.ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || _input.IsCancelPressed || _input.IsJumpDown))
+                if (_input.ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || _input.IsCancelPressed || _input.IsConfirmPressed))
                 {
                     var SelectedOption = options[SettingsSelectIndex - 1];
                     _input.ButtonsHasGoneIdle = false;
@@ -2071,7 +2071,7 @@ namespace OlcSideScrollingConsoleGame
                 }
 
                 // Select
-                if (_input.ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || _input.IsCancelPressed || _input.IsJumpDown))
+                if (_input.ButtonsHasGoneIdle && (GetKey(Key.S).Pressed || _input.IsCancelPressed || _input.IsConfirmPressed))
                 {
                     _input.ButtonsHasGoneIdle = false;
 
