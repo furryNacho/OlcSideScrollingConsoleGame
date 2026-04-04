@@ -7,31 +7,31 @@ namespace OlcSideScrollingConsoleGame.Systems
     /// tile-offsettar för världspositionering och sub-tile-offsettar
     /// för mjuk scrollning, samt antal synliga tiles i vardera led.
     /// </summary>
-    public struct CameraView
+    public readonly record struct CameraView
     {
         /// <summary>Tile-koordinat för vänster kant av vyn (kan vara bråktal).</summary>
-        public float OffsetX { get; }
+        public float OffsetX { get; init; }
 
         /// <summary>Tile-koordinat för övre kant av vyn (kan vara bråktal).</summary>
-        public float OffsetY { get; }
+        public float OffsetY { get; init; }
 
         /// <summary>Sub-tile pixel-offset horisontellt för mjuk scrollning.</summary>
-        public float TileOffsetX { get; }
+        public float TileOffsetX { get; init; }
 
         /// <summary>Sub-tile pixel-offset vertikalt för mjuk scrollning.</summary>
-        public float TileOffsetY { get; }
+        public float TileOffsetY { get; init; }
 
         /// <summary>Antal tiles som ryms horisontellt på skärmen.</summary>
-        public int VisibleTilesX { get; }
+        public int VisibleTilesX { get; init; }
 
         /// <summary>Antal tiles som ryms vertikalt på skärmen.</summary>
-        public int VisibleTilesY { get; }
+        public int VisibleTilesY { get; init; }
 
         /// <summary>Tile-storlek i pixlar (horisontellt).</summary>
-        public int TileWidth { get; }
+        public int TileWidth { get; init; }
 
         /// <summary>Tile-storlek i pixlar (vertikalt).</summary>
-        public int TileHeight { get; }
+        public int TileHeight { get; init; }
 
         public CameraView(
             float offsetX, float offsetY,
@@ -39,14 +39,14 @@ namespace OlcSideScrollingConsoleGame.Systems
             int visibleTilesX, int visibleTilesY,
             int tileWidth, int tileHeight)
         {
-            OffsetX      = offsetX;
-            OffsetY      = offsetY;
-            TileOffsetX  = tileOffsetX;
-            TileOffsetY  = tileOffsetY;
+            OffsetX       = offsetX;
+            OffsetY       = offsetY;
+            TileOffsetX   = tileOffsetX;
+            TileOffsetY   = tileOffsetY;
             VisibleTilesX = visibleTilesX;
             VisibleTilesY = visibleTilesY;
-            TileWidth    = tileWidth;
-            TileHeight   = tileHeight;
+            TileWidth     = tileWidth;
+            TileHeight    = tileHeight;
         }
     }
 }

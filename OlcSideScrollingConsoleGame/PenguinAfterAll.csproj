@@ -12,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <LangVersion>10</LangVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -92,6 +93,7 @@
     <Compile Include="Core\Aggregate.cs" />
     <Compile Include="Core\ReadWrite.cs" />
     <Compile Include="Global\GlobalNamespace\Enum.cs" />
+    <Compile Include="Global\GlobalNamespace\IsExternalInit.cs" />
     <Compile Include="Global\GlobalNamespace\GameConstants.cs" />
     <Compile Include="Global\GlobalNamespace\StaticRes.cs" />
     <Compile Include="Systems\CameraSystem.cs" />
