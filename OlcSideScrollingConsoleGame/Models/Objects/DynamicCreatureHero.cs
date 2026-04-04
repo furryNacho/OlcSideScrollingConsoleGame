@@ -19,5 +19,10 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             StateTick = 2.0f;
             IsHero = true;
         }
+
+        /// <summary>
+        /// Hjältens beteende styrs av Program.cs via IInputProvider — inget autonomt AI-beteende.
+        /// </summary>
+        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null) { }
     }
 }

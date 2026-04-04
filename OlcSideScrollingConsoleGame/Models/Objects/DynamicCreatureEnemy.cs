@@ -814,20 +814,8 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
         }
 
-        //public override void Behaviour(float fElapsedTime, DynamicGameObject player = null)
-        //{
-        //    if (Health <= 0)
-        //    {
-        //        vx = 0;
-        //        vy = 0;
-        //        SolidVsDynamic = false;
-        //        IsAttackable = false;
-        //        // Patrol = Enum.Actions.Left;
-        //        return;
-        //    }
-        //px = 3;
-        //py = 8;
-        //        }
+        // Passivt overlagobjekt — inget autonomt beteende.
+        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null) { }
     }
 
     public class DynamicCreatureOverlay : Creature
@@ -842,6 +830,9 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             SolidVsMap = true;
             DamageGiven = 0;
         }
+
+        // Passivt overlagobjekt — inget autonomt beteende.
+        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null) { }
 
         public override void DrawSelf(Program gfx, float ox, float oy)
         {
@@ -865,6 +856,9 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             SolidVsMap = true;
             DamageGiven = 0;
         }
+
+        // Passivt overlagobjekt — inget autonomt beteende.
+        public override void Behaviour(float fElapsedTime, DynamicGameObject player = null) { }
 
         public override void DrawSelf(Program gfx, float ox, float oy)
         {

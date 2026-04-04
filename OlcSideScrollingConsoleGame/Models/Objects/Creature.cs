@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OlcSideScrollingConsoleGame.Models.Objects
 {
-    public class Creature : DynamicGameObject
+    public abstract class Creature : DynamicGameObject
     {
         public Creature(string name, Sprite sprite)
             : base(name)
@@ -322,7 +322,12 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
         }
 
-        public virtual void Behaviour(float fElapsedTime, DynamicGameObject player = null) { }
+        /// <summary>
+        /// Definierar kreaturets autonoma beteende varje tick.
+        /// Varje konkret subklass måste implementera detta — tom implementation
+        /// är tillåten för passiva objekt (overlay, hero-styrning via Program.cs).
+        /// </summary>
+        public abstract void Behaviour(float fElapsedTime, DynamicGameObject player = null);
 
         public virtual void PerformAttack() { }
 
