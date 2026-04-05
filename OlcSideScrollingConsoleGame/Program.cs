@@ -52,40 +52,96 @@ namespace OlcSideScrollingConsoleGame
         }
 
         private StateMachine<Enum.State> Machine { get; set; }
-        private Creature Hero { get; set; }
         private IInputProvider _input;
         private ICameraSystem _camera;
         private ITileMapRenderer _tileRenderer;
 
+        // ── Nytt tillståndsmaskinsystem (Fas 4b Steg 5) ───────────────────────
+        private States.GameStateManager _stateManager;
+        private States.GameServices _services;
+
         private bool HasSwitchedState { get; set; } = false;
 
-        private bool RightToAccessPodium { get; set; } = true; // once per game. must reset on new game! 
+        private bool RightToAccessPodium
+        {
+            get => _context.RightToAccessPodium;
+            set => _context.RightToAccessPodium = value;
+        }
 
-        private List<DynamicGameObject> listDynamics { get; set; } = new List<DynamicGameObject>();
+        // ── GameContext — alla fält nedan delegerar till _context ──────────────
+        private Core.GameContext _context = new Core.GameContext();
 
-        private OlcSideScrollingConsoleGame.Models.Map CurrentMap { get; set; }
+        private DynamicCreatureHero Hero
+        {
+            get => _context.Player;
+            set => _context.Player = value;
+        }
+        private List<DynamicGameObject> listDynamics => _context.ActiveObjects;
+        private OlcSideScrollingConsoleGame.Models.Map CurrentMap
+        {
+            get => _context.CurrentLevel;
+            set => _context.CurrentLevel = value;
+        }
+        public int IdleCounter
+        {
+            get => _context.IdleCounter;
+            set => _context.IdleCounter = value;
+        }
+        private List<Quest> ListQuests
+        {
+            get => _context.ActiveQuests;
+            set => _context.ActiveQuests = value;
+        }
+        private List<Item> ListItems
+        {
+            get => _context.CollectedItems;
+            set => _context.CollectedItems = value;
+        }
+        public List<int> EnergiIdLista
+        {
+            get => _context.CollectedEnergiIds;
+            set => _context.CollectedEnergiIds = value;
+        }
+        /// <summary>
+        /// 0 = Hjälten på väg ner. Mellan 1 till 3 så länge har hjälten varit i luften.
+        /// </summary>
+        private int HeroAirBornState
+        {
+            get => _context.HeroAirBornState;
+            set => _context.HeroAirBornState = value;
+        }
+        /// <summary>
+        /// 0 = Hjälten är inte på marken. Mellan 1 till 3 så länge har hjälten varit på marken.
+        /// </summary>
+        private int HeroLandedState
+        {
+            get => _context.HeroLandedState;
+            set => _context.HeroLandedState = value;
+        }
+        private TimeSpan ActualTotalTime
+        {
+            get => _context.ActualTotalTime;
+            set => _context.ActualTotalTime = value;
+        }
+        private TimeSpan GameTotalTime
+        {
+            get => _context.GameTotalTime;
+            set => _context.GameTotalTime = value;
+        }
+        private TimeSpan EndTotalTime
+        {
+            get => _context.EndTotalTime;
+            set => _context.EndTotalTime = value;
+        }
+        // ── Övriga fält (ej del av GameContext) ───────────────────────────────
         private Sprite SpriteFont { get; set; }
         private Sprite SpriteItems { get; set; }
-
-
-        public int IdleCounter { get; set; } = 0;
-
+        private Rendering.PixelEngineRenderContext _renderContext;
         private List<string> ListDialogToShow { get; set; }
         private bool doShowDialog = false;
         private float DialogX = 0.0f;
         private float Dialogy = 0.0f;
-        private List<Quest> ListQuests { get; set; } = new List<Quest>();
-        private List<Item> ListItems { get; set; } = new List<Item>();
-        public List<int> EnergiIdLista { get; set; } = new List<int>();
         private EnergiRainObject EnergiRainObj { get; set; } = new EnergiRainObject();
-        /// <summary>
-        /// 0 = Hjälten på väg ner. Mellan 1 till 3 så länge har hjälten varit i luften.
-        /// </summary>
-        private int HeroAirBornState { get; set; }
-        /// <summary>
-        /// 0 = Hjälten är inte på marken. Mellan 1 till 3 så länge har hjälten varit på marken. 
-        /// </summary>
-        private int HeroLandedState { get; set; }
 
         // Skärm- och renderkonstanter delegerade till GameConstants
         const int ScreenW  = GameConstants.ScreenWidth;
@@ -93,10 +149,6 @@ namespace OlcSideScrollingConsoleGame
         const int PixW     = GameConstants.PixelWidth;
         const int PixH     = GameConstants.PixelHeight;
         const int FrameR   = GameConstants.FrameRate;
-
-        private TimeSpan ActualTotalTime { get; set; }
-        private TimeSpan GameTotalTime { get; set; }
-        private TimeSpan EndTotalTime { get; set; }
         // private int EndTotalPercent { get; set; }
 
         private KonamiObj Konami { get; set; } = new KonamiObj();
@@ -133,7 +185,7 @@ namespace OlcSideScrollingConsoleGame
             //ActualTotalTime = new TimeSpan(0, 0, 7, 0, 0);
             ActualTotalTime = new TimeSpan();
 
-            Hero = new DynamicCreatureHero(Core.Aggregate.Instance);
+            Hero = new DynamicCreatureHero();
             //ChangeMap("mapone", 5, 5, Hero);
             ChangeMap("worldmap", 2, 3, Hero);
 
@@ -143,43 +195,42 @@ namespace OlcSideScrollingConsoleGame
 
             SpriteFont = Core.Aggregate.Instance.GetSprite("font");
             SpriteItems = Core.Aggregate.Instance.GetSprite("items");
+
+            _renderContext = new Rendering.PixelEngineRenderContext(this);
+            _renderContext.RegisterSprite(Rendering.SpriteId.Font,             Core.Aggregate.Instance.GetSprite("font"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.Items,            Core.Aggregate.Instance.GetSprite("items"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.Hero,             Core.Aggregate.Instance.GetSprite("hero"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyPenguin,     Core.Aggregate.Instance.GetSprite("enemyone"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyWalrus,      Core.Aggregate.Instance.GetSprite("enemytwo"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyFrost,       Core.Aggregate.Instance.GetSprite("enemythree"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyIcicle,      Core.Aggregate.Instance.GetSprite("enemyzero"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyBoss,        Core.Aggregate.Instance.GetSprite("enemyboss"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyWind,        Core.Aggregate.Instance.GetSprite("enemywind"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.WorldMapTileSheet, Core.Aggregate.Instance.GetSprite("tilesheetwm"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.SplashStart,      Core.Aggregate.Instance.GetSprite(Global.GlobalNamespace.SplashScreenRef.Start));
+            _renderContext.RegisterSprite(Rendering.SpriteId.SplashEnd,        Core.Aggregate.Instance.GetSprite(Global.GlobalNamespace.SplashScreenRef.End));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EndArt,           Core.Aggregate.Instance.GetSprite("endart"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.MapTileSheet,     CurrentMap.Sprite);
+
+            // ── Ny tillståndsmaskin (Fas 4b Steg 5) ──────────────────────────────
+            _stateManager = new States.GameStateManager();
+            _services = new States.GameServices(
+                _input, _camera, _tileRenderer, _renderContext, _stateManager,
+                (mapName, x, y) => ChangeMap(mapName, x, y),
+                Reset,
+                Load,
+                Save
+            );
+            _stateManager.SetInitial(new States.SplashState(_services), _context);
         }
 
         public override void OnUpdate(float elapsed)
         {
-            switch (this.Machine.CurrentState)
-            {
-                case Enum.State.SplashScreen:
-                    this.DisplaySplashScreen(elapsed);
-                    break;
-                case Enum.State.Menu:
-                    this.DisplayMenu(elapsed);
-                    break;
-                case Enum.State.WorldMap:
-                    this.DisplayWorldMap(elapsed);
-                    break;
-                case Enum.State.GameMap:
-                    this.DisplayStage(elapsed);
-                    break;
-                case Enum.State.Pause:
-                    this.DisplayPause(elapsed);
-                    break;
-                case Enum.State.Settings:
-                    this.DisplaySettings(elapsed);
-                    break;
-                case Enum.State.GameOver:
-                    this.DisplayGameOver(elapsed);
-                    break;
-                case Enum.State.EnterHighScore:
-                    this.DisplayEnterHighScore(elapsed);
-                    break;
-                case Enum.State.HighScore:
-                    this.DisplayHighScore(elapsed);
-                    break;
-                case Enum.State.End:
-                    this.DisplayEnd(elapsed);
-                    break;
-            }
+            // Uppdatera spelklockan i kontexten så att alla states kan läsa den
+            _context.GameTotalTime = Clock.Total + _context.ActualTotalTime;
+
+            // Delegera all uppdatering till den nya tillståndsmaskinen (Fas 4b Steg 5)
+            _stateManager.Update(_context, elapsed);
         }
 
         int SettingsSelectIndex = 1;
@@ -888,7 +939,11 @@ namespace OlcSideScrollingConsoleGame
             DrawBigText("Press any button", 8, 210);
         }
 
-        bool returnToEndAfterHighScore = false;
+        bool returnToEndAfterHighScore
+        {
+            get => _context.ReturnToEndAfterHighScore;
+            set => _context.ReturnToEndAfterHighScore = value;
+        }
 
         private void DisplayEnd(float elapsed)
         {
@@ -1945,7 +2000,11 @@ namespace OlcSideScrollingConsoleGame
         int selectedMenuItem = 1;
 
 
-        public Enum.MenuState MenuState { get; set; } = Enum.MenuState.StartMenu;
+        public Enum.MenuState MenuState
+        {
+            get => _context.MenuNavigation;
+            set => _context.MenuNavigation = value;
+        }
         private void DisplayMenu(float elapsed)
         {
             if (HasSwitchedState)
@@ -3020,14 +3079,14 @@ namespace OlcSideScrollingConsoleGame
             // Draw all objekts
             foreach (var myObject in listDynamics)
             {
-                myObject.DrawSelf(this, cam.OffsetX, cam.OffsetY);
+                myObject.DrawSelf(_renderContext, cam.OffsetX, cam.OffsetY);
             }
 
             //Hack, rita alltid hjälten sist..
             var dynamicHeroObj = listDynamics.FirstOrDefault(x => x.IsHero);
             if (dynamicHeroObj != null)
             {
-                dynamicHeroObj.DrawSelf(this, cam.OffsetX, cam.OffsetY);
+                dynamicHeroObj.DrawSelf(_renderContext, cam.OffsetX, cam.OffsetY);
             }
             //
 
@@ -3335,7 +3394,7 @@ namespace OlcSideScrollingConsoleGame
             }
 
             //listDynamics = listDynamics.Where(x => x.Redundant == false).ToList(); // Kanske ska dumpa denna för att kunna göra en poff på fiende om jump damage
-            listDynamics = listDynamics.Where(x => x.RemoveCount < 4).ToList();
+            _context.ActiveObjects.RemoveAll(x => x.RemoveCount >= 4);
 
             if (listDynamics == null || listDynamics.Count <= 0)
             {
@@ -4372,7 +4431,7 @@ namespace OlcSideScrollingConsoleGame
             // Draw all objekts
             foreach (var myObject in listDynamics)
             {
-                myObject.DrawSelf(this, cam.OffsetX, cam.OffsetY);
+                myObject.DrawSelf(_renderContext, cam.OffsetX, cam.OffsetY);
             }
 
 
@@ -5052,17 +5111,8 @@ namespace OlcSideScrollingConsoleGame
 
         public void ChangeMap(string MapName, float x, float y)
         {
-            if (MapName == "worldmap")
-            {
-                this.Machine.Switch(Enum.State.WorldMap);
-                HasSwitchedState = true;
-            }
-            else
-            {
-                ChangeMap(MapName, x, y, this.Hero);
-            }
-
-
+            // Staten hanterar övergången — här laddar vi bara kartan
+            ChangeMap(MapName, x, y, this.Hero);
         }
         public void ChangeMap(string MapName, float x, float y, DynamicGameObject hero)
         {
@@ -5075,6 +5125,12 @@ namespace OlcSideScrollingConsoleGame
                 throw new ArgumentException($"Kartan '{MapName}' är inte laddad.", nameof(MapName));
             }
             CurrentMap = map;
+
+            // Uppdatera MapTileSheet i renderContexten när kartan byts.
+            // _renderContext kan vara null under den första ChangeMap-anropet i OnCreate
+            // (innan _renderContext skapats) — i det fallet sker registreringen i OnCreate.
+            if (_renderContext != null && CurrentMap.Sprite != null)
+                _renderContext.RegisterSprite(Rendering.SpriteId.MapTileSheet, CurrentMap.Sprite);
 
             hero.px = x;
             hero.py = y;

@@ -1,5 +1,5 @@
 ﻿#nullable enable
-using PixelEngine;
+using OlcSideScrollingConsoleGame.Rendering;
 
 namespace OlcSideScrollingConsoleGame.Models.Objects
 {
@@ -16,33 +16,22 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             SolidVsMap = false;
         }
 
-     
-
-        public override void DrawSelf(Program graphics, float ox, float oy)
+        public override void DrawSelf(IRenderContext graphics, float ox, float oy)
         {
-            float fvalue = 16;//8 gör att den typ svävar på rutan. antar att det är det som avgör var skiten ska ritas ut
-            float svalue = 16;//8 flyttar upp den en massa, collisionen är fortfarande på samma plats
-            float radiusVAlue = 16;//size på cirkel
-            // Does nothing
-            // för att kunna se
-            int f = (int)(((px + 0.5f) - ox) * fvalue);
-            int s = (int)(((py + 0.5f) - oy) * svalue);
-            var point = new Point(f, s);
-            var radius = (int)(radiusVAlue * 0.5f);
-            var color = Pixel.Random();
+            int f = (int)(((px + 0.5f) - ox) * 16f);
+            int s = (int)(((py + 0.5f) - oy) * 16f);
+            var color = RenderColor.Random();
 
-            // graphics.DrawCircle(point, radius, color); 
-            graphics.Draw(Flicker(point), color);
-            graphics.Draw(Flicker(point), color);
-            graphics.Draw(Flicker(point), color);
-         
+            var (fx1, fy1) = Flicker(f, s); graphics.DrawPixel(fx1, fy1, color);
+            var (fx2, fy2) = Flicker(f, s); graphics.DrawPixel(fx2, fy2, color);
+            var (fx3, fy3) = Flicker(f, s); graphics.DrawPixel(fx3, fy3, color);
         }
 
-        private Point Flicker(Point c)
+        private (int x, int y) Flicker(int cx, int cy)
         {
-            int rx = Core.Aggregate.Instance.RNG((int)c.X - 5, (int)c.X + 5);
-            int ry = Core.Aggregate.Instance.RNG((int)c.Y - 5, (int)c.Y + 5);
-            return new Point(rx, ry);
+            int rx = Core.Aggregate.Instance.RNG(cx - 5, cx + 5);
+            int ry = Core.Aggregate.Instance.RNG(cy - 5, cy + 5);
+            return (rx, ry);
         }
 
        

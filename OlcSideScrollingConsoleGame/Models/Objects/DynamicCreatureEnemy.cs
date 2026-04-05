@@ -1,6 +1,5 @@
 #nullable enable
-using OlcSideScrollingConsoleGame.Core;
-using PixelEngine;
+using OlcSideScrollingConsoleGame.Rendering;
 using System;
 
 namespace OlcSideScrollingConsoleGame.Models.Objects
@@ -9,7 +8,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     public class DynamicCreatureEnemyPenguin : Creature
     {
 
-        public DynamicCreatureEnemyPenguin(IAssets assets) : base("enemyone", assets.GetSprite("enemyone"))
+        public DynamicCreatureEnemyPenguin() : base("enemyone", SpriteId.EnemyPenguin)
         {
             Friendly = false;
             Health = 2;
@@ -94,7 +93,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     public class DynamicCreatureEnemyWalrus : Creature
     {
 
-        public DynamicCreatureEnemyWalrus(IAssets assets) : base("enemytwo", assets.GetSprite("enemytwo"))
+        public DynamicCreatureEnemyWalrus() : base("enemytwo", SpriteId.EnemyWalrus)
         {
             Friendly = false;
             Health = 2;
@@ -149,7 +148,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     public class DynamicCreatureEnemyFrost : Creature
     {
 
-        public DynamicCreatureEnemyFrost(IAssets assets) : base("enemythree", assets.GetSprite("enemythree"))
+        public DynamicCreatureEnemyFrost() : base("enemythree", SpriteId.EnemyFrost)
         {
             Friendly = false;
             Health = 2;
@@ -213,7 +212,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         /// </summary>
         public override bool IsIndestructible => true;
 
-        public DynamicCreatureEnemyIcicle(IAssets assets) : base("enemyzero", assets.GetSprite("enemyzero"))
+        public DynamicCreatureEnemyIcicle() : base("enemyzero", SpriteId.EnemyIcicle)
         {
             Friendly = false;
             Health = 20;
@@ -328,10 +327,11 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
         }
 
-        public override void DrawSelf(Program gfx, float ox, float oy)
+        public override void DrawSelf(IRenderContext gfx, float ox, float oy)
         {
-            var screen = new PixelEngine.Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
-            gfx.DrawPartialSprite(screen, Sprite!, new PixelEngine.Point(4 * 16, 1 * 16), 16, 16);
+            int screenX = (int)((px - ox) * 16.0f);
+            int screenY = (int)((py - oy) * 16.0f);
+            gfx.DrawPartialSprite(SpriteId, screenX, screenY, 4 * 16, 1 * 16, 16, 16);
         }
     }
 
@@ -341,7 +341,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     public class DynamicCreatureEnemyBoss : Creature
     {
 
-        public DynamicCreatureEnemyBoss(IAssets assets) : base("enemyboss", assets.GetSprite("enemyboss"))
+        public DynamicCreatureEnemyBoss() : base("enemyboss", SpriteId.EnemyBoss)
         //public DynamicCreatureEnemyBoss() : base("enemyboss", Core.Aggregate.Instance.GetSprite("enemyzero"))
         {
             Friendly = false;
@@ -710,7 +710,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         //}
         #endregion
 
-        public override void DrawSelf(Program gfx, float ox, float oy)
+        public override void DrawSelf(IRenderContext gfx, float ox, float oy)
         {
             int sheetOffsetX = 0;
             int sheetOffsetY = 0;
@@ -746,8 +746,9 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             }
             // State == MovingDown: sheetOffset (0,0) — bevarar ursprungsbeteendet
 
-            var screen = new PixelEngine.Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
-            gfx.DrawPartialSprite(screen, Sprite!, new PixelEngine.Point(sheetOffsetX, sheetOffsetY), 16, 16);
+            int screenX = (int)((px - ox) * 16.0f);
+            int screenY = (int)((py - oy) * 16.0f);
+            gfx.DrawPartialSprite(SpriteId, screenX, screenY, sheetOffsetX, sheetOffsetY, 16, 16);
         }
     }
 
@@ -755,7 +756,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     {
 
         //public DynamicCreatureOverlayWorldMap() : base("overlayworldmap", Core.Aggregate.Instance.GetSprite("worldmap"))
-        public DynamicCreatureOverlayWorldMap(IAssets assets) : base("overlayworldmap", assets.GetSprite("tilesheetwm"))
+        public DynamicCreatureOverlayWorldMap() : base("overlayworldmap", SpriteId.WorldMapTileSheet)
         {
             Friendly = true;
             Health = 100;
@@ -767,48 +768,23 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
 
         
 
-        public override void DrawSelf(Program gfx, float ox, float oy)
+        public override void DrawSelf(IRenderContext gfx, float ox, float oy)
         {
+            int sheetOffsetX = 0 * 16;
+            int sheetOffsetY = 1 * 16;
 
-            int SheetOffsetX = 0; //Uppe till vänster är sheet offset 0. (noll index) (Horizontal)
-            int SheetOffsetY = 0;// Om y är 1 så är det en rad ner (noll index) (Vertikal)
-
-            // vilken sprite som ska visas
-            //Inte klarad, visa rödisch
             if (StageStatus == Enum.StageStatus.NotPassed)
             {
-                SheetOffsetX = 2 * 16;
-                SheetOffsetY = 1 * 16;
+                sheetOffsetX = 2 * 16;
             }
-            //Nuvarande, visa blå
             else if (StageStatus == Enum.StageStatus.Current)
             {
-                SheetOffsetX = 1 * 16;
-                SheetOffsetY = 1 * 16;
-            }
-            //Klarad, visa ingen (grön default)
-            else if (StageStatus == Enum.StageStatus.Passed)
-            {
-                SheetOffsetX = 0 * 16;
-                SheetOffsetY = 1 * 16;
-            }
-            else
-            {
-                SheetOffsetX = 0 * 16;
-                SheetOffsetY = 1 * 16;
+                sheetOffsetX = 1 * 16;
             }
 
-            
-
-            //var spriteSize = 32;
-            var firstMagicalPlayerParam = new Point();
-            firstMagicalPlayerParam = new Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
-
-            // SheetOffsetX och SheetOffsetY ger top left in en sprite
-            var secondMagicalPlayerParam = new Point(SheetOffsetX, SheetOffsetY); // Vilken tile i spritesheeten som ska ritas.
-
-            gfx.DrawPartialSprite(firstMagicalPlayerParam, Sprite!, secondMagicalPlayerParam, 16, 32);
-
+            int screenX = (int)((px - ox) * 16.0f);
+            int screenY = (int)((py - oy) * 16.0f);
+            gfx.DrawPartialSprite(SpriteId, screenX, screenY, sheetOffsetX, sheetOffsetY, 16, 32);
         }
 
         // Passivt overlagobjekt — inget autonomt beteende.
@@ -818,7 +794,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     public class DynamicCreatureOverlay : Creature
     {
 
-        public DynamicCreatureOverlay(IAssets assets) : base("overlay", assets.GetSprite("enemyboss"))
+        public DynamicCreatureOverlay() : base("overlay", SpriteId.EnemyBoss)
         {
             Friendly = true;
             Health = 100;
@@ -831,10 +807,11 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         // Passivt overlagobjekt — inget autonomt beteende.
         public override void Behaviour(float fElapsedTime, DynamicGameObject? player = null) { }
 
-        public override void DrawSelf(Program gfx, float ox, float oy)
+        public override void DrawSelf(IRenderContext gfx, float ox, float oy)
         {
-            var screen = new PixelEngine.Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
-            gfx.DrawPartialSprite(screen, Sprite!, new PixelEngine.Point(4 * 16, 3 * 16), 16, 16);
+            int screenX = (int)((px - ox) * 16.0f);
+            int screenY = (int)((py - oy) * 16.0f);
+            gfx.DrawPartialSprite(SpriteId, screenX, screenY, 4 * 16, 3 * 16, 16, 16);
         }
     }
 
@@ -844,7 +821,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     /// </summary>
     public class DynamicCreatureOverlayIce : Creature
     {
-        public DynamicCreatureOverlayIce(IAssets assets) : base("overlayice", assets.GetSprite("enemyboss"))
+        public DynamicCreatureOverlayIce() : base("overlayice", SpriteId.EnemyBoss)
         {
             Friendly = true;
             Health = 100;
@@ -857,17 +834,18 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         // Passivt overlagobjekt — inget autonomt beteende.
         public override void Behaviour(float fElapsedTime, DynamicGameObject? player = null) { }
 
-        public override void DrawSelf(Program gfx, float ox, float oy)
+        public override void DrawSelf(IRenderContext gfx, float ox, float oy)
         {
-            var screen = new PixelEngine.Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
-            gfx.DrawPartialSprite(screen, Sprite!, new PixelEngine.Point(3 * 16, 3 * 16), 16, 16);
+            int screenX = (int)((px - ox) * 16.0f);
+            int screenY = (int)((py - oy) * 16.0f);
+            gfx.DrawPartialSprite(SpriteId, screenX, screenY, 3 * 16, 3 * 16, 16, 16);
         }
     }
 
     public class DynamicCreatureEnemyWind : Creature
     {
 
-        public DynamicCreatureEnemyWind(IAssets assets) : base("enemywind", assets.GetSprite("enemywind"))
+        public DynamicCreatureEnemyWind() : base("enemywind", SpriteId.EnemyWind)
         {
             Friendly = true;
             Health = 50;

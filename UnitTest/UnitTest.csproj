@@ -58,7 +58,11 @@
     <Compile Include="EnemyTypeTests.cs" />
     <Compile Include="TileMapRendererTests.cs" />
     <Compile Include="Fakes\FakeInputProvider.cs" />
+    <Compile Include="GameStateManagerTests.cs" />
     <Compile Include="Fakes\FakeAssets.cs" />
+    <Compile Include="Fakes\FakeRenderContext.cs" />
+    <Compile Include="Fakes\FakeEventBus.cs" />
+    <Compile Include="EventBusTests.cs" />
     <Compile Include="GameConstantsTests.cs" />
     <Compile Include="InputProviderTests.cs" />
     <Compile Include="PhysicsSystemTests.cs" />

@@ -1,10 +1,6 @@
 ﻿using OlcSideScrollingConsoleGame.Models.Objects;
-using PixelEngine;
+using OlcSideScrollingConsoleGame.Rendering;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OlcSideScrollingConsoleGame.Models.Items
 {
@@ -41,18 +37,16 @@ namespace OlcSideScrollingConsoleGame.Models.Items
         public int Collectable { get; set; }
       
 
-        public override void DrawSelf(Program graphics, float ox, float oy)
+        public override void DrawSelf(IRenderContext graphics, float ox, float oy)
         {
             if (Collected)
             {
-                //this.Redundant = true;
                 this.RemoveCount = 5;
                 return;
             }
 
             int spriteX = 0;
             int spriteY = 0;
-            // TODO: animera fram energi - och bort
             if (this.IsTempEnergi)
             {
                 // Animera in
@@ -71,14 +65,14 @@ namespace OlcSideScrollingConsoleGame.Models.Items
                     spriteX = 16 * 2;
                 else if (Collectable > -56)
                     spriteX = 16 * 3;
-                else if (Collectable > -60) //Ett litet glapp innan ta bort för osilerande effekt
+                else if (Collectable > -60)
                     spriteX = 16 * 4;
             }
 
-            var firstMagicalPlayerParamNew = new Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f));
-            var secondMagicalPlayerParamNew = new Point(spriteX, spriteY);
-            graphics.DrawPartialSprite(firstMagicalPlayerParamNew, item.Sprite, secondMagicalPlayerParamNew, 16, 16);
-
+            int screenX = (int)((px - ox) * 16.0f);
+            int screenY = (int)((py - oy) * 16.0f);
+            // Alla spelplockobjekt ritar från SpriteId.Items-arket (ItemEnergi -> "items")
+            graphics.DrawPartialSprite(SpriteId.Items, screenX, screenY, spriteX, spriteY, 16, 16);
         }
 
         public override void Update(float elapsedTime, DynamicGameObject player)

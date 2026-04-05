@@ -1,16 +1,15 @@
 ﻿#nullable enable
-using PixelEngine;
+using OlcSideScrollingConsoleGame.Rendering;
 using System;
 
 namespace OlcSideScrollingConsoleGame.Models.Objects
 {
     public abstract class Creature : DynamicGameObject
     {
-        public Creature(string name, Sprite? sprite)
+        public Creature(string name, SpriteId spriteId)
             : base(name)
-
         {
-            this.Sprite = sprite;
+            SpriteId = spriteId;
             Health = 5;
             MaxHealth = 10;
             FacingDirection = Enum.Direction.EAST;
@@ -25,7 +24,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         protected Enum.GraphicsState sprGraphicsState { get; set; }
         protected int GraphicCounter { get; set; }
         private float Timer { get; set; }
-        protected Sprite? Sprite { get; set; }
+        protected SpriteId SpriteId { get; }
         public int Health { get; set; }
         public int MaxHealth { get; set; }
         public int DamageGiven { get; set; } = 0;
@@ -176,14 +175,10 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         }
 
 
-        public override void DrawSelf(Program gfx, float ox, float oy)  // gfx  = graphics //  olcConscoleGameEngineOOP
+        public override void DrawSelf(IRenderContext gfx, float ox, float oy)
         {
-            // Måste draw rätt sprite som passar state som creature är i, in this point in time
-
-            // Mosvarar vart på spriten som ska ritas. 
-            
-            int SheetOffsetX = 0; //Uppe till vänster är sheet offset 0. (noll index)
-            int SheetOffsetY = 0;// Om y är 1 så är det en rad ner (noll index)
+            int SheetOffsetX = 0;
+            int SheetOffsetY = 0;
 
             switch (sprGraphicsState)
                 {
@@ -292,30 +287,20 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
                         break;
             }
 
-            //Sen är det dags att rita ut spriten
-            // dynamiska objektet finns i world space, men måste rita den i screen space. 1 - 1 translation eftersom alla enheter är en / en enheter.
-            //Vi måste bara ta reda på vart kameran titar i world space.
-            var firstMagicalPlayerParam = new Point();
+            int screenX;
+            int screenY = (int)((py - oy) * 16.0f);
+
             if (IsHero)
             {
-                var notGoOfTheWorldLeft = 0.0f;
-                notGoOfTheWorldLeft = (px - ox) * 16.0f;
-                if (notGoOfTheWorldLeft <= 1.0f)
-                {
-                    notGoOfTheWorldLeft = 1.0f;
-                }
-                firstMagicalPlayerParam = new Point((int)notGoOfTheWorldLeft, (int)((py - oy) * 16.0f));
+                float rawX = (px - ox) * 16.0f;
+                screenX = (int)(rawX <= 1.0f ? 1.0f : rawX);
             }
             else
             {
-                firstMagicalPlayerParam = new Point((int)((px - ox) * 16.0f), (int)((py - oy) * 16.0f)); // Vart tilen ska ritas.
+                screenX = (int)((px - ox) * 16.0f);
             }
 
-            // SheetOffsetX och SheetOffsetY ger top left in en sprite
-            var secondMagicalPlayerParam = new Point(SheetOffsetX, SheetOffsetY); // Vilken tile i spritesheeten som ska ritas.
-
-            // 16 är för närvarande en full enhet 
-            gfx.DrawPartialSprite(firstMagicalPlayerParam, Sprite!, secondMagicalPlayerParam, 16, 16);
+            gfx.DrawPartialSprite(SpriteId, screenX, screenY, SheetOffsetX, SheetOffsetY, 16, 16);
 
         }
 

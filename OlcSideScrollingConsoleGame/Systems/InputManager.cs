@@ -128,15 +128,21 @@ namespace OlcSideScrollingConsoleGame.Systems
         public bool IsJumpPressed   => _game.GetKey(Key.Up).Pressed  || _game.GetKey(Key.Space).Pressed;
         public bool IsJumpReleased  => _game.GetKey(Key.Up).Released || _game.GetKey(Key.Space).Released;
 
-        public bool IsConfirmPressed => _game.GetKey(Key.Space).Pressed || _game.GetKey(Key.X).Pressed || _iip.Button0;
-        public bool IsCancelPressed  => _game.GetKey(Key.Escape).Pressed || _iip.Button7;
-        public bool IsPausePressed   => _game.GetKey(Key.Escape).Pressed || _iip.Button7;
+        public bool IsConfirmPressed => _game.GetKey(Key.Space).Pressed || _game.GetKey(Key.X).Pressed ||
+                                       _game.GetKey(Key.S).Pressed   || _iip.Button0;
+        public bool IsCancelPressed  => _game.GetKey(Key.Escape).Pressed || _game.GetKey(Key.P).Pressed || _iip.Button7;
+        public bool IsPausePressed   => _game.GetKey(Key.Escape).Pressed || _game.GetKey(Key.P).Pressed || _iip.Button7;
 
-        public bool IsRunDown        => _game.GetKey(Key.Z).Down    || _iip.Button1;
+        public bool IsRunDown        => _game.GetKey(Key.Z).Down || _game.GetKey(Key.B).Down || _iip.Button1;
         public bool IsSelectDown     => _iip.Button6;   // gamepad Select-knapp
         public bool IsRunPressed     => _game.GetKey(Key.Z).Pressed || _iip.Button1;
 
         public bool IsAnyKeyPressed  => _game.GetKey(Key.Any).Pressed;
+
+        // ─────────────────────────────────────────────
+        // Fönsterfokus
+        // ─────────────────────────────────────────────
+        public bool IsWindowFocused  => _game.Focus;
 
         // ─────────────────────────────────────────────
         // Dev / debug

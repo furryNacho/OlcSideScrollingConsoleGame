@@ -1,5 +1,5 @@
 ﻿#nullable enable
-using OlcSideScrollingConsoleGame.Core;
+using OlcSideScrollingConsoleGame.Rendering;
 
 namespace OlcSideScrollingConsoleGame.Models.Objects
 {
@@ -7,7 +7,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
     {
         public bool LookUp { get; set; }
         public bool LookDown { get; set; }
-        public DynamicCreatureHero(IAssets assets) : base("hero", assets.GetSprite("hero"))
+        public DynamicCreatureHero() : base("hero", SpriteId.Hero)
         {
             Friendly = true;
             Health = 9;

@@ -1,0 +1,649 @@
+#nullable enable
+using System;
+using System.Linq;
+using OlcSideScrollingConsoleGame.Core;
+using OlcSideScrollingConsoleGame.Global;
+using OlcSideScrollingConsoleGame.Models;
+using OlcSideScrollingConsoleGame.Models.Items;
+using OlcSideScrollingConsoleGame.Models.Objects;
+using OlcSideScrollingConsoleGame.Rendering;
+using OlcSideScrollingConsoleGame.Systems;
+
+namespace OlcSideScrollingConsoleGame.States
+{
+    /// <summary>
+    /// Hanterar gameplay-fasen — fysik, kollision, fiende-AI, kamerarendering och HUD
+    /// för alla spel-banor (mapone–mapnine).
+    /// </summary>
+    /// <remarks>
+    /// MÖNSTER: State Machine (konkret tillstånd)
+    ///
+    /// MOTIVERING:
+    /// Extraherat från Program.DisplayStage (ca 1120 rader). Isolerar alla gameplay-
+    /// specifika fält (BPower, jumpMemory, EnergiRain, enemyJump m.fl.) som tidigare
+    /// låg som lösa public-fält i Program.cs.
+    ///
+    /// ANVÄNDNING:
+    /// Aktiveras från WorldMapState när spelaren väljer en bana. Övergår till
+    /// GameOverState om Hero.Health &lt; 1 eller PauseState vid Escape/P.
+    /// Ljud och energi-lista initieras i Enter().
+    /// </remarks>
+    internal sealed class GameplayState : IGameState
+    {
+        private readonly GameServices _services;
+        private readonly IRenderContext _rc;
+        private const int ScreenW = GameConstants.ScreenWidth;
+        private const int ScreenH = GameConstants.ScreenHeight;
+
+        // Fysik-tillstånd
+        private bool  _bPower;
+        private int   _rememberJumpCollision;
+        private int   _jumpMemory;
+        private int   _fallCounter;
+        private bool  _allowCoyoteTime;
+        private int   _tempMemJumpCounter;
+        private int   _tempMemCoyoteCounter;
+        private bool  _detHarBallatUrLog;
+        private float _maxR, _maxL, _maxY;
+
+        // Fiende-AI
+        private int _enemyJump;
+
+        // Energi-regn vid träff
+        private readonly EnergiRainObject _energiRain = new EnergiRainObject();
+
+        public GameplayState(GameServices services)
+        {
+            _services = services;
+            _rc       = services.RenderContext;
+        }
+
+        public void Enter(GameContext context)
+        {
+            Aggregate.Instance.HasSwitchedState = false;
+
+            // Ta bort redan insamlad energi från aktiva objekt
+            context.ActiveObjects.RemoveAll(x =>
+                context.CollectedEnergiIds.Any(id => id == x.CoinId));
+
+            // Ljud
+            if (Aggregate.Instance.Sound != null)
+            {
+                Aggregate.Instance.Sound.stop(Global.GlobalNamespace.SoundRef.BGSoundWorld);
+                if (context.CurrentLevel?.Name != "mapnine")
+                {
+                    if (!Aggregate.Instance.Sound.isPlaying(Global.GlobalNamespace.SoundRef.BGSoundGame))
+                        Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.BGSoundGame);
+                }
+                else
+                {
+                    Aggregate.Instance.Sound.stop(Global.GlobalNamespace.SoundRef.BGSoundGame);
+                    if (!Aggregate.Instance.Sound.isPlaying(Global.GlobalNamespace.SoundRef.BGSoundFinalStage))
+                        Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
+                }
+            }
+
+            context.Player!.vx = 0;
+            _enemyJump = -1;
+        }
+
+        public void Update(GameContext context, float elapsed)
+        {
+            Aggregate.Instance.Script.ProcessCommands(elapsed);
+
+            // Aggregate kan trigga HasSwitchedState från scripts (t.ex. teleport)
+            if (Aggregate.Instance.HasSwitchedState)
+            {
+                Aggregate.Instance.HasSwitchedState = false;
+                context.ActiveObjects.RemoveAll(x =>
+                    context.CollectedEnergiIds.Any(id => id == x.CoinId));
+            }
+
+            if (_enemyJump > -1) _enemyJump--;
+
+            // Hjälten är död → game over
+            if (context.Player!.Health < 1)
+            {
+                _services.Input.ButtonsHasGoneIdle = false;
+                _services.StateManager.Transition(new GameOverState(_services), context);
+                return;
+            }
+
+            // Rensa redundanta objekt
+            context.ActiveObjects.RemoveAll(x => x.RemoveCount >= 4);
+
+            if (context.ActiveObjects.Count <= 0)
+            {
+                Aggregate.Instance.ReadWrite.WriteToLog("listDynamics är tom i GameplayState");
+                throw new InvalidOperationException("ActiveObjects är tom i GameplayState");
+            }
+
+            _services.Input.Poll();
+            _detHarBallatUrLog = false;
+
+            // Input
+            if (_services.Input.IsWindowFocused)
+                HandleInput(context, elapsed);
+
+            // Fysik + kollision per objekt
+            foreach (var obj in context.ActiveObjects)
+            {
+                obj.detHarBallatUr = false;
+
+                // Speciell boss-bana-logik (mapnine)
+                if (context.CurrentLevel?.Name == "mapnine")
+                {
+                    if (!context.ActiveObjects.Any(x => x is DynamicCreatureEnemyBoss))
+                    {
+                        if (obj is Teleport)
+                        { obj.px = context.Player.px; obj.py = context.Player.py; }
+                    }
+                    else
+                    {
+                        if (obj is DynamicCreatureEnemyBoss)
+                            Aggregate.Instance.CheckSwitchX();
+                        if (obj.Id > 0)
+                            obj.px = Aggregate.Instance.GetMyX(obj.Id);
+                    }
+                }
+
+                if (!obj.Redundant)
+                {
+                    UpdateObject(obj, context, elapsed);
+                }
+                else
+                {
+                    obj.RemoveCount += 1;
+                    obj.Update(elapsed, context.Player);
+                }
+            }
+
+            // Energi-regn
+            if (_energiRain.MakeItRain)
+                MakeItRainEnergi(context);
+
+            // Rendera
+            if (context.CurrentLevel != null)
+            {
+                var cam = _services.Camera.Calculate(
+                    context.Player.px, context.Player.py,
+                    context.CurrentLevel.Width, context.CurrentLevel.Height,
+                    ScreenW, ScreenH);
+
+                foreach (var call in _services.TileRenderer.GetDrawCalls(cam, context.CurrentLevel))
+                    _rc.DrawPartialSprite(SpriteId.MapTileSheet,
+                        call.ScreenX, call.ScreenY, call.SpriteX, call.SpriteY,
+                        call.TileWidth, call.TileHeight);
+
+                foreach (var obj in context.ActiveObjects)
+                    obj.DrawSelf(_rc, cam.OffsetX, cam.OffsetY);
+            }
+
+            HudRenderer.Draw(_rc, context);
+        }
+
+        public void Draw(IRenderContext renderContext) { }
+
+        public void Exit(GameContext context) { }
+
+        // ── Input ────────────────────────────────────────────────────────────────
+        private void HandleInput(GameContext context, float elapsed)
+        {
+            var hero = (DynamicCreatureHero)context.Player!;
+
+            // Run/power-knapp
+            _bPower = _services.Input.IsRunDown || _services.Input.IsSelectDown;
+
+            hero.LookUp   = _services.Input.IsUpDown;
+            hero.LookDown = _services.Input.IsDownDown;
+
+            // Hopp
+            bool jumpDown = _services.Input.IsJumpDown || _services.Input.IsConfirmPressed;
+            if (jumpDown)
+            {
+                if (_services.Input.JumpButtonDownReleaseOnce)
+                    _jumpMemory = 5;
+
+                if (_services.Input.JumpButtonState < 3)
+                    _services.Input.JumpButtonState++;
+
+                if ((hero.vy == 0 && _services.Input.JumpButtonDownRelease) ||
+                    (_allowCoyoteTime && _services.Input.JumpButtonDownReleaseOnce) ||
+                    _enemyJump > -1)
+                {
+                    if (hero.vy != 0 && _allowCoyoteTime)
+                        _tempMemCoyoteCounter++;
+
+                    if (Aggregate.Instance.Sound != null)
+                        Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.Jump);
+
+                    hero.vy = GameConstants.JumpVelocity;
+                    _services.Input.JumpButtonDownRelease = false;
+                    _jumpMemory = -1;
+                    _enemyJump = -1;
+                }
+                _services.Input.JumpButtonDownReleaseOnce = false;
+            }
+            else
+            {
+                _services.Input.JumpButtonDownReleaseOnce = true;
+                _services.Input.JumpButtonState = 0;
+                _services.Input.JumpButtonPressRelease = true;
+                if (context.HeroLandedState != 0)
+                {
+                    _services.Input.JumpButtonDownRelease = true;
+                    _services.Input.JumpButtonCounter = 0;
+                }
+            }
+
+            if (_jumpMemory > 0 && hero.Grounded)
+            {
+                _tempMemJumpCounter++;
+                hero.vy = GameConstants.JumpVelocity;
+                _services.Input.JumpButtonDownRelease = false;
+                _jumpMemory = -1;
+            }
+
+            // Höger
+            if (_services.Input.IsRightDown)
+            {
+                float acc = (hero.Grounded ? GameConstants.MoveAccelerationGround : GameConstants.MoveAccelerationAir) * elapsed;
+                hero.vx += acc;
+                float maxSpd = _bPower ? GameConstants.MaxSpeedPower : GameConstants.MaxSpeedNormal;
+                if (hero.vx > maxSpd) hero.vx = maxSpd;
+            }
+
+            // Vänster
+            if (_services.Input.IsLeftDown)
+            {
+                float acc = (-1f * (hero.Grounded ? GameConstants.MoveAccelerationGround : GameConstants.MoveAccelerationAir)) * elapsed;
+                hero.vx += acc;
+                float maxSpd = _bPower ? GameConstants.MaxSpeedPower : GameConstants.MaxSpeedNormal;
+                if (hero.vx < -maxSpd) hero.vx = -maxSpd;
+            }
+
+            // Pause
+            if (!_services.Input.ButtonsHasGoneIdle && _services.Input.IsIdle && !_services.Input.IsAnyKeyPressed)
+                _services.Input.ButtonsHasGoneIdle = true;
+            if (_services.Input.ButtonsHasGoneIdle && _services.Input.IsCancelPressed)
+            {
+                _services.Input.ButtonsHasGoneIdle = false;
+                _services.StateManager.Transition(new PauseState(_services), context);
+                return;
+            }
+
+            // Idle-animation
+            if (_services.Input.IsIdle && !_services.Input.IsAnyKeyPressed)
+            {
+                context.IdleCounter++;
+                if (context.IdleCounter > GameConstants.IdleTimeout)
+                {
+                    hero.IsIdle = true;
+                    if (context.IdleCounter > 220 && context.IdleCounter < 245)
+                        hero.vy -= 20.1f * elapsed;
+                }
+                if (context.IdleCounter > 250)
+                {
+                    context.IdleCounter = 0;
+                    hero.IsIdle = false;
+                }
+            }
+            else
+            {
+                context.IdleCounter = 0;
+                if (hero.IsIdle) hero.IsIdle = false;
+            }
+        }
+
+        // ── Fysik + kollision per objekt ──────────────────────────────────────────
+        private void UpdateObject(DynamicGameObject obj, GameContext context, float elapsed)
+        {
+            var map = context.CurrentLevel!;
+            float fBorder = GameConstants.CollisionBorderPrecision;
+
+            // Gravitation
+            int rjc = _rememberJumpCollision;
+            PhysicsSystem.ApplyGravity(obj, obj.IsHero, _bPower, ref rjc, elapsed);
+            _rememberJumpCollision = rjc;
+
+            // Luftmotstånd
+            bool isIcy = map.Name == "mapseven" || map.Name == "mapeight" || map.Name == "mapnine";
+            bool anyDir = _services.Input.IsLeftDown || _services.Input.IsRightDown;
+            PhysicsSystem.ApplyDrag(obj, _bPower, isIcy, anyDir, elapsed);
+
+            if (obj.IsHero)
+            {
+                if (obj.vx < _maxL) _maxL = obj.vx;
+                if (obj.vx > _maxR) _maxR = obj.vx;
+            }
+
+            if (PhysicsSystem.ClampVelocities(obj))
+            {
+                obj.detHarBallatUr = true;
+                _detHarBallatUrLog = true;
+            }
+
+            float newX = obj.px + obj.vx * elapsed;
+            float newY = obj.py + obj.vy * elapsed;
+
+            if (obj.IsHero && _rememberJumpCollision >= 0)
+                if (newY > obj.py) newY = obj.py;
+
+            // Horisontell kollision (karta)
+            if (obj.vx <= 0)
+            {
+                var (adjX, hitLeft) = CollisionSystem.ResolveHorizontal(obj.py, newX, obj.vx, fBorder, map);
+                bool turnPatrol = false;
+                if (hitLeft) { newX = adjX; if (obj.Name != "frost") obj.vx = 0; turnPatrol = true; }
+                HandleEnemyHorizontalLeft(obj, ref newX, turnPatrol, map, fBorder);
+            }
+            else
+            {
+                var (adjX, hitRight) = CollisionSystem.ResolveHorizontal(obj.py, newX, obj.vx, fBorder, map);
+                bool turnPatrol = false;
+                if (hitRight) { if (obj.Name != "frost") { newX = adjX; obj.vx = 0; } turnPatrol = true; }
+                HandleEnemyHorizontalRight(obj, ref newX, turnPatrol, map, fBorder);
+            }
+
+            obj.Grounded = false;
+
+            // Vertikal kollision (karta)
+            if (obj.vy <= 0)
+            {
+                if (obj.IsHero) { _jumpMemory = -1; _allowCoyoteTime = false; _fallCounter = 0; if (context.HeroAirBornState < 3) context.HeroAirBornState++; }
+                var (adjY, hitCeil, _) = CollisionSystem.ResolveVertical(newX, newY, obj.vy, map);
+                if (hitCeil) { newY = adjY; obj.vy = 0; if (obj.IsHero && _rememberJumpCollision < 0) _rememberJumpCollision = 5; }
+                if (obj.IsHero) context.HeroLandedState = 0;
+            }
+            else
+            {
+                if (obj.Name != "boss" && obj.Name != "ice")
+                {
+                    var (adjY, _, grounded) = CollisionSystem.ResolveVertical(newX, newY, obj.vy, map);
+                    if (grounded)
+                    {
+                        newY = adjY; obj.vy = 0; obj.Grounded = true;
+                        if (obj.IsHero)
+                        {
+                            _fallCounter = 0; _allowCoyoteTime = true;
+                            if (context.HeroLandedState < 3) context.HeroLandedState++;
+                            if (context.HeroLandedState <= 1 && Aggregate.Instance.Sound != null)
+                                Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.Land);
+                        }
+                    }
+                }
+                if (obj.IsHero)
+                {
+                    context.HeroAirBornState = 0;
+                    if (_jumpMemory >= 0) _jumpMemory--;
+                    if (obj.vy > 1 && _fallCounter < 10) _fallCounter++;
+                    if (_fallCounter > 3) _allowCoyoteTime = false;
+                }
+            }
+
+            // Frost-AI: fast-detektion
+            if (obj is DynamicCreatureEnemyFrost) HandleFrostStuckDetection(obj, ref newY);
+
+            // Dynamisk kollision (objekt vs objekt)
+            float dx = newX, dy = newY;
+            foreach (var other in context.ActiveObjects)
+            {
+                if (other == obj) continue;
+                if (other.SolidVsDynamic && obj.SolidVsDynamic)
+                    HandleDynamicCollision(obj, other, context, ref dx, ref dy);
+                else if (obj.IsHero)
+                    HandleHeroPickup(obj, other, context, dx);
+            }
+
+            if (!obj.detHarBallatUr)
+            { obj.px = dx; obj.py = dy; }
+            else if (_detHarBallatUrLog && obj.Name != "pickup")
+                Aggregate.Instance.ReadWrite.WriteToLog($"Position ej uppdaterad. {obj.Name} vx={obj.vx} vy={obj.vy}");
+
+            obj.Update(elapsed, context.Player!);
+        }
+
+        // ── Fiende-AI: horisontell rörelse ─────────────────────────────────────────
+        private void HandleEnemyHorizontalLeft(DynamicGameObject obj, ref float newX,
+            bool turnPatrol, Map map, float fBorder)
+        {
+            if (obj is DynamicCreatureEnemyWalrus)
+            {
+                bool solid1 = map.GetSolid((int)(newX + 0f), (int)(obj.py + 0f) + 1);
+                bool solid2 = map.GetSolid((int)(newX + 0f), (int)(obj.py + 0.9f) + 1);
+                if (!solid1 || !solid2 || turnPatrol) { newX += 0.1f; obj.vx = 2; obj.Patrol = Enum.Actions.Right; }
+                else obj.Patrol = Enum.Actions.Left;
+            }
+            if (obj is DynamicCreatureEnemyFrost)
+                HandleFrostLeft(obj, ref newX, turnPatrol, map);
+        }
+
+        private static void HandleFrostLeft(DynamicGameObject obj, ref float newX,
+            bool turnPatrol, Map map)
+        {
+            var frost = (Creature)obj;
+            frost.Ticker++;
+
+            if (frost.DoSpecialAction)
+            {
+                bool solid = map.GetSolid((int)(obj.px + 0f), (int)(obj.py + 0f) + 1);
+                if (solid && !frost.HasJumped) { obj.vy = GameConstants.EnemyJumpVelocity; frost.HasJumped = true; }
+                else if (solid && frost.HasJumped)
+                {
+                    if (frost.DoneSpecialAction == 1) { frost.Ticker = 0; frost.DoSpecialAction = false; frost.DoneSpecialAction = 0; frost.HasJumped = false; }
+                    else frost.DoneSpecialAction = 1;
+                }
+            }
+            if (!frost.DoSpecialAction)
+            {
+                if (turnPatrol) { newX += 0.1f; obj.vx = 1; obj.Patrol = Enum.Actions.Right; }
+                else { obj.Patrol = Enum.Actions.Left; if (frost.Ticker > 8) frost.DoSpecialAction = true; }
+            }
+            if ((int)(newX + 1f) <= frost.FromCor) { newX += 0.1f; obj.vx = 1; obj.Patrol = Enum.Actions.Right; }
+        }
+
+        private void HandleEnemyHorizontalRight(DynamicGameObject obj, ref float newX,
+            bool turnPatrol, Map map, float fBorder)
+        {
+            if (obj is DynamicCreatureEnemyWalrus)
+            {
+                bool solid1 = map.GetSolid((int)(newX + (1f - fBorder)), (int)(obj.py + fBorder) + 1);
+                bool solid2 = map.GetSolid((int)(newX + (1f - fBorder)), (int)(obj.py + (1f - fBorder) + 1));
+                if (!solid1 || !solid2 || turnPatrol) { newX = (int)newX; obj.vx = -2; obj.Patrol = Enum.Actions.Left; }
+                else obj.Patrol = Enum.Actions.Right;
+            }
+            if (obj is DynamicCreatureEnemyFrost)
+                HandleFrostRight(obj, ref newX, turnPatrol, map);
+        }
+
+        private static void HandleFrostRight(DynamicGameObject obj, ref float newX,
+            bool turnPatrol, Map map)
+        {
+            var frost = (Creature)obj;
+            frost.Ticker++;
+
+            if (frost.DoSpecialAction)
+            {
+                bool solid = map.GetSolid((int)(obj.px + 0f), (int)(obj.py + 0f) + 1);
+                if (solid && !frost.HasJumped) { obj.vy = GameConstants.EnemyJumpVelocity; frost.HasJumped = true; }
+                else if (solid && frost.HasJumped)
+                {
+                    if (frost.DoneSpecialAction == 1) { frost.Ticker = 0; frost.DoSpecialAction = false; frost.DoneSpecialAction = 0; frost.HasJumped = false; }
+                    else frost.DoneSpecialAction = 1;
+                }
+            }
+            if (!frost.DoSpecialAction)
+            {
+                if (turnPatrol) { newX = (int)newX; obj.vx = -1; obj.Patrol = Enum.Actions.Left; }
+                else { obj.Patrol = Enum.Actions.Right; if (frost.Ticker > 8) frost.DoSpecialAction = true; }
+            }
+            if ((int)newX >= frost.ToCor) { newX = (int)newX; obj.vx = -1; obj.Patrol = Enum.Actions.Left; }
+        }
+
+        // ── Frost fast-detektion ─────────────────────────────────────────────────
+        private static void HandleFrostStuckDetection(DynamicGameObject obj, ref float newY)
+        {
+            if (obj.PrevTick == 10)        obj.SampleOne = obj.px;
+            else if (obj.PrevTick == 30)   obj.SampleTow = obj.px;
+            else if (obj.PrevTick == 50)   obj.SampleThree = obj.px;
+
+            if (obj.PrevTick >= 50)
+            {
+                float c1 = Math.Abs(obj.SampleOne - obj.SampleTow);
+                if (c1 <= 0.3f)
+                {
+                    float c2 = Math.Abs(obj.SampleOne - obj.SampleThree);
+                    if (c2 <= 0.3f)
+                    {
+                        float curr = obj.px;
+                        if (Math.Abs(curr - obj.SampleOne) < 5 && Math.Abs(curr - obj.SampleTow) < 5 && Math.Abs(curr - obj.SampleThree) < 5)
+                            obj.vy = -2;
+                    }
+                }
+            }
+            if (obj.PrevTick >= 60) obj.PrevTick = 0;
+            obj.PrevTick++;
+        }
+
+        // ── Dynamisk kollision ────────────────────────────────────────────────────
+        private void HandleDynamicCollision(DynamicGameObject obj, DynamicGameObject other,
+            GameContext context, ref float dx, ref float dy)
+        {
+            // Horisontell krock
+            if (dx < (other.px + 1f) && (dx + 1f) > other.px &&
+                obj.py < (other.py + 1f) && (obj.py + 1f) > other.py)
+            {
+                if (obj.vx < 0)
+                {
+                    dx = other.px + 1f;
+                    if (other.Friendly != obj.Friendly)
+                    {
+                        if (other.IsHero) DamageHero((Creature)obj, (Creature)other, "3");
+                        else              DamageHero((Creature)other, (Creature)obj, "2");
+                    }
+                }
+                else
+                {
+                    dx = other.px - 1f;
+                    if (other.Friendly != obj.Friendly)
+                    {
+                        if (other.IsHero) DamageHero((Creature)obj, (Creature)other, "2");
+                        else              DamageHero((Creature)other, (Creature)obj, "2");
+                    }
+                }
+
+                if ((obj is DynamicCreatureEnemyWalrus || obj is DynamicCreatureEnemyFrost) && !other.Friendly)
+                {
+                    if (obj.Patrol == Enum.Actions.Right) { obj.Patrol = Enum.Actions.Left;  obj.vx = -2; }
+                    else                                  { obj.Patrol = Enum.Actions.Right; obj.vx =  2; }
+                }
+            }
+
+            // Vertikal krock
+            if (dx < (other.px + 1f) && (dx + 1f) > other.px &&
+                dy < (other.py + 1f) && (dy + 1f) > other.py)
+            {
+                if (obj.vy < 0)
+                {
+                    dy = other.py + 1f;
+                    if (other.Friendly != obj.Friendly)
+                    {
+                        if (!other.Friendly)
+                        { if (context.Player!.px > other.px) DamageHero((Creature)obj, (Creature)other, "1"); }
+                        else
+                        { if (!obj.IsHero) { context.Player!.vy = -5.5f; context.Player.Grounded = true; JumpDamage((Creature)context.Player, (Creature)obj); } }
+                    }
+                }
+                else
+                {
+                    dy = other.py - 1f;
+                    if (other.Friendly != obj.Friendly)
+                    {
+                        if (!other.Friendly)
+                        {
+                            if (other is DynamicCreatureEnemyIcicle)
+                                DamageHero((Creature)other, (Creature)context.Player!, "1");
+                            else
+                            { context.Player!.vy = -5.5f; context.Player.Grounded = true; JumpDamage((Creature)context.Player, (Creature)other); }
+                        }
+                        else
+                            DamageHero((Creature)obj, (Creature)context.Player!, "1");
+                    }
+                }
+            }
+        }
+
+        private void HandleHeroPickup(DynamicGameObject hero, DynamicGameObject other,
+            GameContext context, float dx)
+        {
+            if (dx < (other.px + 1f) && (dx + 1f) > other.px &&
+                hero.py < (other.py + 1f) && (hero.py + 1f) > other.py)
+            {
+                if (Aggregate.Instance.Sound != null && hero.IsAttackable)
+                    Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.PickUp);
+
+                if (other.CoinId > 0)
+                    context.CollectedEnergiIds.Add(other.CoinId);
+
+                context.CurrentLevel!.OnInteraction(context.ActiveObjects, other, Enum.NATURE.WALK);
+                other.OnInteract(hero);
+            }
+        }
+
+        // ── Skada / kollision-hjälpare ────────────────────────────────────────────
+        private void DamageHero(Creature assailant, Creature victim, string from = "")
+        {
+            if (Aggregate.Instance.Sound != null)
+                Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.DamageHero);
+
+            if (victim == null || !victim.IsAttackable) return;
+
+            _energiRain.MakeItRain     = true;
+            _energiRain.NumberOfEnergi = assailant.DamageGiven;
+            _energiRain.StartPosX      = victim.px;
+            _energiRain.StartPosY      = victim.py;
+
+            victim.Health -= assailant.DamageGiven;
+
+            float tx = victim.px - assailant.px;
+            float ty = victim.py - assailant.py;
+            float d  = (float)Math.Sqrt(tx * tx + ty * ty);
+            if (d < 1) d = 1f;
+
+            victim.KnockBack(tx / d, ty / d - 1f, 0.3f);
+
+            if (victim.IsHero) victim.SolidVsDynamic = true;
+            else               victim.OnInteract(assailant);
+        }
+
+        private void JumpDamage(Creature assailant, Creature victim)
+        {
+            if (Aggregate.Instance.Sound != null)
+                Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.Damage);
+
+            if (victim is DynamicCreatureEnemyBoss)
+            {
+                if (!victim.IsAttackable) return;
+                victim.IsAttackable = false;
+                victim.Health -= 10;
+                if (victim.Health <= 0) { victim.Health = 0; victim.Redundant = true; victim.RemoveCount = 1; _enemyJump = 5; }
+            }
+            else if (!victim.IsIndestructible)
+            {
+                victim.Health = 0; victim.Redundant = true; victim.RemoveCount = 1; _enemyJump = 5;
+            }
+        }
+
+        private void MakeItRainEnergi(GameContext context)
+        {
+            _energiRain.MakeItRain = false;
+            float sx = _energiRain.StartPosX, sy = _energiRain.StartPosY;
+            int whenCollectable = 16;
+            int min = _energiRain.NumberOfEnergi / 2 >= context.Player!.Health ? context.Player.Health : _energiRain.NumberOfEnergi / 2;
+            int max = _energiRain.NumberOfEnergi >= context.Player.Health ? context.Player.Health : _energiRain.NumberOfEnergi;
+            int count = Aggregate.Instance.RNG(min, max);
+            for (int i = 0; i < count; i++)
+                context.ActiveObjects.Add(new DynamicItem(sx, sy, Aggregate.Instance.GetItem("energi"), whenCollectable));
+        }
+    }
+}

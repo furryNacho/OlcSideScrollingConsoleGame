@@ -41,6 +41,9 @@ namespace UnitTest.Fakes
         public bool JumpButtonDownReleaseOnce { get; set; }
         public int  JumpButtonCounter         { get; set; }
 
+        // Fönsterfokus
+        public bool IsWindowFocused    { get; set; } = true;
+
         // Idle
         public bool IsIdle             { get; set; }
         public bool ButtonsHasGoneIdle { get; set; }

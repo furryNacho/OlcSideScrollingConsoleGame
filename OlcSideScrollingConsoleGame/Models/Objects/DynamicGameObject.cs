@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using OlcSideScrollingConsoleGame.Rendering;
 
 namespace OlcSideScrollingConsoleGame.Models.Objects
 {
@@ -120,7 +121,7 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
         /// </summary>
         public virtual bool IsIndestructible => false;
 
-        public virtual void DrawSelf(Program graphics, float ox, float oy) { }
+        public virtual void DrawSelf(IRenderContext graphics, float ox, float oy) { }
 
         /// <summary>
         /// Elapsed time
