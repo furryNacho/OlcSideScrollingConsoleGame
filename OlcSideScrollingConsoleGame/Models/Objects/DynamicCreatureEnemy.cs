@@ -1,4 +1,6 @@
 #nullable enable
+using OlcSideScrollingConsoleGame.Global;
+using OlcSideScrollingConsoleGame.Models;
 using OlcSideScrollingConsoleGame.Rendering;
 using System;
 
@@ -143,6 +145,24 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
             }
 
         }
+
+        public override void OnWallCollision(ref float newX, bool turnPatrol, bool movingLeft, IMapData map, float fBorder)
+        {
+            if (movingLeft)
+            {
+                bool solid1 = map.GetSolid((int)(newX + 0f), (int)(py + 0f) + 1);
+                bool solid2 = map.GetSolid((int)(newX + 0f), (int)(py + 0.9f) + 1);
+                if (!solid1 || !solid2 || turnPatrol) { newX += 0.1f; vx = 2; Patrol = Enum.Actions.Right; }
+                else Patrol = Enum.Actions.Left;
+            }
+            else
+            {
+                bool solid1 = map.GetSolid((int)(newX + (1f - fBorder)), (int)(py + fBorder) + 1);
+                bool solid2 = map.GetSolid((int)(newX + (1f - fBorder)), (int)(py + (1f - fBorder) + 1));
+                if (!solid1 || !solid2 || turnPatrol) { newX = (int)newX; vx = -2; Patrol = Enum.Actions.Left; }
+                else Patrol = Enum.Actions.Right;
+            }
+        }
     }
 
     public class DynamicCreatureEnemyFrost : Creature
@@ -201,6 +221,67 @@ namespace OlcSideScrollingConsoleGame.Models.Objects
                 }
             }
 
+        }
+
+        public override void OnWallCollision(ref float newX, bool turnPatrol, bool movingLeft, IMapData map, float fBorder)
+        {
+            Ticker++;
+
+            if (DoSpecialAction)
+            {
+                bool solid = map.GetSolid((int)(px + 0f), (int)(py + 0f) + 1);
+                if (solid && !HasJumped) { vy = GameConstants.EnemyJumpVelocity; HasJumped = true; }
+                else if (solid && HasJumped)
+                {
+                    if (DoneSpecialAction == 1) { Ticker = 0; DoSpecialAction = false; DoneSpecialAction = 0; HasJumped = false; }
+                    else DoneSpecialAction = 1;
+                }
+            }
+            if (!DoSpecialAction)
+            {
+                if (movingLeft)
+                {
+                    if (turnPatrol) { newX += 0.1f; vx = 1; Patrol = Enum.Actions.Right; }
+                    else { Patrol = Enum.Actions.Left; if (Ticker > 8) DoSpecialAction = true; }
+                }
+                else
+                {
+                    if (turnPatrol) { newX = (int)newX; vx = -1; Patrol = Enum.Actions.Left; }
+                    else { Patrol = Enum.Actions.Right; if (Ticker > 8) DoSpecialAction = true; }
+                }
+            }
+            if (movingLeft)
+            {
+                if ((int)(newX + 1f) <= FromCor) { newX += 0.1f; vx = 1; Patrol = Enum.Actions.Right; }
+            }
+            else
+            {
+                if ((int)newX >= ToCor) { newX = (int)newX; vx = -1; Patrol = Enum.Actions.Left; }
+            }
+        }
+
+        public override void OnStuckCheck()
+        {
+            if (PrevTick == 10)      SampleOne   = px;
+            else if (PrevTick == 30) SampleTow   = px;
+            else if (PrevTick == 50) SampleThree = px;
+
+            if (PrevTick >= 50)
+            {
+                float c1 = Math.Abs(SampleOne - SampleTow);
+                if (c1 <= 0.3f)
+                {
+                    float c2 = Math.Abs(SampleOne - SampleThree);
+                    if (c2 <= 0.3f)
+                    {
+                        float curr = px;
+                        if (Math.Abs(curr - SampleOne) < 5 && Math.Abs(curr - SampleTow) < 5 && Math.Abs(curr - SampleThree) < 5)
+                            vy = -2;
+                    }
+                }
+            }
+            if (PrevTick >= 60) PrevTick = 0;
+            PrevTick++;
         }
     }
 

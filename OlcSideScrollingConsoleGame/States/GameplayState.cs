@@ -335,14 +335,14 @@ namespace OlcSideScrollingConsoleGame.States
                 var (adjX, hitLeft) = CollisionSystem.ResolveHorizontal(obj.py, newX, obj.vx, fBorder, map);
                 bool turnPatrol = false;
                 if (hitLeft) { newX = adjX; if (obj.Name != "frost") obj.vx = 0; turnPatrol = true; }
-                HandleEnemyHorizontalLeft(obj, ref newX, turnPatrol, map, fBorder);
+                obj.OnWallCollision(ref newX, turnPatrol, true, map, fBorder);
             }
             else
             {
                 var (adjX, hitRight) = CollisionSystem.ResolveHorizontal(obj.py, newX, obj.vx, fBorder, map);
                 bool turnPatrol = false;
                 if (hitRight) { if (obj.Name != "frost") { newX = adjX; obj.vx = 0; } turnPatrol = true; }
-                HandleEnemyHorizontalRight(obj, ref newX, turnPatrol, map, fBorder);
+                obj.OnWallCollision(ref newX, turnPatrol, false, map, fBorder);
             }
 
             obj.Grounded = false;
@@ -381,8 +381,8 @@ namespace OlcSideScrollingConsoleGame.States
                 }
             }
 
-            // Frost-AI: fast-detektion
-            if (obj is DynamicCreatureEnemyFrost) HandleFrostStuckDetection(obj, ref newY);
+            // AI: fast-detektion (no-op för de flesta, Frost overridar)
+            obj.OnStuckCheck();
 
             // Dynamisk kollision (objekt vs objekt)
             float dx = newX, dy = newY;
@@ -401,108 +401,6 @@ namespace OlcSideScrollingConsoleGame.States
                 Aggregate.Instance.ReadWrite.WriteToLog($"Position ej uppdaterad. {obj.Name} vx={obj.vx} vy={obj.vy}");
 
             obj.Update(elapsed, context.Player!);
-        }
-
-        // ── Fiende-AI: horisontell rörelse ─────────────────────────────────────────
-        private void HandleEnemyHorizontalLeft(DynamicGameObject obj, ref float newX,
-            bool turnPatrol, Map map, float fBorder)
-        {
-            if (obj is DynamicCreatureEnemyWalrus)
-            {
-                bool solid1 = map.GetSolid((int)(newX + 0f), (int)(obj.py + 0f) + 1);
-                bool solid2 = map.GetSolid((int)(newX + 0f), (int)(obj.py + 0.9f) + 1);
-                if (!solid1 || !solid2 || turnPatrol) { newX += 0.1f; obj.vx = 2; obj.Patrol = Enum.Actions.Right; }
-                else obj.Patrol = Enum.Actions.Left;
-            }
-            if (obj is DynamicCreatureEnemyFrost)
-                HandleFrostLeft(obj, ref newX, turnPatrol, map);
-        }
-
-        private static void HandleFrostLeft(DynamicGameObject obj, ref float newX,
-            bool turnPatrol, Map map)
-        {
-            var frost = (Creature)obj;
-            frost.Ticker++;
-
-            if (frost.DoSpecialAction)
-            {
-                bool solid = map.GetSolid((int)(obj.px + 0f), (int)(obj.py + 0f) + 1);
-                if (solid && !frost.HasJumped) { obj.vy = GameConstants.EnemyJumpVelocity; frost.HasJumped = true; }
-                else if (solid && frost.HasJumped)
-                {
-                    if (frost.DoneSpecialAction == 1) { frost.Ticker = 0; frost.DoSpecialAction = false; frost.DoneSpecialAction = 0; frost.HasJumped = false; }
-                    else frost.DoneSpecialAction = 1;
-                }
-            }
-            if (!frost.DoSpecialAction)
-            {
-                if (turnPatrol) { newX += 0.1f; obj.vx = 1; obj.Patrol = Enum.Actions.Right; }
-                else { obj.Patrol = Enum.Actions.Left; if (frost.Ticker > 8) frost.DoSpecialAction = true; }
-            }
-            if ((int)(newX + 1f) <= frost.FromCor) { newX += 0.1f; obj.vx = 1; obj.Patrol = Enum.Actions.Right; }
-        }
-
-        private void HandleEnemyHorizontalRight(DynamicGameObject obj, ref float newX,
-            bool turnPatrol, Map map, float fBorder)
-        {
-            if (obj is DynamicCreatureEnemyWalrus)
-            {
-                bool solid1 = map.GetSolid((int)(newX + (1f - fBorder)), (int)(obj.py + fBorder) + 1);
-                bool solid2 = map.GetSolid((int)(newX + (1f - fBorder)), (int)(obj.py + (1f - fBorder) + 1));
-                if (!solid1 || !solid2 || turnPatrol) { newX = (int)newX; obj.vx = -2; obj.Patrol = Enum.Actions.Left; }
-                else obj.Patrol = Enum.Actions.Right;
-            }
-            if (obj is DynamicCreatureEnemyFrost)
-                HandleFrostRight(obj, ref newX, turnPatrol, map);
-        }
-
-        private static void HandleFrostRight(DynamicGameObject obj, ref float newX,
-            bool turnPatrol, Map map)
-        {
-            var frost = (Creature)obj;
-            frost.Ticker++;
-
-            if (frost.DoSpecialAction)
-            {
-                bool solid = map.GetSolid((int)(obj.px + 0f), (int)(obj.py + 0f) + 1);
-                if (solid && !frost.HasJumped) { obj.vy = GameConstants.EnemyJumpVelocity; frost.HasJumped = true; }
-                else if (solid && frost.HasJumped)
-                {
-                    if (frost.DoneSpecialAction == 1) { frost.Ticker = 0; frost.DoSpecialAction = false; frost.DoneSpecialAction = 0; frost.HasJumped = false; }
-                    else frost.DoneSpecialAction = 1;
-                }
-            }
-            if (!frost.DoSpecialAction)
-            {
-                if (turnPatrol) { newX = (int)newX; obj.vx = -1; obj.Patrol = Enum.Actions.Left; }
-                else { obj.Patrol = Enum.Actions.Right; if (frost.Ticker > 8) frost.DoSpecialAction = true; }
-            }
-            if ((int)newX >= frost.ToCor) { newX = (int)newX; obj.vx = -1; obj.Patrol = Enum.Actions.Left; }
-        }
-
-        // ── Frost fast-detektion ─────────────────────────────────────────────────
-        private static void HandleFrostStuckDetection(DynamicGameObject obj, ref float newY)
-        {
-            if (obj.PrevTick == 10)        obj.SampleOne = obj.px;
-            else if (obj.PrevTick == 30)   obj.SampleTow = obj.px;
-            else if (obj.PrevTick == 50)   obj.SampleThree = obj.px;
-
-            if (obj.PrevTick >= 50)
-            {
-                float c1 = Math.Abs(obj.SampleOne - obj.SampleTow);
-                if (c1 <= 0.3f)
-                {
-                    float c2 = Math.Abs(obj.SampleOne - obj.SampleThree);
-                    if (c2 <= 0.3f)
-                    {
-                        float curr = obj.px;
-                        if (Math.Abs(curr - obj.SampleOne) < 5 && Math.Abs(curr - obj.SampleTow) < 5 && Math.Abs(curr - obj.SampleThree) < 5)
-                            obj.vy = -2;
-                    }
-                }
-            }
-            if (obj.PrevTick >= 60) obj.PrevTick = 0;
-            obj.PrevTick++;
         }
 
         // ── Dynamisk kollision ────────────────────────────────────────────────────
