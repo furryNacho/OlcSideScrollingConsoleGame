@@ -107,7 +107,9 @@
     <Compile Include="Systems\InputManager.cs" />
     <Compile Include="Systems\ITileMapRenderer.cs" />
     <Compile Include="Systems\CollisionResult.cs" />
+    <Compile Include="Systems\AudioSystem.cs" />
     <Compile Include="Systems\CollisionSystem.cs" />
+    <Compile Include="Systems\IAudioSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\TileDrawCall.cs" />
     <Compile Include="Systems\TileMapRenderer.cs" />

@@ -1,17 +1,17 @@
 
 /***************************************************************************************************************************************
 * Developer notes                                                                                                                      *
+*                                                                                                                                      *                                                                                                                                   *
+* This project (Penguin After All) started out as a pure tinker project trying out OLCPixelGameEngine.                                 *
 *                                                                                                                                      *
-* This project (Penguin After All) was never intended for public view (if you're reading this I feel kinda bad for you).               *
-* With that said I shouldn't have to apologize for breaking good coding practice.                                                      *
-* If you came here looking for good examples on how to go about i advise you to look elsewhere.                                        *
+* As the project progressed I started indulging the thought of actually publishing the compiled version to the public.                 *
+* The game is available for free on itch.io (https://furynacho.itch.io/penguin-after-all)                                              *
+* Later, this project became a tinkering project to test out Claude Code. This gave new life to the project                            *
+* and the goal became to refactor and update the project.                                                                              *
 *                                                                                                                                      *
-* This project started out as a pure tinker project with absolute disregard of any rules or guidelines for coding convention.          *
-* (I did whatever i felt lika at the moment not concerning myself with code etiket or anyone's opinion.)                               *
-* As the project progressed I started indulging the thought of actually publishing the compiled version to the public for free.        *
 * I want to remind you that all creative content belonging to this project is copyright protected.                                     *
 *                                                                                                                                      *
-* 2020-11-14, Dev.                                                                                                                     *
+* 2026-04-06, Dev.                                                                                                                     *
 *                                                                                                                                      *
 ***************************************************************************************************************************************/
 
@@ -156,6 +156,7 @@ namespace OlcSideScrollingConsoleGame
             _stateManager = new States.GameStateManager();
             _services = new States.GameServices(
                 _input, _camera, _tileRenderer, _renderContext, _stateManager,
+                new Systems.AudioSystem(Core.Aggregate.Instance.Sound),
                 (mapName, x, y) => ChangeMap(mapName, x, y),
                 Reset,
                 Load,

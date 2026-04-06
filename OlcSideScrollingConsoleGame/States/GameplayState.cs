@@ -67,20 +67,17 @@ namespace OlcSideScrollingConsoleGame.States
                 context.CollectedEnergiIds.Any(id => id == x.CoinId));
 
             // Ljud
-            if (Aggregate.Instance.Sound != null)
+            _services.Audio.Stop(Global.GlobalNamespace.SoundRef.BGSoundWorld);
+            if (context.CurrentLevel?.Name != "mapnine")
             {
-                Aggregate.Instance.Sound.stop(Global.GlobalNamespace.SoundRef.BGSoundWorld);
-                if (context.CurrentLevel?.Name != "mapnine")
-                {
-                    if (!Aggregate.Instance.Sound.isPlaying(Global.GlobalNamespace.SoundRef.BGSoundGame))
-                        Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.BGSoundGame);
-                }
-                else
-                {
-                    Aggregate.Instance.Sound.stop(Global.GlobalNamespace.SoundRef.BGSoundGame);
-                    if (!Aggregate.Instance.Sound.isPlaying(Global.GlobalNamespace.SoundRef.BGSoundFinalStage))
-                        Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
-                }
+                if (!_services.Audio.IsPlaying(Global.GlobalNamespace.SoundRef.BGSoundGame))
+                    _services.Audio.Play(Global.GlobalNamespace.SoundRef.BGSoundGame);
+            }
+            else
+            {
+                _services.Audio.Stop(Global.GlobalNamespace.SoundRef.BGSoundGame);
+                if (!_services.Audio.IsPlaying(Global.GlobalNamespace.SoundRef.BGSoundFinalStage))
+                    _services.Audio.Play(Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
             }
 
             context.Player!.vx = 0;
@@ -214,8 +211,7 @@ namespace OlcSideScrollingConsoleGame.States
                     if (hero.vy != 0 && _allowCoyoteTime)
                         _tempMemCoyoteCounter++;
 
-                    if (Aggregate.Instance.Sound != null)
-                        Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.Jump);
+                    _services.Audio.Play(Global.GlobalNamespace.SoundRef.Jump);
 
                     hero.vy = GameConstants.JumpVelocity;
                     _services.Input.JumpButtonDownRelease = false;
@@ -367,8 +363,8 @@ namespace OlcSideScrollingConsoleGame.States
                         {
                             _fallCounter = 0; _allowCoyoteTime = true;
                             if (context.HeroLandedState < 3) context.HeroLandedState++;
-                            if (context.HeroLandedState <= 1 && Aggregate.Instance.Sound != null)
-                                Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.Land);
+                            if (context.HeroLandedState <= 1)
+                                _services.Audio.Play(Global.GlobalNamespace.SoundRef.Land);
                         }
                     }
                 }
@@ -477,8 +473,8 @@ namespace OlcSideScrollingConsoleGame.States
             if (dx < (other.px + 1f) && (dx + 1f) > other.px &&
                 hero.py < (other.py + 1f) && (hero.py + 1f) > other.py)
             {
-                if (Aggregate.Instance.Sound != null && hero.IsAttackable)
-                    Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.PickUp);
+                if (hero.IsAttackable)
+                    _services.Audio.Play(Global.GlobalNamespace.SoundRef.PickUp);
 
                 if (other.CoinId > 0)
                     context.CollectedEnergiIds.Add(other.CoinId);
@@ -491,8 +487,7 @@ namespace OlcSideScrollingConsoleGame.States
         // ── Skada / kollision-hjälpare ────────────────────────────────────────────
         private void DamageHero(Creature assailant, Creature victim, string from = "")
         {
-            if (Aggregate.Instance.Sound != null)
-                Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.DamageHero);
+            _services.Audio.Play(Global.GlobalNamespace.SoundRef.DamageHero);
 
             if (victim == null || !victim.IsAttackable) return;
 
@@ -516,8 +511,7 @@ namespace OlcSideScrollingConsoleGame.States
 
         private void JumpDamage(Creature assailant, Creature victim)
         {
-            if (Aggregate.Instance.Sound != null)
-                Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.Damage);
+            _services.Audio.Play(Global.GlobalNamespace.SoundRef.Damage);
 
             if (victim is DynamicCreatureEnemyBoss)
             {

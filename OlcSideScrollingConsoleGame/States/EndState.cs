@@ -73,23 +73,19 @@ namespace OlcSideScrollingConsoleGame.States
             _typeOfEnding = DetermineEnding(context);
 
             // Stoppa alla bakgrundsljud och starta rätt slut-musik
-            if (Aggregate.Instance.Sound != null)
+            _services.Audio.StopAll();
+            _services.Audio.Pause(Global.GlobalNamespace.SoundRef.BGSoundWorld);
+            _services.Audio.Pause(Global.GlobalNamespace.SoundRef.BGSoundGame);
+            _services.Audio.Pause(Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
+
+            if (!_services.Audio.IsPlaying(Global.GlobalNamespace.SoundRef.BGSoundEnd))
             {
-                Aggregate.Instance.Sound.stop();
-
-                Aggregate.Instance.Sound.pause(Global.GlobalNamespace.SoundRef.BGSoundWorld);
-                Aggregate.Instance.Sound.pause(Global.GlobalNamespace.SoundRef.BGSoundGame);
-                Aggregate.Instance.Sound.pause(Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
-
-                if (!Aggregate.Instance.Sound.isPlaying(Global.GlobalNamespace.SoundRef.BGSoundEnd))
-                {
-                    if (_typeOfEnding == Enum.TypeOfEnding.Perfect)
-                        Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.BGPerfectEnd);
-                    else if (_typeOfEnding == Enum.TypeOfEnding.NerePerfect)
-                        Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.BGNearPerfectEnd);
-                    else
-                        Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.BGSoundEnd);
-                }
+                if (_typeOfEnding == Enum.TypeOfEnding.Perfect)
+                    _services.Audio.Play(Global.GlobalNamespace.SoundRef.BGPerfectEnd);
+                else if (_typeOfEnding == Enum.TypeOfEnding.NerePerfect)
+                    _services.Audio.Play(Global.GlobalNamespace.SoundRef.BGNearPerfectEnd);
+                else
+                    _services.Audio.Play(Global.GlobalNamespace.SoundRef.BGSoundEnd);
             }
 
             // Spara sluttiden och nollställ animationen

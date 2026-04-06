@@ -38,13 +38,10 @@ namespace OlcSideScrollingConsoleGame.States
         {
             _konami = new KonamiObj();
 
-            if (Aggregate.Instance.Sound != null)
-            {
-                Aggregate.Instance.Sound.pause(Global.GlobalNamespace.SoundRef.BGSoundWorld);
-                Aggregate.Instance.Sound.pause(Global.GlobalNamespace.SoundRef.BGSoundGame);
-                Aggregate.Instance.Sound.pause(Global.GlobalNamespace.SoundRef.BGSoundEnd);
-                Aggregate.Instance.Sound.pause(Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
-            }
+            _services.Audio.Pause(Global.GlobalNamespace.SoundRef.BGSoundWorld);
+            _services.Audio.Pause(Global.GlobalNamespace.SoundRef.BGSoundGame);
+            _services.Audio.Pause(Global.GlobalNamespace.SoundRef.BGSoundEnd);
+            _services.Audio.Pause(Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
         }
 
         public void Update(GameContext context, float elapsed)

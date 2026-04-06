@@ -59,14 +59,11 @@ namespace OlcSideScrollingConsoleGame.States
                 _currentStage = Aggregate.Instance.Settings!.ActivePlayer.StageCompleted;
 
             // Ljud
-            if (Aggregate.Instance.Sound != null)
-            {
-                Aggregate.Instance.Sound.stop(Global.GlobalNamespace.SoundRef.BGSoundGame);
-                Aggregate.Instance.Sound.pause(Global.GlobalNamespace.SoundRef.BGSoundEnd);
-                Aggregate.Instance.Sound.pause(Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
-                if (!Aggregate.Instance.Sound.isPlaying(Global.GlobalNamespace.SoundRef.BGSoundWorld))
-                    Aggregate.Instance.Sound.play(Global.GlobalNamespace.SoundRef.BGSoundWorld);
-            }
+            _services.Audio.Stop(Global.GlobalNamespace.SoundRef.BGSoundGame);
+            _services.Audio.Pause(Global.GlobalNamespace.SoundRef.BGSoundEnd);
+            _services.Audio.Pause(Global.GlobalNamespace.SoundRef.BGSoundFinalStage);
+            if (!_services.Audio.IsPlaying(Global.GlobalNamespace.SoundRef.BGSoundWorld))
+                _services.Audio.Play(Global.GlobalNamespace.SoundRef.BGSoundWorld);
 
             // Kolla om vi ska gå till slutskärmen
             if (Aggregate.Instance.Settings!.ActivePlayer.ShowEnd)

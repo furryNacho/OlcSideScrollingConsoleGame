@@ -46,6 +46,9 @@
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\MSTest.TestFramework.1.3.2\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="Audio.Library">
+      <HintPath>..\Audio.Library.dll</HintPath>
+    </Reference>
     <Reference Include="PixelEngine">
       <HintPath>..\PixelEngine.dll</HintPath>
     </Reference>
@@ -53,6 +56,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudioSystemTests.cs" />
     <Compile Include="CameraSystemTests.cs" />
     <Compile Include="EnemyWallCollisionTests.cs" />
     <Compile Include="CollisionSystemTests.cs" />
@@ -61,6 +65,7 @@
     <Compile Include="Fakes\FakeInputProvider.cs" />
     <Compile Include="GameStateManagerTests.cs" />
     <Compile Include="Fakes\FakeAssets.cs" />
+    <Compile Include="Fakes\FakeAudioSystem.cs" />
     <Compile Include="Fakes\FakeRenderContext.cs" />
     <Compile Include="Fakes\FakeEventBus.cs" />
     <Compile Include="EventBusTests.cs" />

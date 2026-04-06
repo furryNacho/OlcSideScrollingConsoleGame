@@ -40,6 +40,9 @@ namespace OlcSideScrollingConsoleGame.States
         /// <summary>Statemaskinen — används av states för att göra övergångar.</summary>
         public GameStateManager StateManager { get; }
 
+        /// <summary>Null-säkert ljudsystem. Anrop är no-ops om hårdvara saknas.</summary>
+        public IAudioSystem Audio { get; }
+
         /// <summary>
         /// Laddar och aktiverar en karta. Kallar Program.ChangeMap(name, x, y, hero)
         /// med spelarens nuvarande hero-objekt från GameContext.
@@ -67,6 +70,7 @@ namespace OlcSideScrollingConsoleGame.States
             ITileMapRenderer tileRenderer,
             IRenderContext renderContext,
             GameStateManager stateManager,
+            IAudioSystem audio,
             Action<string, float, float> changeMap,
             Action reset,
             Action<int> load,
@@ -77,6 +81,7 @@ namespace OlcSideScrollingConsoleGame.States
             TileRenderer = tileRenderer;
             RenderContext = renderContext;
             StateManager = stateManager;
+            Audio        = audio;
             ChangeMap    = changeMap;
             Reset        = reset;
             Load         = load;

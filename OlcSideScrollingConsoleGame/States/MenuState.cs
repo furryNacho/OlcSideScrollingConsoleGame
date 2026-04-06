@@ -45,8 +45,7 @@ namespace OlcSideScrollingConsoleGame.States
 
         public void Update(GameContext context, float elapsed)
         {
-            if (Aggregate.Instance.Sound != null)
-                Aggregate.Instance.Sound.pause();
+            _services.Audio.PauseAll();
 
             _rc.Clear(RenderColor.Black);
             _services.Input.Poll();
@@ -133,7 +132,7 @@ namespace OlcSideScrollingConsoleGame.States
                     {
                         "Developer:", "FuryNacho",
                         "olcPixelGameEngine:", "Javidx9",
-                        "Game Engine Port:", "DevChrome",
+                        //"Game Engine Port:", "DevChrome", //(Not used when upgrading to .net 8)
                         "Music and Sound:", "Fiskifickorna",
                         "", "Back"
                     };
@@ -210,8 +209,7 @@ namespace OlcSideScrollingConsoleGame.States
                     break;
 
                 case "Exit Game":
-                    if (Aggregate.Instance.Sound != null)
-                        Aggregate.Instance.Sound.cleanUp();
+                    _services.Audio.CleanUp();
                     Aggregate.Instance.ThisGame?.Finish();
                     break;
 
