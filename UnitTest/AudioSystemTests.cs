@@ -158,5 +158,55 @@ namespace UnitTest
             var audio = new AudioSystem(null);
             audio.CleanUp();
         }
+
+        [TestMethod]
+        public void AudioSystem_NullSound_Mute_DoesNotThrow()
+        {
+            var audio = new AudioSystem(null);
+            audio.Mute();
+        }
+
+        [TestMethod]
+        public void AudioSystem_NullSound_UnMute_DoesNotThrow()
+        {
+            var audio = new AudioSystem(null);
+            audio.UnMute();
+        }
+
+        // ── FakeAudioSystem – Mute/UnMute ─────────────────────────────────────────
+
+        [TestMethod]
+        public void FakeAudio_Mute_IncrementsMuteCount()
+        {
+            var audio = new FakeAudioSystem();
+            audio.Mute();
+            audio.Mute();
+            Assert.AreEqual(2, audio.MuteCount);
+        }
+
+        [TestMethod]
+        public void FakeAudio_Mute_SetsMutedFlag()
+        {
+            var audio = new FakeAudioSystem();
+            audio.Mute();
+            Assert.IsTrue(audio.IsMuted);
+        }
+
+        [TestMethod]
+        public void FakeAudio_UnMute_IncrementsUnMuteCount()
+        {
+            var audio = new FakeAudioSystem();
+            audio.UnMute();
+            Assert.AreEqual(1, audio.UnMuteCount);
+        }
+
+        [TestMethod]
+        public void FakeAudio_UnMute_ClearsMutedFlag()
+        {
+            var audio = new FakeAudioSystem();
+            audio.Mute();
+            audio.UnMute();
+            Assert.IsFalse(audio.IsMuted);
+        }
     }
 }

@@ -48,5 +48,11 @@ namespace OlcSideScrollingConsoleGame.Systems
 
         /// <inheritdoc/>
         public void CleanUp()                  => _sound?.cleanUp();
+
+        /// <inheritdoc/>
+        public void Mute()                     => _sound?.mute();
+
+        /// <inheritdoc/>
+        public void UnMute()                   => _sound?.unMute();
     }
 }

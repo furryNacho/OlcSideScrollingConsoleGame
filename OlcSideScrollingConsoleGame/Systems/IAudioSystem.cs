@@ -41,5 +41,11 @@ namespace OlcSideScrollingConsoleGame.Systems
 
         /// <summary>Frigör alla ljud-resurser. Anropas när applikationen avslutas.</summary>
         void CleanUp();
+
+        /// <summary>Dämpar alla ljud. Påverkar inte uppspelningsläget — ljuden återupptas vid UnMute.</summary>
+        void Mute();
+
+        /// <summary>Återaktiverar ljudet efter Mute.</summary>
+        void UnMute();
     }
 }

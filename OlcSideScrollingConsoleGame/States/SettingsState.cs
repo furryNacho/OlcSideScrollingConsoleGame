@@ -178,12 +178,12 @@ namespace OlcSideScrollingConsoleGame.States
                     if (sel.Display == "Turn Sound On")
                     {
                         Aggregate.Instance.Settings!.AudioOn = true;
-                        Aggregate.Instance.Sound?.unMute();
+                        _services.Audio.UnMute();
                     }
                     else if (sel.Display == "Turn Sound Off")
                     {
                         Aggregate.Instance.Settings!.AudioOn = false;
-                        Aggregate.Instance.Sound?.mute();
+                        _services.Audio.Mute();
                     }
                     Aggregate.Instance.SaveSettings();
                     break;

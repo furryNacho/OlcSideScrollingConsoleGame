@@ -16,6 +16,9 @@ namespace UnitTest.Fakes
         public int          StopAllCount  { get; private set; }
         public int          PauseAllCount { get; private set; }
         public int          CleanUpCount  { get; private set; }
+        public int          MuteCount     { get; private set; }
+        public int          UnMuteCount   { get; private set; }
+        public bool         IsMuted       { get; private set; }
 
         private readonly HashSet<string> _playing = new HashSet<string>();
 
@@ -52,5 +55,8 @@ namespace UnitTest.Fakes
         public bool IsPlaying(string soundRef) => _playing.Contains(soundRef);
 
         public void CleanUp() => CleanUpCount++;
+
+        public void Mute()   { MuteCount++;   IsMuted = true; }
+        public void UnMute() { UnMuteCount++; IsMuted = false; }
     }
 }
