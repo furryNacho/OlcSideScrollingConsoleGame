@@ -159,8 +159,8 @@ namespace UnitTest
             frost.px = 5f;
             frost.PrevTick = 0;
 
-            // Tick fram till 10
-            for (int i = 0; i < 10; i++) frost.OnStuckCheck();
+            // Tick fram till 10 — check sker innan inkrement, kräver 11 anrop för att nå PrevTick==10
+            for (int i = 0; i < 11; i++) frost.OnStuckCheck();
             Assert.AreEqual(5f, frost.SampleOne, "SampleOne ska sättas vid tick 10");
 
             frost.px = 5f;
