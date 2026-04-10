@@ -535,7 +535,7 @@ namespace OlcSideScrollingConsoleGame.States
             }
             catch (Exception ex)
             {
-                Aggregate.Instance.ReadWrite.WriteToLog("EndState.AdvanceTyping " + ex.ToString());
+                System.Diagnostics.Debug.WriteLine("EndState.AdvanceTyping " + ex.ToString());
             }
         }
 

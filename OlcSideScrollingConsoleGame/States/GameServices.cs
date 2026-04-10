@@ -77,6 +77,24 @@ namespace OlcSideScrollingConsoleGame.States
         public Action ExitGame { get; }
 
         /// <summary>
+        /// Kontrollerar om ett skript triggat en kartwitch denna frame och nollställer flaggan.
+        /// Returnerar true om en switch är väntande (GameplayState ska rensa aktiva objekt).
+        /// </summary>
+        public Func<bool> CheckAndClearSwitchedState { get; }
+
+        /// <summary>Nollställer ScriptSwitchedState-flaggan (anropas i Enter).</summary>
+        public Action ClearSwitchedState { get; }
+
+        /// <summary>
+        /// Uppdaterar bossbanans X-switch-mekanik (CheckSwitchX i Aggregate).
+        /// Anropas varje frame för Boss-objektet på mapnine.
+        /// </summary>
+        public Action TriggerBossCheck { get; }
+
+        /// <summary>Returnerar X-positionen för ett boss-objekt med givet id (GetMyX).</summary>
+        public Func<int, int> GetBossObjectX { get; }
+
+        /// <summary>
         /// Skapar ett nytt GameServices med alla beroenden och callbacks.
         /// </summary>
         public GameServices(
@@ -94,23 +112,31 @@ namespace OlcSideScrollingConsoleGame.States
             Action reset,
             Action<int> load,
             Action<int> save,
-            Action exitGame)
+            Action exitGame,
+            Func<bool> checkAndClearSwitchedState,
+            Action clearSwitchedState,
+            Action triggerBossCheck,
+            Func<int, int> getBossObjectX)
         {
-            Input         = input;
-            Camera        = camera;
-            TileRenderer  = tileRenderer;
-            RenderContext = renderContext;
-            StateManager  = stateManager;
-            Audio         = audio;
-            Score         = score;
-            Script        = script;
-            Settings      = settings;
-            Assets        = assets;
-            ChangeMap     = changeMap;
-            Reset         = reset;
-            Load          = load;
-            Save          = save;
-            ExitGame      = exitGame;
+            Input                    = input;
+            Camera                   = camera;
+            TileRenderer             = tileRenderer;
+            RenderContext            = renderContext;
+            StateManager             = stateManager;
+            Audio                    = audio;
+            Score                    = score;
+            Script                   = script;
+            Settings                 = settings;
+            Assets                   = assets;
+            ChangeMap                = changeMap;
+            Reset                    = reset;
+            Load                     = load;
+            Save                     = save;
+            ExitGame                 = exitGame;
+            CheckAndClearSwitchedState = checkAndClearSwitchedState;
+            ClearSwitchedState       = clearSwitchedState;
+            TriggerBossCheck         = triggerBossCheck;
+            GetBossObjectX           = getBossObjectX;
         }
     }
 }

@@ -225,7 +225,7 @@ namespace OlcSideScrollingConsoleGame.States
                     break;
 
                 default:
-                    Aggregate.Instance.ReadWrite.WriteToLog(
+                    System.Diagnostics.Debug.WriteLine(
                         "MenuState.HandleSelection - okänt val: " + selected);
                     break;
             }

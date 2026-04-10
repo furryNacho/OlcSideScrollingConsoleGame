@@ -165,7 +165,11 @@ namespace OlcSideScrollingConsoleGame
                 Reset,
                 Load,
                 Save,
-                () => Core.Aggregate.Instance.ThisGame?.Finish()
+                () => Core.Aggregate.Instance.ThisGame?.Finish(),
+                () => { bool v = Core.Aggregate.Instance.HasSwitchedState; Core.Aggregate.Instance.HasSwitchedState = false; return v; },
+                () => Core.Aggregate.Instance.HasSwitchedState = false,
+                () => Core.Aggregate.Instance.CheckSwitchX(),
+                id  => Core.Aggregate.Instance.GetMyX(id)
             );
             _stateManager.SetInitial(new States.SplashState(_services), _context);
         }

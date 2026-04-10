@@ -61,7 +61,7 @@ namespace OlcSideScrollingConsoleGame.States
 
         public void Enter(GameContext context)
         {
-            Aggregate.Instance.HasSwitchedState = false;
+            _services.ClearSwitchedState();
 
             // Ta bort redan insamlad energi från aktiva objekt
             context.ActiveObjects.RemoveAll(x =>
@@ -90,9 +90,8 @@ namespace OlcSideScrollingConsoleGame.States
             _services.Script.Tick(elapsed);
 
             // Aggregate kan trigga HasSwitchedState från scripts (t.ex. teleport)
-            if (Aggregate.Instance.HasSwitchedState)
+            if (_services.CheckAndClearSwitchedState())
             {
-                Aggregate.Instance.HasSwitchedState = false;
                 context.ActiveObjects.RemoveAll(x =>
                     context.CollectedEnergiIds.Any(id => id == x.CoinId));
             }
@@ -112,7 +111,7 @@ namespace OlcSideScrollingConsoleGame.States
 
             if (context.ActiveObjects.Count <= 0)
             {
-                Aggregate.Instance.ReadWrite.WriteToLog("listDynamics är tom i GameplayState");
+                System.Diagnostics.Debug.WriteLine("listDynamics är tom i GameplayState");
                 throw new InvalidOperationException("ActiveObjects är tom i GameplayState");
             }
 
@@ -139,9 +138,9 @@ namespace OlcSideScrollingConsoleGame.States
                     else
                     {
                         if (obj is DynamicCreatureEnemyBoss)
-                            Aggregate.Instance.CheckSwitchX();
+                            _services.TriggerBossCheck();
                         if (obj.Id > 0)
-                            obj.px = Aggregate.Instance.GetMyX(obj.Id);
+                            obj.px = _services.GetBossObjectX(obj.Id);
                     }
                 }
 
@@ -395,7 +394,7 @@ namespace OlcSideScrollingConsoleGame.States
             if (!obj.detHarBallatUr)
             { obj.px = dx; obj.py = dy; }
             else if (_detHarBallatUrLog && obj.Name != "pickup")
-                Aggregate.Instance.ReadWrite.WriteToLog($"Position ej uppdaterad. {obj.Name} vx={obj.vx} vy={obj.vy}");
+                System.Diagnostics.Debug.WriteLine($"Position ej uppdaterad. {obj.Name} vx={obj.vx} vy={obj.vy}");
 
             obj.Update(elapsed, context.Player!);
         }
