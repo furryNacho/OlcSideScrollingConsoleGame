@@ -52,6 +52,9 @@ namespace OlcSideScrollingConsoleGame.States
         /// <summary>Inställningar och sparslottar utan direkt Aggregate-beroende.</summary>
         public ISettingsService Settings { get; }
 
+        /// <summary>Sprites, items och kartdata via Aggregates IAssets-implementation.</summary>
+        public Core.IAssets Assets { get; }
+
         /// <summary>
         /// Laddar och aktiverar en karta. Kallar Program.ChangeMap(name, x, y, hero)
         /// med spelarens nuvarande hero-objekt från GameContext.
@@ -70,6 +73,9 @@ namespace OlcSideScrollingConsoleGame.States
         /// <summary>Sparar nuvarande spel till angiven slot (1–3).</summary>
         public Action<int> Save { get; }
 
+        /// <summary>Avslutar spelloopen. Kallar Program.Finish() via Aggregate.</summary>
+        public Action ExitGame { get; }
+
         /// <summary>
         /// Skapar ett nytt GameServices med alla beroenden och callbacks.
         /// </summary>
@@ -83,10 +89,12 @@ namespace OlcSideScrollingConsoleGame.States
             IScoreSystem score,
             IScriptSystem script,
             ISettingsService settings,
+            Core.IAssets assets,
             Action<string, float, float> changeMap,
             Action reset,
             Action<int> load,
-            Action<int> save)
+            Action<int> save,
+            Action exitGame)
         {
             Input         = input;
             Camera        = camera;
@@ -97,10 +105,12 @@ namespace OlcSideScrollingConsoleGame.States
             Score         = score;
             Script        = script;
             Settings      = settings;
+            Assets        = assets;
             ChangeMap     = changeMap;
             Reset         = reset;
             Load          = load;
             Save          = save;
+            ExitGame      = exitGame;
         }
     }
 }

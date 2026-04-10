@@ -210,7 +210,7 @@ namespace OlcSideScrollingConsoleGame.States
 
                 case "Exit Game":
                     _services.Audio.CleanUp();
-                    Aggregate.Instance.ThisGame?.Finish();
+                    _services.ExitGame();
                     break;
 
                 case "View High Score":

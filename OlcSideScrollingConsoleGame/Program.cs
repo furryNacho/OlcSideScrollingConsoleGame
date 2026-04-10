@@ -160,10 +160,12 @@ namespace OlcSideScrollingConsoleGame
                 new Systems.ScoreSystem(),
                 new Systems.ScriptSystem(),
                 new Systems.SettingsService(),
+                Core.Aggregate.Instance,
                 (mapName, x, y) => ChangeMap(mapName, x, y),
                 Reset,
                 Load,
-                Save
+                Save,
+                () => Core.Aggregate.Instance.ThisGame?.Finish()
             );
             _stateManager.SetInitial(new States.SplashState(_services), _context);
         }

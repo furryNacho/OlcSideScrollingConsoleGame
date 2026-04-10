@@ -51,6 +51,7 @@ namespace OlcSideScrollingConsoleGame.States
 
         // Energi-regn vid träff
         private readonly EnergiRainObject _energiRain = new EnergiRainObject();
+        private readonly Random _rng = new Random();
 
         public GameplayState(GameServices services)
         {
@@ -533,9 +534,9 @@ namespace OlcSideScrollingConsoleGame.States
             int whenCollectable = 16;
             int min = _energiRain.NumberOfEnergi / 2 >= context.Player!.Health ? context.Player.Health : _energiRain.NumberOfEnergi / 2;
             int max = _energiRain.NumberOfEnergi >= context.Player.Health ? context.Player.Health : _energiRain.NumberOfEnergi;
-            int count = Aggregate.Instance.RNG(min, max);
+            int count = min >= max ? min : _rng.Next(min, max);
             for (int i = 0; i < count; i++)
-                context.ActiveObjects.Add(new DynamicItem(sx, sy, Aggregate.Instance.GetItem("energi"), whenCollectable));
+                context.ActiveObjects.Add(new DynamicItem(sx, sy, _services.Assets.GetItem("energi"), whenCollectable));
         }
     }
 }
