@@ -128,7 +128,7 @@ namespace OlcSideScrollingConsoleGame.States
             _rc.Clear(RenderColor.Black);
             _services.Input.Poll();
 
-            Aggregate.Instance.Settings!.ActivePlayer.ShowEnd = false;
+            _services.Settings.ActivePlayer.ShowEnd = false;
 
             // Input
             if (_services.Input.IsWindowFocused)

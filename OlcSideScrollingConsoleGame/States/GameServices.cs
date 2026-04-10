@@ -49,6 +49,9 @@ namespace OlcSideScrollingConsoleGame.States
         /// <summary>Tickar spelets kommandokö (ScriptProcessor) en gång per frame.</summary>
         public IScriptSystem Script { get; }
 
+        /// <summary>Inställningar och sparslottar utan direkt Aggregate-beroende.</summary>
+        public ISettingsService Settings { get; }
+
         /// <summary>
         /// Laddar och aktiverar en karta. Kallar Program.ChangeMap(name, x, y, hero)
         /// med spelarens nuvarande hero-objekt från GameContext.
@@ -79,6 +82,7 @@ namespace OlcSideScrollingConsoleGame.States
             IAudioSystem audio,
             IScoreSystem score,
             IScriptSystem script,
+            ISettingsService settings,
             Action<string, float, float> changeMap,
             Action reset,
             Action<int> load,
@@ -92,6 +96,7 @@ namespace OlcSideScrollingConsoleGame.States
             Audio         = audio;
             Score         = score;
             Script        = script;
+            Settings      = settings;
             ChangeMap     = changeMap;
             Reset         = reset;
             Load          = load;

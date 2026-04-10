@@ -106,7 +106,7 @@ namespace OlcSideScrollingConsoleGame.States
             {
                 case Enum.MenuState.Audio:
                     header = "Audio";
-                    string soundIs = Aggregate.Instance.Settings!.AudioOn ? "on" : "off";
+                    string soundIs = _services.Settings.AudioOn ? "on" : "off";
                     bread  = "Sound is " + soundIs;
                     return new List<OptionsObj>
                     {
@@ -177,15 +177,15 @@ namespace OlcSideScrollingConsoleGame.States
                 case Enum.MenuState.Audio:
                     if (sel.Display == "Turn Sound On")
                     {
-                        Aggregate.Instance.Settings!.AudioOn = true;
+                        _services.Settings.AudioOn = true;
                         _services.Audio.UnMute();
                     }
                     else if (sel.Display == "Turn Sound Off")
                     {
-                        Aggregate.Instance.Settings!.AudioOn = false;
+                        _services.Settings.AudioOn = false;
                         _services.Audio.Mute();
                     }
-                    Aggregate.Instance.SaveSettings();
+                    _services.Settings.Save();
                     break;
 
                 case Enum.MenuState.ClearHighScore:
@@ -197,13 +197,10 @@ namespace OlcSideScrollingConsoleGame.States
                     break;
 
                 case Enum.MenuState.ClearSavedGame:
-                    if (sel.OptionIsSlotOne)
-                        Aggregate.Instance.Settings!.SaveSlotsObjs.SlotOne = new SaveSlot();
-                    else if (sel.OptionIsSlotTwo)
-                        Aggregate.Instance.Settings!.SaveSlotsObjs.SlotTwo = new SaveSlot();
-                    else if (sel.OptionIsSlotThree)
-                        Aggregate.Instance.Settings!.SaveSlotsObjs.SlotThree = new SaveSlot();
-                    Aggregate.Instance.SaveSettings();
+                    if (sel.OptionIsSlotOne)        _services.Settings.ClearSaveSlot(1);
+                    else if (sel.OptionIsSlotTwo)   _services.Settings.ClearSaveSlot(2);
+                    else if (sel.OptionIsSlotThree) _services.Settings.ClearSaveSlot(3);
+                    _services.Settings.Save();
                     break;
 
                 case Enum.MenuState.Load:
@@ -222,14 +219,14 @@ namespace OlcSideScrollingConsoleGame.States
                     if (sel.OptionIsSlotOne)        _services.Save(1);
                     else if (sel.OptionIsSlotTwo)   _services.Save(2);
                     else if (sel.OptionIsSlotThree) _services.Save(3);
-                    Aggregate.Instance.SaveSettings();
+                    _services.Settings.Save();
                     break;
             }
         }
 
-        private static List<OptionsObj> DefaultListSave()
+        private List<OptionsObj> DefaultListSave()
         {
-            var slots = Aggregate.Instance.Settings!.SaveSlotsObjs;
+            var slots = _services.Settings.SaveSlots;
 
             string d1 = slots.SlotOne.IsUsed
                 ? slots.SlotOne.DateTime.ToString("dd MMM yy") + " " + slots.SlotOne.StageCompleted

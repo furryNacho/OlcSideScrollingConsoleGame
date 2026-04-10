@@ -59,6 +59,7 @@
     <Compile Include="AudioSystemTests.cs" />
     <Compile Include="ScoreSystemTests.cs" />
     <Compile Include="ScriptSystemTests.cs" />
+    <Compile Include="SettingsServiceTests.cs" />
     <Compile Include="CameraSystemTests.cs" />
     <Compile Include="EnemyWallCollisionTests.cs" />
     <Compile Include="CollisionSystemTests.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Fakes\FakeAudioSystem.cs" />
     <Compile Include="Fakes\FakeScoreSystem.cs" />
     <Compile Include="Fakes\FakeScriptSystem.cs" />
+    <Compile Include="Fakes\FakeSettingsService.cs" />
     <Compile Include="Fakes\FakeRenderContext.cs" />
     <Compile Include="Fakes\FakeEventBus.cs" />
     <Compile Include="EventBusTests.cs" />

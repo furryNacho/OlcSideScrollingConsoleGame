@@ -56,7 +56,7 @@ namespace OlcSideScrollingConsoleGame.States
             _services.Script.Tick(elapsed);
 
             if (_currentStage == 0)
-                _currentStage = Aggregate.Instance.Settings!.ActivePlayer.StageCompleted;
+                _currentStage = _services.Settings.ActivePlayer.StageCompleted;
 
             // Ljud
             _services.Audio.Stop(Global.GlobalNamespace.SoundRef.BGSoundGame);
@@ -66,7 +66,7 @@ namespace OlcSideScrollingConsoleGame.States
                 _services.Audio.Play(Global.GlobalNamespace.SoundRef.BGSoundWorld);
 
             // Kolla om vi ska gå till slutskärmen
-            if (Aggregate.Instance.Settings!.ActivePlayer.ShowEnd)
+            if (_services.Settings.ActivePlayer.ShowEnd)
             {
                 _services.Input.ButtonsHasGoneIdle = false;
                 _services.StateManager.Transition(new EndState(_services), context);
@@ -86,7 +86,7 @@ namespace OlcSideScrollingConsoleGame.States
 
             // Spawn-position
             float corrX = 3f, corrY = 8f;
-            int spawn = Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap;
+            int spawn = _services.Settings.ActivePlayer.SpawnAtWorldMap;
             if (spawn >= 1 && spawn <= 8) { corrX = 3 + (spawn - 1) * 3f; corrY = 8f; }
 
             // Byt till världskartan om vi inte är där
@@ -119,7 +119,7 @@ namespace OlcSideScrollingConsoleGame.States
 
                 if (_services.Input.ButtonsHasGoneIdle && _services.Input.IsRightDown)
                 {
-                    if (_unlockAll || (_currentStage != 0 && _currentStage <= Aggregate.Instance.Settings.ActivePlayer.StageCompleted))
+                    if (_unlockAll || (_currentStage != 0 && _currentStage <= _services.Settings.ActivePlayer.StageCompleted))
                         context.Player.vx = 3;
                 }
 
@@ -213,7 +213,7 @@ namespace OlcSideScrollingConsoleGame.States
 
                 if (obj is DynamicCreatureOverlayWorldMap)
                 {
-                    int completed = Aggregate.Instance.Settings!.ActivePlayer.StageCompleted;
+                    int completed = _services.Settings.ActivePlayer.StageCompleted;
                     if (obj.Id < completed + 1)         obj.StageStatus = Enum.StageStatus.Passed;
                     else if (obj.Id == completed + 1)   obj.StageStatus = Enum.StageStatus.Current;
                     else                                 obj.StageStatus = Enum.StageStatus.NotPassed;
@@ -265,7 +265,7 @@ namespace OlcSideScrollingConsoleGame.States
 
         private void UpdateHeroStageStop(DynamicGameObject hero, GameContext context)
         {
-            int completed = Aggregate.Instance.Settings!.ActivePlayer.StageCompleted;
+            int completed = _services.Settings.ActivePlayer.StageCompleted;
             float p = hero.px;
 
             if (CheckStageZone(p, GameConstants.WorldMapStage1X, _no1, completed, 0))
@@ -294,7 +294,7 @@ namespace OlcSideScrollingConsoleGame.States
         {
             _no1 = stage == 1; _no2 = stage == 2; _no3 = stage == 3; _no4 = stage == 4;
             _no5 = stage == 5; _no6 = stage == 6; _no7 = stage == 7; _no8 = stage == 8;
-            Aggregate.Instance.Settings!.ActivePlayer.SpawnAtWorldMap = stage;
+            _services.Settings.ActivePlayer.SpawnAtWorldMap = stage;
             _currentStage = stage;
         }
 

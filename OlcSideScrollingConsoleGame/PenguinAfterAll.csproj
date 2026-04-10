@@ -114,6 +114,8 @@
     <Compile Include="Systems\ScoreSystem.cs" />
     <Compile Include="Systems\IScriptSystem.cs" />
     <Compile Include="Systems\ScriptSystem.cs" />
+    <Compile Include="Systems\ISettingsService.cs" />
+    <Compile Include="Systems\SettingsService.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\TileDrawCall.cs" />
     <Compile Include="Systems\TileMapRenderer.cs" />
