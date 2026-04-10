@@ -124,7 +124,7 @@ namespace OlcSideScrollingConsoleGame.States
                 }
             }
 
-            Aggregate.Instance.Script.ProcessCommands(elapsed);
+            _services.Script.Tick(elapsed);
             _rc.Clear(RenderColor.Black);
             _services.Input.Poll();
 

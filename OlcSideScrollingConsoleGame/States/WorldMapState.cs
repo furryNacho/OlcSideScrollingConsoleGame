@@ -53,7 +53,7 @@ namespace OlcSideScrollingConsoleGame.States
 
         public void Update(GameContext context, float elapsed)
         {
-            Aggregate.Instance.Script.ProcessCommands(elapsed);
+            _services.Script.Tick(elapsed);
 
             if (_currentStage == 0)
                 _currentStage = Aggregate.Instance.Settings!.ActivePlayer.StageCompleted;

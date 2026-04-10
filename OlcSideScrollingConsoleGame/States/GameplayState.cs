@@ -86,7 +86,7 @@ namespace OlcSideScrollingConsoleGame.States
 
         public void Update(GameContext context, float elapsed)
         {
-            Aggregate.Instance.Script.ProcessCommands(elapsed);
+            _services.Script.Tick(elapsed);
 
             // Aggregate kan trigga HasSwitchedState från scripts (t.ex. teleport)
             if (Aggregate.Instance.HasSwitchedState)

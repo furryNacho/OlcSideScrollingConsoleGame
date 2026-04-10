@@ -54,7 +54,7 @@ namespace OlcSideScrollingConsoleGame.States
 
         public void Update(GameContext context, float elapsed)
         {
-            Aggregate.Instance.Script.ProcessCommands(elapsed);
+            _services.Script.Tick(elapsed);
             _rc.Clear(RenderColor.Black);
             _services.Input.Poll();
 

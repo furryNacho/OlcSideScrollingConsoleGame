@@ -158,6 +158,7 @@ namespace OlcSideScrollingConsoleGame
                 _input, _camera, _tileRenderer, _renderContext, _stateManager,
                 new Systems.AudioSystem(Core.Aggregate.Instance.Sound),
                 new Systems.ScoreSystem(),
+                new Systems.ScriptSystem(),
                 (mapName, x, y) => ChangeMap(mapName, x, y),
                 Reset,
                 Load,
