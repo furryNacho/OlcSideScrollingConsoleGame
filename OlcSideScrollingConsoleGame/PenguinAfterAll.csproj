@@ -110,6 +110,8 @@
     <Compile Include="Systems\AudioSystem.cs" />
     <Compile Include="Systems\CollisionSystem.cs" />
     <Compile Include="Systems\IAudioSystem.cs" />
+    <Compile Include="Systems\IScoreSystem.cs" />
+    <Compile Include="Systems\ScoreSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\TileDrawCall.cs" />
     <Compile Include="Systems\TileMapRenderer.cs" />

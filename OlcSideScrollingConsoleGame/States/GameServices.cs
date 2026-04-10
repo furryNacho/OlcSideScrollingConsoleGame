@@ -43,6 +43,9 @@ namespace OlcSideScrollingConsoleGame.States
         /// <summary>Null-säkert ljudsystem. Anrop är no-ops om hårdvara saknas.</summary>
         public IAudioSystem Audio { get; }
 
+        /// <summary>Highscore-operationer utan direkt Aggregate-beroende.</summary>
+        public IScoreSystem Score { get; }
+
         /// <summary>
         /// Laddar och aktiverar en karta. Kallar Program.ChangeMap(name, x, y, hero)
         /// med spelarens nuvarande hero-objekt från GameContext.
@@ -71,21 +74,23 @@ namespace OlcSideScrollingConsoleGame.States
             IRenderContext renderContext,
             GameStateManager stateManager,
             IAudioSystem audio,
+            IScoreSystem score,
             Action<string, float, float> changeMap,
             Action reset,
             Action<int> load,
             Action<int> save)
         {
-            Input        = input;
-            Camera       = camera;
-            TileRenderer = tileRenderer;
+            Input         = input;
+            Camera        = camera;
+            TileRenderer  = tileRenderer;
             RenderContext = renderContext;
-            StateManager = stateManager;
-            Audio        = audio;
-            ChangeMap    = changeMap;
-            Reset        = reset;
-            Load         = load;
-            Save         = save;
+            StateManager  = stateManager;
+            Audio         = audio;
+            Score         = score;
+            ChangeMap     = changeMap;
+            Reset         = reset;
+            Load          = load;
+            Save          = save;
         }
     }
 }

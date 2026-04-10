@@ -190,7 +190,7 @@ namespace OlcSideScrollingConsoleGame.States
 
                 case Enum.MenuState.ClearHighScore:
                     if (sel.Display == "Yes")
-                        Aggregate.Instance.ResetHighScore();
+                        _services.Score.Reset();
                     context.MenuNavigation = Enum.MenuState.SettingsMenu;
                     _services.Input.ButtonsHasGoneIdle = false;
                     _services.StateManager.Transition(new MenuState(_services), context);

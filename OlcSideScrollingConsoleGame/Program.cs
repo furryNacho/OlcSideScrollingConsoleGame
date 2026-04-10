@@ -157,6 +157,7 @@ namespace OlcSideScrollingConsoleGame
             _services = new States.GameServices(
                 _input, _camera, _tileRenderer, _renderContext, _stateManager,
                 new Systems.AudioSystem(Core.Aggregate.Instance.Sound),
+                new Systems.ScoreSystem(),
                 (mapName, x, y) => ChangeMap(mapName, x, y),
                 Reset,
                 Load,

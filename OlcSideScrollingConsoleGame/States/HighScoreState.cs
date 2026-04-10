@@ -71,7 +71,7 @@ namespace OlcSideScrollingConsoleGame.States
             _rc.DrawText("    Name  Time        %", 8, 45);
 
             int idx = 0;
-            foreach (var row in Aggregate.Instance.GetHighScoreList())
+            foreach (var row in _services.Score.GetList())
             {
                 idx++;
                 int y = idx * 10 + 50;

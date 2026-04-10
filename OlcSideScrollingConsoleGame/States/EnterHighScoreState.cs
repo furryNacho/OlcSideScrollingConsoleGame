@@ -58,7 +58,7 @@ namespace OlcSideScrollingConsoleGame.States
             _rc.Clear(RenderColor.Black);
             _services.Input.Poll();
 
-            bool newTop = Aggregate.Instance.IsNewFirstPlaceHS(context.EndTotalTime);
+            bool newTop = _services.Score.IsNewFirstPlace(context.EndTotalTime);
 
             // Rita rubriker
             if (newTop)
@@ -177,14 +177,14 @@ namespace OlcSideScrollingConsoleGame.States
                     foreach (int ascii in _nameAscii)
                         name += ((char)ascii).ToString();
 
-                    Aggregate.Instance.PutOnHighScore(new HighScoreObj
+                    _services.Score.PutOnHighScore(new HighScoreObj
                     {
                         DateTime = DateTime.Now,
                         Handle   = name,
                         TimeSpan = context.EndTotalTime,
                         Percent  = context.CollectedEnergiIds.Count
                     });
-                    Aggregate.Instance.SaveHighScoreList();
+                    _services.Score.Save();
 
                     _services.Input.ButtonsHasGoneIdle = false;
                     _services.StateManager.Transition(new HighScoreState(_services), context);

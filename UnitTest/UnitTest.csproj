@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioSystemTests.cs" />
+    <Compile Include="ScoreSystemTests.cs" />
     <Compile Include="CameraSystemTests.cs" />
     <Compile Include="EnemyWallCollisionTests.cs" />
     <Compile Include="CollisionSystemTests.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="GameStateManagerTests.cs" />
     <Compile Include="Fakes\FakeAssets.cs" />
     <Compile Include="Fakes\FakeAudioSystem.cs" />
+    <Compile Include="Fakes\FakeScoreSystem.cs" />
     <Compile Include="Fakes\FakeRenderContext.cs" />
     <Compile Include="Fakes\FakeEventBus.cs" />
     <Compile Include="EventBusTests.cs" />

@@ -114,7 +114,7 @@ namespace OlcSideScrollingConsoleGame.States
                 {
                     context.RightToAccessPodium = false;
 
-                    if (Aggregate.Instance.PlacesOnHighScore(context.EndTotalTime))
+                    if (_services.Score.PlacesOnHighScore(context.EndTotalTime))
                     {
                         context.ReturnToEndAfterHighScore = true;
                         _services.Input.ButtonsHasGoneIdle = false;
