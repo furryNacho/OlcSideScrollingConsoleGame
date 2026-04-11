@@ -96,6 +96,15 @@ namespace OlcSideScrollingConsoleGame.States
                     context.CollectedEnergiIds.Any(id => id == x.CoinId));
             }
 
+            // Skript kan byta karta till worldmap (bana klar → CommandChangeMap).
+            // I så fall ska WorldMapState ta över — GameplayState ska inte köra
+            // gravitation och hopplogik mot världskartan.
+            if (context.CurrentLevel?.Name == "worldmap")
+            {
+                _services.StateManager.Transition(new WorldMapState(_services), context);
+                return;
+            }
+
             if (_enemyJump > -1) _enemyJump--;
 
             // Hjälten är död → game over

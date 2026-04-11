@@ -7,11 +7,23 @@ using PixelEngine;
 namespace OlcSideScrollingConsoleGame.Systems
 {
     /// <summary>
-    /// Kapslar in all input-hantering (tangentbord + gamepad).
-    /// Exponerar semantiska spelåtgärder istället för råa knapptillstånd.
-    /// Ansvarar för uppdatering av gamepad-tillstånd varje frame.
-    /// Implementerar IInputProvider för testbarhet (DIP).
+    /// Kapslar in tangentbords- och gamepad-input och exponerar semantiska spelåtgärder.
+    /// Implementerar IInputProvider för att möjliggöra testning utan hårdvara.
     /// </summary>
+    /// <remarks>
+    /// MÖNSTER: Adapter
+    ///
+    /// MOTIVERING:
+    /// PixelEngine och SlimDX exponerar råa knapptillstånd kopplade till specifika
+    /// tangentbords- och gamepad-API:er. InputManager adapterar dessa till ett
+    /// speldomänspecifikt interface (IsJumpPressed, IsConfirmPressed osv.) vilket
+    /// bryter beroendet mot konkret hårdvara i resten av koden (DIP).
+    ///
+    /// ANVÄNDNING:
+    /// Skapas i Program.OnCreate() och skickas till GameServices. States anropar
+    /// IInputProvider via _services.Input — aldrig InputManager direkt.
+    /// I tester används FakeInputProvider för hårdvarufri simulering.
+    /// </remarks>
     public class InputManager : IInputProvider
     {
         private readonly Game _game;

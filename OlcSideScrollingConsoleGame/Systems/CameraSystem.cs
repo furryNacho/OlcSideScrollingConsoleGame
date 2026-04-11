@@ -5,14 +5,19 @@ namespace OlcSideScrollingConsoleGame.Systems
 {
     /// <summary>
     /// Beräknar kamerans position och scrollning för en tile-baserad värld.
-    ///
-    /// Kameran centreras på målet och kläms mot kartans gränser så att
-    /// inga tomrum visas utanför kartan. Sub-tile-offsettar beräknas för
-    /// mjuk scrollning mellan hela tile-positioner.
-    ///
-    /// Inga PixelEngine- eller hårdvaruberoenden — alla beräkningar är rena
-    /// in/ut-transformationer och enkla att enhetstesta.
+    /// Centrerar på målet och klämer mot kartgränser för att undvika tomrum utanför kartan.
     /// </summary>
+    /// <remarks>
+    /// MÖNSTER: System (tillståndslös beräkningsklass)
+    ///
+    /// MOTIVERING:
+    /// Kameralogiken låg inbäddad i DisplayStage och var kopplad till PixelEngine-typer.
+    /// Extraheringen gör beräkningarna tillståndslösa och testbara utan spelmotor (SRP, DIP).
+    ///
+    /// ANVÄNDNING:
+    /// Injiceras via ICameraSystem i GameServices och anropas från states som behöver
+    /// kameravy. Tar kartdimensioner och målposition; returnerar en CameraView-record.
+    /// </remarks>
     public class CameraSystem : ICameraSystem
     {
         /// <inheritdoc />

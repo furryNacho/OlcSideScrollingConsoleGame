@@ -44,9 +44,8 @@ namespace OlcSideScrollingConsoleGame.Core
         private Dictionary<string, Sprite> MapSprites { get; set; } = new Dictionary<string, Sprite>();
         private Dictionary<string, Map> MapMaps { get; set; } = new Dictionary<string, Map>();
         private Dictionary<string, Item> MapItems { get; set; } = new Dictionary<string, Item>();
-        private Dictionary<string, LevelObj> MapData { get; set; } = new Dictionary<string, LevelObj>();
+        private OlcSideScrollingConsoleGame.Systems.IMapRepository MapRepository { get; set; } = null!;
         private string PathSprites => @"\Resources\Assets\Sprites";
-        private string PathMapData => @"\Resources\Assets\MapData";
         private string PathSettings => @"\Resources\Settings";
         private string PathSound  => @"\Resources\Assets\Sound";
         /// <summary>Sätts i Load() — null! före dess (garanterat initierat via Load).</summary>
@@ -66,8 +65,8 @@ namespace OlcSideScrollingConsoleGame.Core
             ReadWrite = new ReadWrite(EnableWriteToLog);
             LoadSettings();
 
+            MapRepository = new OlcSideScrollingConsoleGame.Systems.MapRepository(ReadWrite);
             LoadSprites();
-            LoadAllMapData();
             LoadMaps();
             LoadItems();
             Script = new ScriptProcessor();
@@ -192,72 +191,33 @@ namespace OlcSideScrollingConsoleGame.Core
             }
         }
 
-        private void LoadAllMapData()
-        {
-            LoadMapData("worldmap", PathMapData, @"\worldmap", ".json");
-            LoadMapData("mapone", PathMapData, @"\mapone", ".json"); 
-            LoadMapData("maptwo", PathMapData, @"\maptwo", ".json"); 
-            LoadMapData("mapthree", PathMapData, @"\mapthree", ".json"); 
-            LoadMapData("mapfour", PathMapData, @"\mapfour", ".json");
-            LoadMapData("mapfive", PathMapData, @"\mapfive", ".json");
-            LoadMapData("mapsix", PathMapData, @"\mapsix", ".json");
-            LoadMapData("mapseven", PathMapData, @"\mapseven", ".json");
-            LoadMapData("mapeight", PathMapData, @"\mapeight", ".json");
-            LoadMapData("mapnine", PathMapData, @"\mapnine", ".json");
-
-        }
-
-        private void LoadMapData(string FriendlyName, string FilePath, string FileName, string FileExtension)
-        {
-            // make sure resource exists
-            var fullDirectory = ReadWrite.CreateIfNotExists(FilePath, FileName, FileExtension, false);
-            if (!string.IsNullOrEmpty(fullDirectory))
-            {
-                var mapData = ReadWrite.ReadJson<LevelObj>(FilePath, FileName, FileExtension, false);
-                if (mapData != null)
-                {
-                    MapData.Add(FriendlyName, mapData);
-                }
-                else
-                {
-                    ReadWrite.WriteToLog(String.Format("LoadMapData - Data is null. FriendlyName: {0}. Root: {1}. Path: {2}. FileName: {3}. FileExtension: {4}",
-                    FriendlyName, ReadWrite.GetRoot, FilePath, FileName, FileExtension));
-                    throw new FileLoadException("Could not Load resource");
-                }
-            }
-            else
-            {
-                ReadWrite.WriteToLog(String.Format("LoadMapData - Could not load resource. FriendlyName: {0}. Root: {1}. Path: {2}. FileName: {3}. FileExtension: {4}",
-                    FriendlyName, ReadWrite.GetRoot, FilePath, FileName, FileExtension));
-                throw new FileLoadException("Could not Load resource");
-            }
-        }
-
         private void LoadMaps()
         {
-            var wm = new WorldMap(this);
+            var enemyFactory = new OlcSideScrollingConsoleGame.Systems.EnemyFactory();
+            var itemFactory  = new OlcSideScrollingConsoleGame.Systems.ItemFactory();
+
+            var wm = new WorldMap(this, enemyFactory, itemFactory);
             MapMaps.Add("worldmap", wm);
 
-            var lvl1 = new MapOne(this);
+            var lvl1 = new MapOne(this, enemyFactory, itemFactory);
             MapMaps.Add("mapone", lvl1);
-            var lvl2 = new MapTwo(this);
+            var lvl2 = new MapTwo(this, enemyFactory, itemFactory);
             MapMaps.Add("maptwo", lvl2);
-            var lvl3 = new MapThree(this);
+            var lvl3 = new MapThree(this, enemyFactory, itemFactory);
             MapMaps.Add("mapthree", lvl3);
-            var lvl4 = new MapFour(this);
+            var lvl4 = new MapFour(this, enemyFactory, itemFactory);
             MapMaps.Add("mapfour", lvl4);
-            var lvl5 = new MapFive(this);
+            var lvl5 = new MapFive(this, enemyFactory, itemFactory);
             MapMaps.Add("mapfive", lvl5);
-            var lvl6 = new MapSix(this);
+            var lvl6 = new MapSix(this, enemyFactory, itemFactory);
             MapMaps.Add("mapsix", lvl6);
-            var lvl7 = new MapSeven(this);
+            var lvl7 = new MapSeven(this, enemyFactory, itemFactory);
             MapMaps.Add("mapseven", lvl7);
-            var lvl8 = new MapEight(this);
+            var lvl8 = new MapEight(this, enemyFactory, itemFactory);
             MapMaps.Add("mapeight", lvl8);
 
-            var lvl9 = new MapNine(this);
+            var lvl9 = new MapNine(this, enemyFactory, itemFactory);
             MapMaps.Add("mapnine", lvl9);
-
         }
 
         private void LoadItems()
@@ -343,8 +303,7 @@ namespace OlcSideScrollingConsoleGame.Core
         }
         #endregion
 
-        public LevelObj? GetMapData(string name) =>
-            MapData.TryGetValue(name, out var mapData) ? mapData : null;
+        public LevelObj? GetMapData(string name) => MapRepository.Load(name);
 
         public Sprite? GetSprite(string name) =>
             MapSprites.TryGetValue(name, out var sprite) ? sprite : null;

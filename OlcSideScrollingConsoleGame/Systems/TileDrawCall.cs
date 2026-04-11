@@ -2,12 +2,22 @@
 namespace OlcSideScrollingConsoleGame.Systems
 {
     /// <summary>
-    /// Representerar ett enskilt tile-ritningsanrop: var på skärmen
-    /// en tile ska ritas och vilken del av spritesheetet som används.
-    ///
-    /// Innehåller inga PixelEngine-typer — koordinaterna är rena heltal
-    /// och enkla att kontrollera i enhetstester.
+    /// Immutabel datastruktur för ett enskilt tile-ritningsanrop.
+    /// Anger var på skärmen och vilken del av spritesheetet som ska ritas.
     /// </summary>
+    /// <remarks>
+    /// MÖNSTER: Value Object (readonly record struct)
+    ///
+    /// MOTIVERING:
+    /// Separerar beräkning (vilka tiles, var) från ritning (DrawPartialSprite).
+    /// TileMapRenderer producerar en sekvens av TileDrawCall — anroparen ritar dem
+    /// via IRenderContext. Inga PixelEngine-typer; koordinaterna är rena heltal
+    /// enkla att kontrollera i enhetstester.
+    ///
+    /// ANVÄNDNING:
+    /// Returneras av ITileMapRenderer.GetDrawCalls() och konsumeras av states
+    /// som skickar varje anrop vidare till IRenderContext.DrawPartialSprite.
+    /// </remarks>
     public readonly record struct TileDrawCall
     {
         /// <summary>Pixelposition X på skärmen.</summary>

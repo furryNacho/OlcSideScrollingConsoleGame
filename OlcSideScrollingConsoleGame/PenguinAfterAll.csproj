@@ -124,6 +124,12 @@
     <Compile Include="Systems\SaveLoadSystem.cs" />
     <Compile Include="Systems\ISaveGameRepository.cs" />
     <Compile Include="Systems\SaveGameRepository.cs" />
+    <Compile Include="Systems\IMapRepository.cs" />
+    <Compile Include="Systems\MapRepository.cs" />
+    <Compile Include="Systems\IEnemyFactory.cs" />
+    <Compile Include="Systems\EnemyFactory.cs" />
+    <Compile Include="Systems\IItemFactory.cs" />
+    <Compile Include="Systems\ItemFactory.cs" />
     <Compile Include="Systems\IScriptSystem.cs" />
     <Compile Include="Systems\ScriptSystem.cs" />
     <Compile Include="Systems\ISettingsService.cs" />
@@ -134,6 +140,8 @@
     <Compile Include="Models\Items\DynamicItem.cs" />
     <Compile Include="Models\Items\Items.cs" />
     <Compile Include="Models\IMapData.cs" />
+    <Compile Include="Models\EnemyType.cs" />
+    <Compile Include="Models\ItemType.cs" />
     <Compile Include="Core\IAssets.cs" />
     <Compile Include="Core\IEventBus.cs" />
     <Compile Include="Core\EventBus.cs" />

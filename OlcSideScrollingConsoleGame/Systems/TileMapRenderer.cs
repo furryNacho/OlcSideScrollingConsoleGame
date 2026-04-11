@@ -6,15 +6,21 @@ using OlcSideScrollingConsoleGame.Models;
 namespace OlcSideScrollingConsoleGame.Systems
 {
     /// <summary>
-    /// Beräknar vilka tiles som ska ritas för en given kameravy.
-    ///
-    /// Loopen itererar över alla synliga tiles (plus en extra buffert-tile
-    /// i varje riktning för mjuk scrollning) och beräknar skärm- och
-    /// spritesheet-koordinater för varje tile.
-    ///
-    /// Inga PixelEngine-beroenden — returnerar rena <see cref="TileDrawCall"/>-värden
-    /// som anroparen skickar vidare till spelmotorns DrawPartialSprite.
+    /// Beräknar vilka tiles som är synliga och var de ska ritas för en given kameravy.
+    /// Returnerar rena TileDrawCall-värden utan PixelEngine-beroende.
     /// </summary>
+    /// <remarks>
+    /// MÖNSTER: System
+    ///
+    /// MOTIVERING:
+    /// Tile-ritlogiken låg i DisplayStage och var direkt kopplad till PixelEngine.
+    /// Extraheringen gör beräkningarna motorfria och enkla att testa (SRP, DIP).
+    /// yield return ger lazy evaluering — tiles beräknas bara när anroparen konsumerar dem.
+    ///
+    /// ANVÄNDNING:
+    /// Injiceras via ITileMapRenderer i GameServices. States itererar över GetDrawCalls()
+    /// och skickar varje TileDrawCall till IRenderContext.DrawPartialSprite.
+    /// </remarks>
     public class TileMapRenderer : ITileMapRenderer
     {
         /// <inheritdoc />

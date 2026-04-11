@@ -4,10 +4,22 @@ using OlcSideScrollingConsoleGame.Models;
 namespace OlcSideScrollingConsoleGame.Systems
 {
     /// <summary>
-    /// Hanterar tile-baserad kollisionsdetektering och positionsjustering (SRP).
-    /// Alla metoder är rena funktioner — de muterar inga objekt och har inga sidoeffekter.
-    /// Spelspecifik logik (fiende-AI, hjälte-state, ljud) hanteras av anroparen.
+    /// Tile-baserad kollisionsdetektering och positionsjustering.
+    /// Alla metoder är rena funktioner utan sidoeffekter — spellogiken hanteras av anroparen.
     /// </summary>
+    /// <remarks>
+    /// MÖNSTER: System (statisk beräkningsklass)
+    ///
+    /// MOTIVERING:
+    /// Kollisionslogiken var inbäddad i Program.cs med all annan spellogik. Extraheringen
+    /// till rena funktioner utan tillstånd gör det möjligt att testa varje scenario
+    /// (träff horisontellt, vertikalt, hörn) utan spelmotor eller hårdvara (SRP).
+    ///
+    /// ANVÄNDNING:
+    /// Anropas från GameplayState varje frame för hjälte och fiender.
+    /// Returnerar CollisionResult — anroparen ansvarar för att reagera på resultatet
+    /// (t.ex. nollställa hastighet, spela ljud, trigga fiende-AI).
+    /// </remarks>
     public static class CollisionSystem
     {
         /// <summary>

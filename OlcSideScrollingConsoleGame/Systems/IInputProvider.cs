@@ -3,13 +3,21 @@ namespace OlcSideScrollingConsoleGame.Systems
 {
     /// <summary>
     /// Abstraktion över spelets input-källor (tangentbord + gamepad).
-    /// Gör det möjligt att testa all logik som beror på input
-    /// utan åtkomst till riktig hårdvara eller PixelEngine.
-    ///
-    /// Dependency Inversion Principle: högnivåkod (PhysicsSystem,
-    /// menysystem m.m.) beror på detta interface – inte på
-    /// konkreta SlimDX- eller PixelEngine-klasser.
+    /// Exponerar semantiska spelåtgärder istället för råa knapptillstånd.
     /// </summary>
+    /// <remarks>
+    /// MÖNSTER: Adapter (interface-sida)
+    ///
+    /// MOTIVERING:
+    /// Högnivåkod (states, spellogik) beror på detta interface — inte på konkreta
+    /// SlimDX- eller PixelEngine-klasser. Det gör det möjligt att testa all
+    /// inputberoende logik utan hårdvara och möjliggör framtida byte av input-bibliotek
+    /// utan att röra spelkoden (DIP).
+    ///
+    /// ANVÄNDNING:
+    /// Implementeras av InputManager (produktion) och FakeInputProvider (tester).
+    /// Injiceras i GameServices och sprids till alla states som behöver input.
+    /// </remarks>
     public interface IInputProvider
     {
         // ─────────────────────────────────────────────

@@ -81,6 +81,7 @@ namespace OlcSideScrollingConsoleGame.States
                 _hasAccumulated = true;
                 context.Player!.vx = 0;
                 context.Player.vy  = 0;
+                context.Player.TurnedTo = Enum.PlayerOrientation.Right;
                 context.Player.ChangeStageKnockBackReset();
             }
 

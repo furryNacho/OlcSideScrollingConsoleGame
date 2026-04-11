@@ -2,12 +2,21 @@
 namespace OlcSideScrollingConsoleGame.Systems
 {
     /// <summary>
-    /// Resultatet av en kameraberäkning för en given frame.
-    ///
-    /// Innehåller alla värden som renderings- och spellogiken behöver:
-    /// tile-offsettar för världspositionering och sub-tile-offsettar
-    /// för mjuk scrollning, samt antal synliga tiles i vardera led.
+    /// Immutabel datastruktur med resultatet av en kameraberäkning för en frame.
+    /// Innehåller tile-offsettar, sub-tile-offsettar och antal synliga tiles.
     /// </summary>
+    /// <remarks>
+    /// MÖNSTER: Value Object (readonly record struct)
+    ///
+    /// MOTIVERING:
+    /// CameraView är ett rent dataobjekt utan beteende. Readonly record struct ger
+    /// värdesemantik och oföränderlighet — kameraberäkningen producerar ett nytt
+    /// värde varje frame utan sidoeffekter.
+    ///
+    /// ANVÄNDNING:
+    /// Returneras av ICameraSystem.Calculate() och konsumeras av states som behöver
+    /// veta vad som ska renderas och var. Skickas vidare till TileMapRenderer.
+    /// </remarks>
     public readonly record struct CameraView
     {
         /// <summary>Tile-koordinat för vänster kant av vyn (kan vara bråktal).</summary>

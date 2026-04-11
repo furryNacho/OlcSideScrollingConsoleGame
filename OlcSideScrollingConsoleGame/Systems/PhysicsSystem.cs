@@ -7,10 +7,20 @@ namespace OlcSideScrollingConsoleGame.Systems
 {
     /// <summary>
     /// Rena fysikberäkningar: gravitation, luftmotstånd och hastighetsbegränsning.
-    ///
     /// Alla metoder är tillståndslösa och muterar bara det DynamicGameObject som skickas in.
-    /// Separerat från Program.cs (SRP) och enkelt att enhetstesta utan hårdvara.
     /// </summary>
+    /// <remarks>
+    /// MÖNSTER: System (statisk hjälpklass)
+    ///
+    /// MOTIVERING:
+    /// Fysiklogiken låg tidigare inbäddad i Program.cs och var omöjlig att testa isolerat.
+    /// Extraheringen till en statisk klass utan tillstånd gör varje beräkning till en
+    /// ren in/ut-funktion som kan testas fristående från spelmotor och hårdvara (SRP).
+    ///
+    /// ANVÄNDNING:
+    /// Anropas från GameplayState varje frame för hjälte och fiender.
+    /// Tar alltid ett DynamicGameObject som muteras in-place — ingen instansiering krävs.
+    /// </remarks>
     public static class PhysicsSystem
     {
         // ─────────────────────────────────────────────────────────────

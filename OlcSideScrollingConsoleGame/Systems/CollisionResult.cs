@@ -2,9 +2,22 @@
 namespace OlcSideScrollingConsoleGame.Systems
 {
     /// <summary>
-    /// Resultatet av ett kollisionstest mot kartan för ett objekt.
+    /// Immutabel datastruktur med resultatet av ett kollisionstest mot kartan.
     /// Innehåller justerade positioner och flaggor för vilka sidor som träffades.
     /// </summary>
+    /// <remarks>
+    /// MÖNSTER: Value Object (readonly record struct)
+    ///
+    /// MOTIVERING:
+    /// CollisionResult är ett rent dataobjekt — CollisionSystem producerar ett nytt
+    /// värde per test utan sidoeffekter. Readonly record struct garanterar att
+    /// resultatet inte muteras av konsumenten.
+    ///
+    /// ANVÄNDNING:
+    /// Returneras av CollisionSystem.Move() och läses av GameplayState för att
+    /// avgöra om hjälten är på marken, träffar en vägg, osv. Skickas även till
+    /// fiendeklassernas OnWallCollision/OnStuckCheck.
+    /// </remarks>
     public readonly record struct CollisionResult
     {
         /// <summary>Justerad X-position efter horisontell kollision.</summary>

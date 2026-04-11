@@ -2,11 +2,19 @@
 namespace OlcSideScrollingConsoleGame.Systems
 {
     /// <summary>
-    /// Kontrakt för kamerasystemet.
-    ///
-    /// Separerar kameralogiken från spelmotorn och möjliggör
-    /// testning utan hårdvara eller PixelEngine-beroenden.
+    /// Kontrakt för kamerasystemet — beräknar scroll-offset och synliga tiles per frame.
     /// </summary>
+    /// <remarks>
+    /// MÖNSTER: System (interface för DIP)
+    ///
+    /// MOTIVERING:
+    /// Gör kameralogiken utbytbar och testbar. States beror på ICameraSystem, inte på
+    /// CameraSystem direkt, vilket möjliggör utbyte och fakad testning (DIP).
+    ///
+    /// ANVÄNDNING:
+    /// Implementeras av CameraSystem (produktion) och FakeCameraSystem (tester som
+    /// kräver förutsägbar kameravy). Injiceras i GameServices och sprids till states.
+    /// </remarks>
     public interface ICameraSystem
     {
         /// <summary>
