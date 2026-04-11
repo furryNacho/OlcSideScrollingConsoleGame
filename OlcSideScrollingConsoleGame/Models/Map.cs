@@ -4,7 +4,6 @@ using OlcSideScrollingConsoleGame.Core;
 using OlcSideScrollingConsoleGame.Models.Items;
 using OlcSideScrollingConsoleGame.Models.Objects;
 using OlcSideScrollingConsoleGame.Systems;
-using PixelEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +19,7 @@ namespace OlcSideScrollingConsoleGame.Models
         public int Width { get; set; }
         public int Height { get; set; }
         public string Name { get; set; }
-        public Sprite? Sprite { get; set; }
+        public string? SpritePath { get; set; }
         /// <summary>
         /// Plural for index
         /// </summary>
@@ -38,7 +37,7 @@ namespace OlcSideScrollingConsoleGame.Models
             Width = 0;
             Height = 0;
             Name = "";
-            Sprite = null;
+            SpritePath = null;
         }
 
         public virtual bool PopulateDynamics(List<DynamicGameObject> listDynamicObjs)
@@ -75,7 +74,7 @@ namespace OlcSideScrollingConsoleGame.Models
         public bool Create(CreateObj createObj)
         {
             Name = createObj.name;
-            Sprite = createObj.sprite;
+            SpritePath = createObj.spritePath;
             Height = createObj.levelObj.Height;
             Width = createObj.levelObj.Width;
             Indices = createObj.levelObj.TileIndex;
@@ -116,7 +115,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = assets.GetMapData("worldmap"),
-                sprite = assets.GetSprite("tilesheetwm"), // tilesheetwm //tilesheetone
+                spritePath = assets.GetSpritePath("tilesheetwm"), // tilesheetwm //tilesheetone
                 name = "worldmap",
             };
 
@@ -230,7 +229,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = assets.GetMapData("mapone"),
-                sprite = assets.GetSprite("tilesheetspring"),
+                spritePath = assets.GetSpritePath("tilesheetspring"),
                 name = "mapone",
             };
 
@@ -338,7 +337,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = assets.GetMapData("maptwo"),
-                sprite = assets.GetSprite("tilesheetspring"),
+                spritePath = assets.GetSpritePath("tilesheetspring"),
                 name = "maptwo",
             };
 
@@ -445,7 +444,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = assets.GetMapData("mapthree"),
-                sprite = assets.GetSprite("tilesheetsummer"),
+                spritePath = assets.GetSpritePath("tilesheetsummer"),
                 name = "mapthree",
             };
 
@@ -557,7 +556,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = assets.GetMapData("mapfour"),
-                sprite = assets.GetSprite("tilesheetsummer"),
+                spritePath = assets.GetSpritePath("tilesheetsummer"),
                 name = "mapfour",
             };
 
@@ -775,7 +774,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = assets.GetMapData("mapfive"),
-                sprite = assets.GetSprite("tilesheetfall"),
+                spritePath = assets.GetSpritePath("tilesheetfall"),
                 name = "mapfive",
             };
 
@@ -932,7 +931,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = assets.GetMapData("mapsix"),
-                sprite = assets.GetSprite("tilesheetfall"),
+                spritePath = assets.GetSpritePath("tilesheetfall"),
                 name = "mapsix",
             };
 
@@ -1101,7 +1100,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = assets.GetMapData("mapseven"),
-                sprite = assets.GetSprite("tilesheetwinter"),
+                spritePath = assets.GetSpritePath("tilesheetwinter"),
                 name = "mapseven",
             };
 
@@ -1604,7 +1603,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = assets.GetMapData("mapeight"),
-                sprite = assets.GetSprite("tilesheetwinter"),
+                spritePath = assets.GetSpritePath("tilesheetwinter"),
                 name = "mapeight",
             };
 
@@ -2085,7 +2084,7 @@ namespace OlcSideScrollingConsoleGame.Models
             this.CreateObj = new CreateObj()
             {
                 levelObj = assets.GetMapData("mapnine"),
-                sprite = assets.GetSprite("tilesheetwinter"),
+                spritePath = assets.GetSpritePath("tilesheetwinter"),
                 name = "mapnine",
             };
 

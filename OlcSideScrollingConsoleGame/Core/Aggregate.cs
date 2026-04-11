@@ -42,6 +42,7 @@ namespace OlcSideScrollingConsoleGame.Core
         /// <summary>Sätts i Load() — null! före dess (garanterat initierat via Load).</summary>
         public ReadWrite ReadWrite { get; set; } = null!;
         private Dictionary<string, Sprite> MapSprites { get; set; } = new Dictionary<string, Sprite>();
+        private Dictionary<string, string> MapSpritePaths { get; set; } = new Dictionary<string, string>();
         private Dictionary<string, Map> MapMaps { get; set; } = new Dictionary<string, Map>();
         private Dictionary<string, Item> MapItems { get; set; } = new Dictionary<string, Item>();
         private OlcSideScrollingConsoleGame.Systems.IMapRepository MapRepository { get; set; } = null!;
@@ -182,6 +183,7 @@ namespace OlcSideScrollingConsoleGame.Core
             {
                 var sprite = Sprite.Load(fullDirectory);
                 MapSprites.Add(FriendlyName, sprite);
+                MapSpritePaths.Add(FriendlyName, fullDirectory);
             }
             else
             {
@@ -305,6 +307,17 @@ namespace OlcSideScrollingConsoleGame.Core
 
         public LevelObj? GetMapData(string name) => MapRepository.Load(name);
 
+        /// <summary>
+        /// Returnerar den fullständiga filsökvägen till en laddad sprite.
+        /// Används av PixelEngineRenderContext.RegisterSprite för att ladda sprites motor-agnostiskt.
+        /// </summary>
+        public string? GetSpritePath(string name) =>
+            MapSpritePaths.TryGetValue(name, out var path) ? path : null;
+
+        /// <summary>
+        /// Hämtar en redan laddad PixelEngine.Sprite vid namn.
+        /// Används internt av Items.cs — anropas via Aggregate.Instance direkt.
+        /// </summary>
         public Sprite? GetSprite(string name) =>
             MapSprites.TryGetValue(name, out var sprite) ? sprite : null;
 

@@ -40,11 +40,12 @@ namespace OlcSideScrollingConsoleGame.Rendering
 
         /// <summary>
         /// Registrerar en sprite under ett motor-agnostiskt ID.
+        /// Laddar sprite-filen från disk — anroparen skickar bara en filsökväg.
         /// Anropas från Program.cs (Composition Root) under initialisering och
         /// vid kartbyte (för SpriteId.MapTileSheet).
         /// </summary>
-        public void RegisterSprite(SpriteId id, Sprite sprite)
-            => _sprites[id] = sprite;
+        public void RegisterSprite(SpriteId id, string filePath)
+            => _sprites[id] = Sprite.Load(filePath);
 
         /// <inheritdoc />
         public int ScreenWidth => _game.ScreenWidth;

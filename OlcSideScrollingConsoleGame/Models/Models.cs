@@ -1,5 +1,4 @@
-﻿using PixelEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +11,7 @@ namespace OlcSideScrollingConsoleGame.Models
     public class CreateObj
     {
         public string fileData { get; set; }
-        public Sprite sprite { get; set; }
+        public string spritePath { get; set; }
         public string name { get; set; }
         public string fileDataJsonPath { get; set; }
 

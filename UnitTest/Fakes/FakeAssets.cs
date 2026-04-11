@@ -10,7 +10,7 @@ namespace UnitTest.Fakes
     /// </summary>
     public class FakeAssets : IAssets
     {
-        public PixelEngine.Sprite GetSprite(string name) => null;
+        public string GetSpritePath(string name) => null;
         public Item GetItem(string name) => null;
         public LevelObj GetMapData(string name) => null;
     }

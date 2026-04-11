@@ -149,20 +149,20 @@ namespace OlcSideScrollingConsoleGame
             _dialog       = new Systems.DialogSystem();
 
             _renderContext = new Rendering.PixelEngineRenderContext(this);
-            _renderContext.RegisterSprite(Rendering.SpriteId.Font,              Core.Aggregate.Instance.GetSprite("font"));
-            _renderContext.RegisterSprite(Rendering.SpriteId.Items,             Core.Aggregate.Instance.GetSprite("items"));
-            _renderContext.RegisterSprite(Rendering.SpriteId.Hero,              Core.Aggregate.Instance.GetSprite("hero"));
-            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyPenguin,      Core.Aggregate.Instance.GetSprite("enemyone"));
-            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyWalrus,       Core.Aggregate.Instance.GetSprite("enemytwo"));
-            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyFrost,        Core.Aggregate.Instance.GetSprite("enemythree"));
-            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyIcicle,       Core.Aggregate.Instance.GetSprite("enemyzero"));
-            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyBoss,         Core.Aggregate.Instance.GetSprite("enemyboss"));
-            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyWind,         Core.Aggregate.Instance.GetSprite("enemywind"));
-            _renderContext.RegisterSprite(Rendering.SpriteId.WorldMapTileSheet,  Core.Aggregate.Instance.GetSprite("tilesheetwm"));
-            _renderContext.RegisterSprite(Rendering.SpriteId.SplashStart,        Core.Aggregate.Instance.GetSprite(Global.GlobalNamespace.SplashScreenRef.Start));
-            _renderContext.RegisterSprite(Rendering.SpriteId.SplashEnd,          Core.Aggregate.Instance.GetSprite(Global.GlobalNamespace.SplashScreenRef.End));
-            _renderContext.RegisterSprite(Rendering.SpriteId.EndArt,             Core.Aggregate.Instance.GetSprite("endart"));
-            _renderContext.RegisterSprite(Rendering.SpriteId.MapTileSheet,       CurrentMap.Sprite);
+            _renderContext.RegisterSprite(Rendering.SpriteId.Font,              Core.Aggregate.Instance.GetSpritePath("font"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.Items,             Core.Aggregate.Instance.GetSpritePath("items"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.Hero,              Core.Aggregate.Instance.GetSpritePath("hero"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyPenguin,      Core.Aggregate.Instance.GetSpritePath("enemyone"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyWalrus,       Core.Aggregate.Instance.GetSpritePath("enemytwo"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyFrost,        Core.Aggregate.Instance.GetSpritePath("enemythree"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyIcicle,       Core.Aggregate.Instance.GetSpritePath("enemyzero"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyBoss,         Core.Aggregate.Instance.GetSpritePath("enemyboss"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EnemyWind,         Core.Aggregate.Instance.GetSpritePath("enemywind"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.WorldMapTileSheet,  Core.Aggregate.Instance.GetSpritePath("tilesheetwm"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.SplashStart,        Core.Aggregate.Instance.GetSpritePath(Global.GlobalNamespace.SplashScreenRef.Start));
+            _renderContext.RegisterSprite(Rendering.SpriteId.SplashEnd,          Core.Aggregate.Instance.GetSpritePath(Global.GlobalNamespace.SplashScreenRef.End));
+            _renderContext.RegisterSprite(Rendering.SpriteId.EndArt,             Core.Aggregate.Instance.GetSpritePath("endart"));
+            _renderContext.RegisterSprite(Rendering.SpriteId.MapTileSheet,       CurrentMap.SpritePath);
 
             _stateManager = new States.GameStateManager();
             _services = new States.GameServices(
@@ -232,8 +232,8 @@ namespace OlcSideScrollingConsoleGame
             // Uppdatera MapTileSheet i renderContexten när kartan byts.
             // _renderContext kan vara null under det första ChangeMap-anropet i OnCreate
             // (innan _renderContext skapats) — i det fallet sker registreringen i OnCreate.
-            if (_renderContext != null && CurrentMap.Sprite != null)
-                _renderContext.RegisterSprite(Rendering.SpriteId.MapTileSheet, CurrentMap.Sprite);
+            if (_renderContext != null && CurrentMap.SpritePath != null)
+                _renderContext.RegisterSprite(Rendering.SpriteId.MapTileSheet, CurrentMap.SpritePath);
 
             hero.px = x;
             hero.py = y;
