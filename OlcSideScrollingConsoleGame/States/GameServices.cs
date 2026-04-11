@@ -20,7 +20,7 @@ namespace OlcSideScrollingConsoleGame.States
     ///
     /// ANVÄNDNING:
     /// Skapas en gång i Program.cs (Composition Root). Skickas till varje state
-    /// via konstruktorn. Callbacks (ChangeMap, Reset, Load, Save) pekar på metoder
+    /// via konstruktorn. Callbacks (ChangeMap, Reset) pekar på metoder
     /// i Program.cs och fångar dess privata fält via closure.
     /// </remarks>
     public class GameServices
@@ -55,6 +55,18 @@ namespace OlcSideScrollingConsoleGame.States
         /// <summary>Sprites, items och kartdata via Aggregates IAssets-implementation.</summary>
         public Core.IAssets Assets { get; }
 
+        /// <summary>Dialogrutor triggas av skriptsystemet och renderas av GameplayState.</summary>
+        public IDialogSystem Dialog { get; }
+
+        /// <summary>Quest-lista och map-populering för aktiva quests.</summary>
+        public IQuestSystem Quests { get; }
+
+        /// <summary>Spelarens itemlager — insamlade items.</summary>
+        public IItemSystem Items { get; }
+
+        /// <summary>Världskartans stage-ingångspunkter och spawn-positioner.</summary>
+        public IWorldMapSystem WorldMap { get; }
+
         /// <summary>
         /// Laddar och aktiverar en karta. Kallar Program.ChangeMap(name, x, y, hero)
         /// med spelarens nuvarande hero-objekt från GameContext.
@@ -67,11 +79,8 @@ namespace OlcSideScrollingConsoleGame.States
         /// </summary>
         public Action Reset { get; }
 
-        /// <summary>Laddar ett sparat spel från angiven slot (1–3).</summary>
-        public Action<int> Load { get; }
-
-        /// <summary>Sparar nuvarande spel till angiven slot (1–3).</summary>
-        public Action<int> Save { get; }
+        /// <summary>Laddar och sparar spel till/från namngivna sparslottar.</summary>
+        public ISaveLoadSystem SaveLoad { get; }
 
         /// <summary>Avslutar spelloopen. Kallar Program.Finish() via Aggregate.</summary>
         public Action ExitGame { get; }
@@ -108,10 +117,13 @@ namespace OlcSideScrollingConsoleGame.States
             IScriptSystem script,
             ISettingsService settings,
             Core.IAssets assets,
+            IDialogSystem dialog,
+            IQuestSystem quests,
+            IItemSystem items,
+            IWorldMapSystem worldMap,
+            ISaveLoadSystem saveLoad,
             Action<string, float, float> changeMap,
             Action reset,
-            Action<int> load,
-            Action<int> save,
             Action exitGame,
             Func<bool> checkAndClearSwitchedState,
             Action clearSwitchedState,
@@ -128,10 +140,13 @@ namespace OlcSideScrollingConsoleGame.States
             Script                   = script;
             Settings                 = settings;
             Assets                   = assets;
+            Dialog                   = dialog;
+            Quests                   = quests;
+            Items                    = items;
+            WorldMap                 = worldMap;
+            SaveLoad                 = saveLoad;
             ChangeMap                = changeMap;
             Reset                    = reset;
-            Load                     = load;
-            Save                     = save;
             ExitGame                 = exitGame;
             CheckAndClearSwitchedState = checkAndClearSwitchedState;
             ClearSwitchedState       = clearSwitchedState;

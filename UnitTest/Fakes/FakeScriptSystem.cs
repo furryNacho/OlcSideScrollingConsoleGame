@@ -10,7 +10,10 @@ namespace UnitTest.Fakes
     public class FakeScriptSystem : IScriptSystem
     {
         public int TickCount { get; private set; }
+        public int CompleteCommandCount { get; private set; }
 
         public void Tick(float elapsed) => TickCount++;
+
+        public void CompleteCurrentCommand() => CompleteCommandCount++;
     }
 }

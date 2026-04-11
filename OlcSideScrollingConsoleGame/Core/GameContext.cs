@@ -125,10 +125,5 @@ namespace OlcSideScrollingConsoleGame.Core
         /// </summary>
         public bool RightToAccessPodium { get; set; } = true;
 
-        /// <summary>
-        /// Dialograd köad av skriptsystemet (ShowDialog). Läses och nollställs av
-        /// DialogSystem när det extraheras (Fas 4b). Null = ingen aktiv dialog.
-        /// </summary>
-        public List<string>? PendingDialog { get; set; }
     }
 }

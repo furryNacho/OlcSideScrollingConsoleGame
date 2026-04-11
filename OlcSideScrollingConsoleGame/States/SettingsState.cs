@@ -206,9 +206,9 @@ namespace OlcSideScrollingConsoleGame.States
                 case Enum.MenuState.Load:
                     if (sel.SlotIsUsed)
                     {
-                        if (sel.OptionIsSlotOne)        _services.Load(1);
-                        else if (sel.OptionIsSlotTwo)   _services.Load(2);
-                        else if (sel.OptionIsSlotThree) _services.Load(3);
+                        if (sel.OptionIsSlotOne)        _services.SaveLoad.Load(1);
+                        else if (sel.OptionIsSlotTwo)   _services.SaveLoad.Load(2);
+                        else if (sel.OptionIsSlotThree) _services.SaveLoad.Load(3);
 
                         _services.Input.ButtonsHasGoneIdle = false;
                         _services.StateManager.Transition(new WorldMapState(_services), context);
@@ -216,9 +216,9 @@ namespace OlcSideScrollingConsoleGame.States
                     break;
 
                 case Enum.MenuState.Save:
-                    if (sel.OptionIsSlotOne)        _services.Save(1);
-                    else if (sel.OptionIsSlotTwo)   _services.Save(2);
-                    else if (sel.OptionIsSlotThree) _services.Save(3);
+                    if (sel.OptionIsSlotOne)        _services.SaveLoad.Save(1);
+                    else if (sel.OptionIsSlotTwo)   _services.SaveLoad.Save(2);
+                    else if (sel.OptionIsSlotThree) _services.SaveLoad.Save(3);
                     _services.Settings.Save();
                     break;
             }

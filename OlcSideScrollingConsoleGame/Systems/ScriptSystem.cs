@@ -24,5 +24,8 @@ namespace OlcSideScrollingConsoleGame.Systems
     {
         /// <inheritdoc/>
         public void Tick(float elapsed) => Aggregate.Instance.Script.ProcessCommands(elapsed);
+
+        /// <inheritdoc/>
+        public void CompleteCurrentCommand() => Aggregate.Instance.Script.CompletedCommand();
     }
 }

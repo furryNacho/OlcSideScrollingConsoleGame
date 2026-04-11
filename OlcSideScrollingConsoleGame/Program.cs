@@ -52,6 +52,11 @@ namespace OlcSideScrollingConsoleGame
         private ICameraSystem           _camera;
         private ITileMapRenderer        _tileRenderer;
         private Rendering.PixelEngineRenderContext _renderContext;
+        private Systems.IDialogSystem    _dialog;
+        private Systems.IQuestSystem     _questSystem;
+        private Systems.IItemSystem      _itemSystem;
+        private Systems.IWorldMapSystem  _worldMapSystem;
+        private Systems.ISaveLoadSystem  _saveLoadSystem;
 
         // ── Ny tillståndsmaskin (Fas 4b Steg 5) ──────────────────────────────
         private States.GameStateManager _stateManager;
@@ -129,6 +134,11 @@ namespace OlcSideScrollingConsoleGame
         {
             Core.Aggregate.Instance.Load(this);
 
+            _questSystem      = new Systems.QuestSystem(_context);
+            _itemSystem       = new Systems.ItemSystem(_context);
+            _worldMapSystem   = new Systems.WorldMapSystem();
+            _saveLoadSystem   = new Systems.SaveLoadSystem(_context, new Systems.SaveGameRepository(), () => Clock.HardReset());
+
             ActualTotalTime = new TimeSpan();
             Hero = new DynamicCreatureHero();
             ChangeMap("worldmap", 2, 3, Hero);
@@ -136,6 +146,7 @@ namespace OlcSideScrollingConsoleGame
             _input        = new InputManager(this);
             _camera       = new CameraSystem();
             _tileRenderer = new TileMapRenderer();
+            _dialog       = new Systems.DialogSystem();
 
             _renderContext = new Rendering.PixelEngineRenderContext(this);
             _renderContext.RegisterSprite(Rendering.SpriteId.Font,              Core.Aggregate.Instance.GetSprite("font"));
@@ -161,10 +172,13 @@ namespace OlcSideScrollingConsoleGame
                 new Systems.ScriptSystem(),
                 new Systems.SettingsService(),
                 Core.Aggregate.Instance,
+                _dialog,
+                _questSystem,
+                _itemSystem,
+                _worldMapSystem,
+                _saveLoadSystem,
                 (mapName, x, y) => ChangeMap(mapName, x, y),
                 Reset,
-                Load,
-                Save,
                 () => Core.Aggregate.Instance.ThisGame?.Finish(),
                 () => { bool v = Core.Aggregate.Instance.HasSwitchedState; Core.Aggregate.Instance.HasSwitchedState = false; return v; },
                 () => Core.Aggregate.Instance.HasSwitchedState = false,
@@ -184,7 +198,7 @@ namespace OlcSideScrollingConsoleGame
             _stateManager.Update(_context, elapsed);
         }
 
-        // ── Infrastrukturoperationer (injiceras i GameServices som delegates) ─
+        // ── Infrastrukturoperationer ──────────────────────────────────────────
 
         private void Reset()
         {
@@ -195,105 +209,6 @@ namespace OlcSideScrollingConsoleGame
             RightToAccessPodium = true;
             Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted = 0;
             EnergiIdLista = new List<int>();
-        }
-
-        private void Load(int slot)
-        {
-            if (slot == 3)
-            {
-                var copyObj = new SaveSlot()
-                {
-                    DateTime       = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.DateTime,
-                    Time           = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.Time,
-                    IsUsed         = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.IsUsed,
-                    HeroEnergi     = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.HeroEnergi,
-                    StageCompleted = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.StageCompleted,
-                    SpawnAtWorldMap = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.SpawnAtWorldMap,
-                    ShowEnd        = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.ShowEnd,
-                    EnergiCollected = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.EnergiCollected
-                };
-                ActualTotalTime = copyObj.Time;
-                Core.Aggregate.Instance.Settings.ActivePlayer = copyObj;
-                Hero.Health = copyObj.HeroEnergi;
-                EnergiIdLista = copyObj.EnergiCollected;
-            }
-            else if (slot == 2)
-            {
-                var copyObj = new SaveSlot()
-                {
-                    DateTime       = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.DateTime,
-                    Time           = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.Time,
-                    IsUsed         = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.IsUsed,
-                    HeroEnergi     = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.HeroEnergi,
-                    StageCompleted = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.StageCompleted,
-                    SpawnAtWorldMap = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.SpawnAtWorldMap,
-                    ShowEnd        = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.ShowEnd,
-                    EnergiCollected = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.EnergiCollected
-                };
-                ActualTotalTime = copyObj.Time;
-                Core.Aggregate.Instance.Settings.ActivePlayer = copyObj;
-                Hero.Health = copyObj.HeroEnergi;
-                EnergiIdLista = copyObj.EnergiCollected;
-            }
-            else
-            {
-                var copyObj = new SaveSlot()
-                {
-                    DateTime       = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.DateTime,
-                    Time           = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.Time,
-                    IsUsed         = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.IsUsed,
-                    HeroEnergi     = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.HeroEnergi,
-                    StageCompleted = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.StageCompleted,
-                    SpawnAtWorldMap = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.SpawnAtWorldMap,
-                    ShowEnd        = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.ShowEnd,
-                    EnergiCollected = Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.EnergiCollected
-                };
-                ActualTotalTime = copyObj.Time;
-                Core.Aggregate.Instance.Settings.ActivePlayer = copyObj;
-                Hero.Health = copyObj.HeroEnergi;
-                EnergiIdLista = copyObj.EnergiCollected;
-            }
-            Clock.HardReset();
-        }
-
-        private void Save(int slot)
-        {
-            var copyObj = new SaveSlot()
-            {
-                DateTime        = Core.Aggregate.Instance.Settings.ActivePlayer.DateTime,
-                Time            = Core.Aggregate.Instance.Settings.ActivePlayer.Time,
-                IsUsed          = Core.Aggregate.Instance.Settings.ActivePlayer.IsUsed,
-                HeroEnergi      = Core.Aggregate.Instance.Settings.ActivePlayer.HeroEnergi,
-                StageCompleted  = Core.Aggregate.Instance.Settings.ActivePlayer.StageCompleted,
-                SpawnAtWorldMap = Core.Aggregate.Instance.Settings.ActivePlayer.SpawnAtWorldMap,
-                ShowEnd         = Core.Aggregate.Instance.Settings.ActivePlayer.ShowEnd,
-                EnergiCollected = EnergiIdLista
-            };
-
-            if (slot == 3)
-            {
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree = copyObj;
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.HeroEnergi = Hero.Health;
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.Time       = GameTotalTime;
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.DateTime   = DateTime.Now;
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotThree.IsUsed     = true;
-            }
-            else if (slot == 2)
-            {
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo = copyObj;
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.HeroEnergi = Hero.Health;
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.Time       = GameTotalTime;
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.DateTime   = DateTime.Now;
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotTwo.IsUsed     = true;
-            }
-            else
-            {
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne = copyObj;
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.HeroEnergi = Hero.Health;
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.Time       = GameTotalTime;
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.DateTime   = DateTime.Now;
-                Core.Aggregate.Instance.Settings.SaveSlotsObjs.SlotOne.IsUsed     = true;
-            }
         }
 
         public void ChangeMap(string MapName, float x, float y)
@@ -324,34 +239,22 @@ namespace OlcSideScrollingConsoleGame
             hero.py = y;
 
             CurrentMap.PopulateDynamics(listDynamics);
-
-            foreach (var q in ListQuests)
-                q.PopulateDynamics(listDynamics, CurrentMap.Name);
+            _questSystem.PopulateForMap(listDynamics, CurrentMap.Name);
         }
 
-        public void AddQuest(Quest quest)
-        {
-            // Lägg till quest främst i listan — nyaste quest prioriteras
-            var updated = new List<Quest> { quest };
-            foreach (var q in ListQuests)
-                updated.Add(q);
-            ListQuests = updated;
-        }
+        public void AddQuest(Quest quest) => _questSystem.Add(quest);
 
         public bool GiveItem(Item item)
         {
-            ListItems.Add(item);
+            _itemSystem.Collect(item);
             return true;
         }
 
         /// <summary>
-        /// Anropas av skriptsystemet för att köa en dialogruta.
-        /// Dialog-rendering är ett framtida steg (DialogSystem/DialogState).
+        /// Anropas av skriptsystemet (CommandShowDialog) för att visa en dialogruta.
+        /// DialogSystem äger renderingen; GameplayState hanterar avfärdning och
+        /// frigör skriptkön via IScriptSystem.CompleteCurrentCommand().
         /// </summary>
-        public void ShowDialog(List<string> listLines)
-        {
-            // TODO: koppla till DialogSystem när det extraheras (Fas 4b)
-            _context.PendingDialog = listLines;
-        }
+        public void ShowDialog(List<string> listLines) => _dialog.Show(listLines);
     }
 }

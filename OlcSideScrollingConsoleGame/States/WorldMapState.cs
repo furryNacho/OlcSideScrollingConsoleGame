@@ -85,9 +85,8 @@ namespace OlcSideScrollingConsoleGame.States
             }
 
             // Spawn-position
-            float corrX = 3f, corrY = 8f;
             int spawn = _services.Settings.ActivePlayer.SpawnAtWorldMap;
-            if (spawn >= 1 && spawn <= 8) { corrX = 3 + (spawn - 1) * 3f; corrY = 8f; }
+            var (corrX, corrY) = _services.WorldMap.GetSpawnPosition(spawn);
 
             // Byt till världskartan om vi inte är där
             if (context.CurrentLevel?.Name != "worldmap")
@@ -177,25 +176,11 @@ namespace OlcSideScrollingConsoleGame.States
         // ── Banval ───────────────────────────────────────────────────────────────
         private bool TryEnterStage(int spawnSlot, GameContext context)
         {
-            string? mapName = null;
-            float mx = 2, my = 23;
-
-            switch (spawnSlot)
-            {
-                case 1: mapName = "mapone";   mx = 2; my = 23; break;
-                case 2: mapName = "maptwo";   mx = 2; my = 23; break;
-                case 3: mapName = "mapthree"; mx = 2; my = 20; break;
-                case 4: mapName = "mapfour";  mx = 2; my = 3;  break;
-                case 5: mapName = "mapfive";  mx = 2; my = 33; break;
-                case 6: mapName = "mapsix";   mx = 2; my = 22; break;
-                case 7: mapName = "mapseven"; mx = 3; my = 18; break;
-                case 8: mapName = "mapeight"; mx = 4; my = 41; break;
-            }
-
-            if (mapName == null) return false;
+            var entry = _services.WorldMap.GetStageEntry(spawnSlot);
+            if (entry == null) return false;
 
             _hasAccumulated = false;
-            _services.ChangeMap(mapName, mx, my);
+            _services.ChangeMap(entry.Value.MapName, entry.Value.X, entry.Value.Y);
             _services.Input.ButtonsHasGoneIdle = false;
             _services.StateManager.Transition(new GameplayState(_services), context);
             return true;

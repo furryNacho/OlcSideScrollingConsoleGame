@@ -23,5 +23,11 @@ namespace OlcSideScrollingConsoleGame.Systems
     {
         /// <summary>Tickar kommandokön ett steg. Anropas en gång per frame i varje state.</summary>
         void Tick(float elapsed);
+
+        /// <summary>
+        /// Markerar det pågående skriptkommandot som klart så att köen kan gå vidare.
+        /// Anropas av GameplayState när spelaren avfärdar en dialogruta.
+        /// </summary>
+        void CompleteCurrentCommand();
     }
 }

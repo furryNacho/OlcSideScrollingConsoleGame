@@ -118,8 +118,10 @@ namespace OlcSideScrollingConsoleGame.States
             _services.Input.Poll();
             _detHarBallatUrLog = false;
 
-            // Input
-            if (_services.Input.IsWindowFocused)
+            // Input — hoppas om dialog är aktiv; dialog-avfärdning hanteras separat
+            if (_services.Dialog.IsActive)
+                HandleDialogInput();
+            else if (_services.Input.IsWindowFocused)
                 HandleInput(context, elapsed);
 
             // Fysik + kollision per objekt
@@ -177,11 +179,29 @@ namespace OlcSideScrollingConsoleGame.States
             }
 
             HudRenderer.Draw(_rc, context);
+
+            if (_services.Dialog.IsActive)
+                _services.Dialog.Render(_rc);
         }
 
         public void Draw(IRenderContext renderContext) { }
 
         public void Exit(GameContext context) { }
+
+        // ── Dialog-input ─────────────────────────────────────────────────────────
+        /// <summary>
+        /// Avfärdar aktiv dialogruta vid confirm-tryck och kompletterar skriptkommandot.
+        /// Anropas i Update() när en dialog är aktiv, istället för HandleInput().
+        /// </summary>
+        private void HandleDialogInput()
+        {
+            if (_services.Input.IsConfirmPressed)
+            {
+                _services.Dialog.Dismiss();
+                _services.Script.CompleteCurrentCommand();
+                _services.Input.ButtonsHasGoneIdle = false;
+            }
+        }
 
         // ── Input ────────────────────────────────────────────────────────────────
         private void HandleInput(GameContext context, float elapsed)
